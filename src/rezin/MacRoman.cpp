@@ -114,7 +114,7 @@ class MacRomanEncoding : public Encoding {
         foreach (i, range(0x80)) {
             if (kMap[i] == code) {
                 if (kMap[i] == code) {
-                    out->append(1, 0x80 | kMap[i]);
+                    out->append(1, 0x80 | i);
                     return;
                 }
             }
