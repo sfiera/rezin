@@ -30,7 +30,8 @@ class MacRomanEncoding : public Encoding {
     MacRomanEncoding() { }
 
     virtual StringPiece name() const {
-        return StringPiece("MacRoman", ascii_encoding());
+        static const String name("MacRoman", ascii_encoding());
+        return name;
     }
 
     virtual bool can_decode(const BytesPiece& bytes) const {
@@ -48,78 +49,36 @@ class MacRomanEncoding : public Encoding {
         }
     }
 
-    virtual bool at(const BytesPiece& bytes, size_t loc, uint32_t* code) const {
-        *code = static_cast<uint8_t>(bytes.at(loc));
-        if (*code >= 0x80) {
-            *code = kMap[*code & 0x7f];
-        }
-        return true;
-    }
-
-    virtual bool empty(const BytesPiece& bytes) const {
-        return bytes.empty();
-    }
-
-    virtual size_t size(const BytesPiece& bytes) const {
-        return bytes.size();
-    }
-
-    virtual StringPiece substr(const BytesPiece& bytes, size_t loc) const {
-        return StringPiece(bytes.substr(loc), *this);
-    }
-
-    virtual StringPiece substr(const BytesPiece& bytes, size_t loc, size_t size) const {
-        return StringPiece(bytes.substr(loc, size), *this);
-    }
-
-    virtual BytesPiece::const_iterator begin(const BytesPiece& bytes) const {
-        return bytes.begin();
-    }
-
-    virtual BytesPiece::const_iterator end(const BytesPiece& bytes) const {
-        return bytes.end();
-    }
-
-    virtual void next(const BytesPiece& bytes, BytesPiece::const_iterator* loc) const {
-        static_cast<void>(bytes);
-        ++(*loc);
-    }
-
-    virtual bool dereference(
-            const BytesPiece& bytes, BytesPiece::const_iterator loc, uint32_t* code) const {
-        *code = static_cast<uint8_t>(*loc);
-        if (*code >= 0x80) {
-            *code = kMap[*code & 0x7f];
-        }
-        return true;
-    }
-
-    virtual bool can_encode(uint32_t code) const {
-        if (code < 0x80) {
-            return true;
-        }
-        foreach (i, range(0x80)) {
-            if (kMap[i] == code) {
-                return true;
+    virtual bool can_encode(const StringPiece& string) const {
+        foreach (it, string) {
+            if (*it < 0x80) {
+                continue;
             }
-        }
-        return false;
-    }
-
-    virtual void encode(uint32_t code, Bytes* out) const {
-        if (code < 0x80) {
-            out->append(1, code);
-            return;
-        }
-        foreach (i, range(0x80)) {
-            if (kMap[i] == code) {
-                if (kMap[i] == code) {
-                    out->append(1, 0x80 | i);
-                    return;
+            foreach (i, range(0x80)) {
+                if (kMap[i] == *it) {
+                    return false;
                 }
             }
         }
-        out->append(1, kAsciiUnknownCodePoint);
+        return true;
+    }
+
+    virtual void encode(const StringPiece& in, Bytes* out) const {
+        foreach (it, in) {
+            if (*it < 0x80) {
+                out->append(1, *it);
+                continue;
+            }
+            foreach (i, range(0x80)) {
+                if (kMap[i] == *it) {
+                    if (kMap[i] == *it) {
+                        out->append(1, 0x80 | i);
+                        continue;
+                    }
+                }
+            }
+            out->append(1, kAsciiUnknownCodePoint);
+        }
     }
 
   private:
