@@ -2,8 +2,8 @@
     'target_defaults': {
         'include_dirs': [
             'include',
-            '../libsfz/include',
-            '../librgos/include',
+            '<(DEPTH)/ext/libsfz/include',
+            '<(DEPTH)/ext/librgos/include',
         ],
         'xcode_settings': {
             'GCC_TREAT_WARNINGS_AS_ERRORS': 'YES',
@@ -19,6 +19,21 @@
     },
     'targets': [
         {
+            'target_name': 'check-deps',
+            'type': 'none',
+            'actions': [
+                {
+                    'action_name': 'check-deps',
+                    'inputs': [ ],
+                    'outputs': [ ],
+                    'action': [
+                        './scripts/check-deps.sh',
+                        '<(DEPTH)',
+                    ],
+                },
+            ],
+        },
+        {
             'target_name': 'librezin',
             'type': '<(library)',
             'sources': [
@@ -31,8 +46,9 @@
                 'src/rezin/StringList.cpp',
             ],
             'dependencies': [
-                '../libsfz/libsfz.gyp:libsfz',
-                '../librgos/librgos.gyp:librgos',
+                ':check-deps',
+                '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
+                '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
             ],
         },
     ],

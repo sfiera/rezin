@@ -1,0 +1,6 @@
+[submodule "ext/libsfz"]
+	path = ext/libsfz
+	url = git://git.sfiera.net/libsfz
+[submodule "ext/librgos"]
+	path = ext/librgos
+	url = git://git.sfiera.net/librgos
