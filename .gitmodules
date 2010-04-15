@@ -1,6 +1,12 @@
 [submodule "ext/libsfz"]
 	path = ext/libsfz
-	url = git://git.sfiera.net/libsfz
+	url = git://github.com/sfiera/libsfz.git
 [submodule "ext/librgos"]
 	path = ext/librgos
-	url = git://git.sfiera.net/librgos
+	url = git://github.com/sfiera/librgos.git
+[submodule "ext/googletest"]
+	path = ext/googletest
+	url = git://github.com/sfiera/googletest.git
+[submodule "ext/googlemock"]
+	path = ext/googlemock
+	url = git://github.com/sfiera/googlemock.git

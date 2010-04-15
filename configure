@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -e
+
+gyp --depth=. -Dlibrary=static_library
