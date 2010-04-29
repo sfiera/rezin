@@ -228,11 +228,10 @@ const Encoding& mac_roman_encoding() {
 void cr2nl(String* string) {
     String result;
     foreach (it, StringPiece(*string)) {
-        uint32_t code = *it;
-        if (code == '\r') {
+        if (*it == '\r') {
             result.append(1, '\n');
         } else {
-            result.append(1, code);
+            result.append(1, *it);
         }
     }
     result.swap(string);
