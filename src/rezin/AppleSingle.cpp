@@ -6,13 +6,13 @@
 #include "rezin/AppleSingle.hpp"
 
 #include <libkern/OSByteOrder.h>
-#include "sfz/BinaryReader.hpp"
 #include "sfz/Foreach.hpp"
 #include "sfz/Format.hpp"
 #include "sfz/Formatter.hpp"
 #include "sfz/Range.hpp"
+#include "sfz/ReadItem.hpp"
+#include "sfz/ReadSource.hpp"
 
-using sfz::BytesBinaryReader;
 using sfz::BytesPiece;
 using sfz::Exception;
 using sfz::FormatItem;
@@ -20,6 +20,7 @@ using sfz::StringPiece;;
 using sfz::ascii_encoding;
 using sfz::hex;
 using sfz::range;
+using sfz::read;
 
 namespace rezin {
 
@@ -50,9 +51,9 @@ enum AppleSingleVersion {
 
 AppleSingle::AppleSingle(const BytesPiece& data) {
     bool little_endian = false;
-    BytesBinaryReader magic_bin(data.substr(0, 4));
+    BytesPiece remainder;
     uint32_t magic;
-    magic_bin.read(&magic);
+    read(&remainder, &magic);
     switch (magic) {
       case APPLE_SINGLE_MAGIC:
       case APPLE_DOUBLE_MAGIC:
@@ -67,9 +68,8 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
         throw Exception("invalid magic number 0x{0}.", hex(magic, 8));
     }
 
-    BytesBinaryReader bin(data.substr(4));
     uint32_t version;
-    bin.read(&version);
+    read(&remainder, &version);
     if (little_endian) {
         version = OSSwapInt32(version);
     }
@@ -77,10 +77,10 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
     switch (version) {
       case APPLE_SINGLE_VERSION_2:
         {
-            bin.discard(16);
+            remainder.shift(16);
 
             uint16_t entry_count;
-            bin.read(&entry_count);
+            read(&remainder, &entry_count);
             if (little_endian) {
                 entry_count = OSSwapInt16(entry_count);
             }
@@ -89,9 +89,9 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
                 uint32_t id;
                 uint32_t offset;
                 uint32_t length;
-                bin.read(&id);
-                bin.read(&offset);
-                bin.read(&length);
+                read(&remainder, &id);
+                read(&remainder, &offset);
+                read(&remainder, &length);
 
                 if (little_endian) {
                     id = OSSwapInt32(id);

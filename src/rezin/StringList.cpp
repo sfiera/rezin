@@ -8,33 +8,36 @@
 #include <vector>
 #include "rezin/MacRoman.hpp"
 #include "rgos/Json.hpp"
-#include "sfz/BinaryReader.hpp"
 #include "sfz/Foreach.hpp"
 #include "sfz/Range.hpp"
+#include "sfz/ReadItem.hpp"
+#include "sfz/ReadSource.hpp"
 #include "sfz/SmartPtr.hpp"
 
 using rgos::Json;
 using sfz::Bytes;
-using sfz::BytesBinaryReader;
 using sfz::BytesPiece;
+using sfz::ReadItem;
+using sfz::ReadSource;
 using sfz::String;
 using sfz::range;
+using sfz::read;
 using sfz::scoped_ptr;
 using std::vector;
 
 namespace rezin {
 
 Json read_string_list(const BytesPiece& data) {
-    BytesBinaryReader bin(data);
+    BytesPiece in(data);
     uint16_t array_size;
-    bin.read(&array_size);
+    read(&in, &array_size);
 
     vector<Json> result;
     foreach (i, range(array_size)) {
         uint8_t data[256];
         uint8_t size;
-        bin.read(&size);
-        bin.read(data, size);
+        read(&in, &size);
+        read(&in, data, size);
         Bytes utf8;
         String string(BytesPiece(data, size), mac_roman_encoding());
         cr2nl(&string);

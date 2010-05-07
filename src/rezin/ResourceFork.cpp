@@ -8,23 +8,25 @@
 #include <stdexcept>
 #include "rezin/MacRoman.hpp"
 #include "rezin/ResourceType.hpp"
-#include "sfz/BinaryReader.hpp"
 #include "sfz/Foreach.hpp"
 #include "sfz/Format.hpp"
 #include "sfz/Formatter.hpp"
 #include "sfz/Range.hpp"
+#include "sfz/ReadItem.hpp"
+#include "sfz/ReadSource.hpp"
 #include "sfz/SmartPtr.hpp"
 
 using sfz::Bytes;
-using sfz::BytesBinaryReader;
 using sfz::BytesPiece;
 using sfz::Exception;
-using sfz::FormatItem;
+using sfz::ReadItem;
+using sfz::ReadSource;
 using sfz::StringKey;
 using sfz::StringPiece;
 using sfz::ascii_encoding;
 using sfz::quote;
 using sfz::range;
+using sfz::read;
 using sfz::scoped_ptr;
 using std::map;
 
@@ -32,28 +34,28 @@ namespace rezin {
 
 ResourceFork::ResourceFork(const BytesPiece& data) {
     // Resource header.
-    BytesBinaryReader header_bin(data.substr(0, 16));
+    BytesPiece header(data.substr(0, 16));
     uint32_t data_offset;
     uint32_t map_offset;
     uint32_t data_length;
     uint32_t map_length;
-    header_bin.read(&data_offset);
-    header_bin.read(&map_offset);
-    header_bin.read(&data_length);
-    header_bin.read(&map_length);
+    read(&header, &data_offset);
+    read(&header, &map_offset);
+    read(&header, &data_length);
+    read(&header, &map_length);
 
     BytesPiece map_data = data.substr(map_offset, map_length);
     BytesPiece data_data = data.substr(data_offset, data_length);
 
     // Map header.
-    BytesBinaryReader map_bin(map_data.substr(16, 14));
+    BytesPiece map(map_data.substr(16, 14));
     uint16_t type_offset;
     uint16_t name_offset;
     uint16_t type_count;
-    map_bin.discard(8);
-    map_bin.read(&type_offset);
-    map_bin.read(&name_offset);
-    map_bin.read(&type_count);
+    map.shift(8);
+    read(&map, &type_offset);
+    read(&map, &name_offset);
+    read(&map, &type_count);
     ++type_count;
 
     BytesPiece type_data = map_data.substr(type_offset);

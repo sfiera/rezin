@@ -8,19 +8,21 @@
 #include <stdexcept>
 #include "rezin/MacRoman.hpp"
 #include "rezin/ResourceEntry.hpp"
-#include "sfz/BinaryReader.hpp"
 #include "sfz/Foreach.hpp"
 #include "sfz/Format.hpp"
 #include "sfz/Range.hpp"
+#include "sfz/ReadItem.hpp"
+#include "sfz/ReadSource.hpp"
 #include "sfz/SmartPtr.hpp"
 
-using sfz::BytesBinaryReader;
 using sfz::BytesPiece;
 using sfz::Exception;
-using sfz::FormatItem;
+using sfz::ReadItem;
+using sfz::ReadSource;
 using sfz::StringPiece;
 using sfz::ascii_encoding;
 using sfz::range;
+using sfz::read;
 using sfz::scoped_ptr;
 using std::map;
 
@@ -54,11 +56,11 @@ ResourceType::ResourceType(
         const BytesPiece& type_data, int index, const BytesPiece& name_data,
         const BytesPiece& data_data) {
     _code.assign(type_data.substr(2 + index * 8, 4), mac_roman_encoding());
-    BytesBinaryReader bin(type_data.substr(6 + index * 8, 4));
+    BytesPiece type(type_data.substr(6 + index * 8, 4));
     uint16_t count;
     uint16_t offset;
-    bin.read(&count);
-    bin.read(&offset);
+    read(&type, &count);
+    read(&type, &offset);
     ++count;
 
     BytesPiece entry_data = type_data.substr(offset);

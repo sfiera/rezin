@@ -6,30 +6,34 @@
 #include "rezin/Sound.hpp"
 
 #include "rgos/JsonVisitor.hpp"
-#include "sfz/BinaryReader.hpp"
-#include "sfz/BinaryWriter.hpp"
 #include "sfz/Foreach.hpp"
 #include "sfz/Format.hpp"
 #include "sfz/Formatter.hpp"
 #include "sfz/Range.hpp"
+#include "sfz/ReadItem.hpp"
+#include "sfz/ReadSource.hpp"
 #include "sfz/SmartPtr.hpp"
+#include "sfz/WriteItem.hpp"
+#include "sfz/WriteTarget.hpp"
 
 using rgos::Json;
 using rgos::JsonDefaultVisitor;
-using sfz::BinaryReader;
-using sfz::BinaryWriter;
 using sfz::Bytes;
-using sfz::BytesBinaryReader;
-using sfz::BytesBinaryWriter;
 using sfz::BytesPiece;
 using sfz::Exception;
 using sfz::FormatItem;
+using sfz::ReadItem;
+using sfz::ReadSource;
 using sfz::StringKey;
 using sfz::StringPiece;
+using sfz::WriteItem;
+using sfz::WriteTarget;
 using sfz::ascii_encoding;
 using sfz::hex;
 using sfz::range;
+using sfz::read;
 using sfz::scoped_ptr;
+using sfz::write;
 using std::make_pair;
 using std::map;
 using std::vector;
@@ -40,22 +44,22 @@ namespace {
 
 // Read the header of a format 1 'snd ' resource.
 //
-// @param [in] bin      The BinaryReader to read from.
-void read_snd_format_1_header(BinaryReader* bin) {
+// @param [in] in       The ReadSource to read from.
+void read_snd_format_1_header(ReadSource in) {
     uint16_t synthesizer_count;
-    bin->read(&synthesizer_count);
+    read(in, &synthesizer_count);
     if (synthesizer_count != 1) {
         throw Exception("can only handle 1 synthesizer; {0} found", synthesizer_count);
     }
 
     uint16_t type;
-    bin->read(&type);
+    read(in, &type);
     if (type != 5) {
         throw Exception("can only handle sampledSynth; {0} found", type);
     }
 
     uint32_t options;
-    bin->read(&options);
+    read(in, &options);
     if ((options & 0x00F0) != options) {
         throw Exception("can only handle initMono and initStereo, not 0x{0}", hex(options));
     }
@@ -63,21 +67,21 @@ void read_snd_format_1_header(BinaryReader* bin) {
 
 // Read the header of a format 2 'snd ' resource.
 //
-// @param [in] bin      The BinaryReader to read from.
-void read_snd_format_2_header(BinaryReader* bin) {
-    bin->discard(2);
+// @param [in] in       The ReadSource to read from.
+void read_snd_format_2_header(ReadSource in) {
+    in.shift(2);
 }
 
 // Read an individual command from a 'snd ' resource.
 //
-// @param [in] bin      The BinaryReader to read from.
+// @param [in] in       The ReadSource to read from.
 // @param [out] command The sound command.
 // @param [out] param1  The first parameter to the sound command.
 // @param [out] param2  The second parameter to the sound command.
-void read_snd_command(BinaryReader* bin, uint16_t* command, uint16_t* param1, uint32_t* param2) {
-    bin->read(command);
-    bin->read(param1);
-    bin->read(param2);
+void read_snd_command(ReadSource in, uint16_t* command, uint16_t* param1, uint32_t* param2) {
+    read(in, command);
+    read(in, param1);
+    read(in, param2);
 }
 
 // Read the definition for a block of sampled sound data.
@@ -85,36 +89,36 @@ void read_snd_command(BinaryReader* bin, uint16_t* command, uint16_t* param1, ui
 // Much of the data from the table is discarded: loop_start; loop_end; encoding; and
 // base_frequency.  Hopefully this information is not important.
 //
-// @param [in] bin      The BinaryReader to read from.
+// @param [in] in       The ReadSource to read from.
 // @param [out] pointer Where to look for the block of sampled sound data.
 // @param [out] size    The size of the sampled sound data.
 // @param [out] rate    The sample rate of the sound in Hz, e.g. 44100, 22050, 11025.
-void read_snd_data_table(BinaryReader* bin, uint32_t* pointer, uint32_t* size, double* rate) {
+void read_snd_data_table(ReadSource in, uint32_t* pointer, uint32_t* size, double* rate) {
     uint32_t fixed_sample_rate;
     uint32_t loop_start;
     uint32_t loop_end;
     uint8_t encoding;
     uint8_t base_frequency;
 
-    bin->read(pointer);
-    bin->read(size);
-    bin->read(&fixed_sample_rate);
+    read(in, pointer);
+    read(in, size);
+    read(in, &fixed_sample_rate);
     *rate = fixed_sample_rate / 65536.0;
-    bin->read(&loop_start);
-    bin->read(&loop_end);
-    bin->read(&encoding);
-    bin->read(&base_frequency);
+    read(in, &loop_start);
+    read(in, &loop_end);
+    read(in, &encoding);
+    read(in, &base_frequency);
 }
 
 // Reads the samples for a sound into a JSON array.
 //
-// @param [in] bin      The BinaryReader to read from.
+// @param [in] in       The ReadSource to read from.
 // @param [in] sample_count The number of samples to read.
 // @param [out] samples The array to read the samples into.
-void read_snd_samples(BinaryReader* bin, int sample_count, vector<Json>* samples) {
+void read_snd_samples(ReadSource in, int sample_count, vector<Json>* samples) {
     foreach (i, range(sample_count)) {
         uint8_t sample;
-        bin->read(&sample);
+        read(in, &sample);
         samples->push_back(Json::number(sample));
     }
 }
@@ -123,20 +127,20 @@ void read_snd_samples(BinaryReader* bin, int sample_count, vector<Json>* samples
 
 Json read_snd(const BytesPiece& in) {
     map<StringKey, Json> result;
-    BytesBinaryReader bin(in);
+    BytesPiece remainder(in);
     uint16_t format;
-    bin.read(&format);
+    read(&remainder, &format);
     if (format == 1) {
-        read_snd_format_1_header(&bin);
+        read_snd_format_1_header(&remainder);
     } else if (format == 2) {
-        read_snd_format_2_header(&bin);
+        read_snd_format_2_header(&remainder);
     } else {
         throw Exception("unknown 'snd ' format '{0}'", format);
     }
     result.insert(make_pair(StringKey("format", ascii_encoding()), Json::number(format)));
 
     uint16_t command_count;
-    bin.read(&command_count);
+    read(&remainder, &command_count);
     if (command_count != 1) {
         throw Exception("can only handle 1 command; {0} found", command_count);
     }
@@ -144,7 +148,7 @@ Json read_snd(const BytesPiece& in) {
     uint16_t command;
     uint16_t zero;
     uint32_t offset;
-    read_snd_command(&bin, &command, &zero, &offset);
+    read_snd_command(&remainder, &command, &zero, &offset);
     if (command != 0x8051) {
         throw Exception("can only handle bufferCmd; 0x{0} found", hex(command, 4));
     }
@@ -152,18 +156,18 @@ Json read_snd(const BytesPiece& in) {
         throw Exception("param1 must be zero; {0} found", zero);
     }
 
-    BytesBinaryReader sound_bin(in.substr(offset));
+    BytesPiece sound(in.substr(offset));
     uint32_t pointer;
     uint32_t sample_count;
     double sample_rate;
-    read_snd_data_table(&sound_bin, &pointer, &sample_count, &sample_rate);
+    read_snd_data_table(&sound, &pointer, &sample_count, &sample_rate);
     result.insert(make_pair(StringKey("channels", ascii_encoding()), Json::number(1)));
     result.insert(make_pair(StringKey("sample_bits", ascii_encoding()), Json::number(8)));
     result.insert(make_pair(StringKey("sample_rate", ascii_encoding()), Json::number(sample_rate)));
 
     vector<Json> samples;
-    BytesBinaryReader sample_bin(in.substr(offset + 22 + pointer, sample_count));
-    read_snd_samples(&sample_bin, sample_count, &samples);
+    BytesPiece sample(in.substr(offset + 22 + pointer, sample_count));
+    read_snd_samples(&sample, sample_count, &samples);
     result.insert(make_pair(StringKey("samples", ascii_encoding()), Json::array(samples)));
     return Json::object(result);
 }
@@ -261,9 +265,9 @@ class SoundInfoVisitor : public JsonDefaultVisitor {
 // Not verified for special values (positive and negative zero and infinity, NaN) correctly,
 // because those aren't valid sample rates, and that's the reason this function was written.
 //
-// @param [out] bin     The BinaryWriter to write the value to.
+// @param [out] out     The WriteTarget to write the value to.
 // @param [in] d        A double-precision floating point value.
-void write_float80(BinaryWriter* bin, double d) {
+void write_float80(WriteTarget out, double d) {
     // Reinterpret `d` as uint64_t, since we will be manupulating bits.
     uint64_t sample_rate_bits = *reinterpret_cast<uint64_t*>(&d);
 
@@ -279,54 +283,52 @@ void write_float80(BinaryWriter* bin, double d) {
     //   * the sign, 1 bit.
     //   * the exponent, 15 bits with a bias of 16383.
     //   * the fraction, 64 bits, with no implicit '1' bit.
-    bin->write<uint16_t>((sign << 15) | ((exponent + 16383) & 0x7FFF));
-    bin->write<uint64_t>(fraction << 11);
+    write<uint16_t>(out, (sign << 15) | ((exponent + 16383) & 0x7FFF));
+    write<uint64_t>(out, fraction << 11);
 }
 
 // Write an IFF chunk.
 //
-// @param [out] bin     The BinaryWriter to write the chunk to.
+// @param [out] out     The WriteTarget to write the chunk to.
 // @param [in] name     A four-byte chunk name.
 // @param [in] data     The content of the chunk.
-void write_chunk(BinaryWriter* bin, const char* name, const BytesPiece& data) {
-    bin->write(name, 4);
-    bin->write<uint32_t>(data.size());
-    bin->write(data.data(), data.size());
+void write_chunk(WriteTarget out, const char* name, const BytesPiece& data) {
+    write(out, name, 4);
+    write<uint32_t>(out, data.size());
+    write(out, data.data(), data.size());
 }
 
 // Write an AIFF "COMM" chunk.
 //
 // The "COMM" (common) chunk specifies how to interpret samples from the "SSND" chunk.
 //
-// @param [out] bin     The BinaryWriter to write the chunk to.
+// @param [out] out     The WriteTarget to write the chunk to.
 // @param [in] info     Contains the information to write.
-void write_comm(BinaryWriter* bin, const SoundInfo& info) {
-    Bytes data;
-    BytesBinaryWriter comm(&data);
-    comm.write<int16_t>(info.channels);
-    comm.write<uint32_t>(info.samples.size());
-    comm.write<int16_t>(info.sample_bits);
+void write_comm(WriteTarget out, const SoundInfo& info) {
+    Bytes comm;
+    write<int16_t>(&comm, info.channels);
+    write<uint32_t>(&comm, info.samples.size());
+    write<int16_t>(&comm, info.sample_bits);
     write_float80(&comm, info.sample_rate);
 
-    write_chunk(bin, "COMM", data);
+    write_chunk(out, "COMM", comm);
 }
 
 // Write an AIFF "SSND" chunk.
 //
 // The "SSND" (sampled sound) chunk is an array of samples from the sound.
 //
-// @param [out] bin     The BinaryWriter to write the chunk to.
+// @param [out] out     The WriteTarget to write the chunk to.
 // @param [in] info     Contains the samples to write.
-void write_ssnd(BinaryWriter* bin, const SoundInfo& info) {
-    Bytes data;
-    BytesBinaryWriter ssnd(&data);
-    ssnd.write<uint32_t>(0);
-    ssnd.write<uint32_t>(0);
+void write_ssnd(WriteTarget out, const SoundInfo& info) {
+    Bytes ssnd;
+    write<uint32_t>(&ssnd, 0);
+    write<uint32_t>(&ssnd, 0);
     foreach (it, info.samples) {
-        ssnd.write<int8_t>(*it - 0x80);
+        write<int8_t>(&ssnd, *it - 0x80);
     }
 
-    write_chunk(bin, "SSND", data);
+    write_chunk(out, "SSND", ssnd);
 }
 
 // Write an AIFF file.
@@ -336,16 +338,15 @@ void write_ssnd(BinaryWriter* bin, const SoundInfo& info) {
 // IFF file, which consists of the identifier "AIFF", followed by the two chunks, "COMM" and
 // "SSND", which define the content of the sound.
 //
-// @param [out] bin     The BinaryWriter to write the sound data to.
+// @param [out] out     The WriteTarget to write the sound data to.
 // @param [in] info     Contains the sound to write.
-void write_form(BinaryWriter* bin, const SoundInfo& info) {
-    Bytes data;
-    BytesBinaryWriter form(&data);
-    form.write("AIFF", 4);
+void write_form(WriteTarget out, const SoundInfo& info) {
+    Bytes form;
+    write(&form, "AIFF", 4);
     write_comm(&form, info);
     write_ssnd(&form, info);
 
-    write_chunk(bin, "FORM", data);
+    write_chunk(out, "FORM", form);
 }
 
 }  // namespace
@@ -355,8 +356,7 @@ void write_aiff(const Json& sound, Bytes* out) {
     SoundInfoVisitor visitor(&info);
     sound.accept(&visitor);
 
-    BytesBinaryWriter bin(out);
-    write_form(&bin, info);
+    write_form(out, info);
 }
 
 }  // namespace rezin
