@@ -51,7 +51,7 @@ enum AppleSingleVersion {
 
 AppleSingle::AppleSingle(const BytesPiece& data) {
     bool little_endian = false;
-    BytesPiece remainder;
+    BytesPiece remainder(data);
     uint32_t magic;
     read(&remainder, &magic);
     switch (magic) {
