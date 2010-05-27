@@ -8,11 +8,7 @@
 
 #include <stdint.h>
 #include <map>
-#include "sfz/Bytes.hpp"
-#include "sfz/Macros.hpp"
-#include "sfz/Exception.hpp"
-
-namespace sfz { class FormatItem; }
+#include "sfz/sfz.hpp"
 
 namespace rezin {
 

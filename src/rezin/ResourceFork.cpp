@@ -6,24 +6,14 @@
 #include "rezin/ResourceFork.hpp"
 
 #include <stdexcept>
-#include "rezin/MacRoman.hpp"
 #include "rezin/ResourceType.hpp"
-#include "sfz/Foreach.hpp"
-#include "sfz/Format.hpp"
-#include "sfz/Formatter.hpp"
-#include "sfz/Range.hpp"
-#include "sfz/ReadItem.hpp"
-#include "sfz/ReadSource.hpp"
-#include "sfz/SmartPtr.hpp"
+#include "sfz/sfz.hpp"
 
-using sfz::Bytes;
 using sfz::BytesPiece;
 using sfz::Exception;
-using sfz::ReadItem;
-using sfz::ReadSource;
 using sfz::StringKey;
 using sfz::StringPiece;
-using sfz::ascii_encoding;
+using sfz::format;
 using sfz::quote;
 using sfz::range;
 using sfz::read;
@@ -65,7 +55,8 @@ ResourceFork::ResourceFork(const BytesPiece& data) {
         scoped_ptr<ResourceType> type(new ResourceType(type_data, i, name_data, data_data));
         StringKey key(type->code());
         if (_types.find(key) != _types.end()) {
-            throw Exception("duplicate resource type in resource fork {0}", quote(type->code()));
+            throw Exception(format(
+                        "duplicate resource type in resource fork {0}", quote(type->code())));
         }
         _types[key] = type.release();
     }
@@ -80,7 +71,7 @@ ResourceFork::~ResourceFork() {
 const ResourceType& ResourceFork::at(const StringPiece& code) const {
     map<StringKey, ResourceType*>::const_iterator it = _types.find(code);
     if (it == _types.end()) {
-        throw Exception("no such resource type '{0}'", code);
+        throw Exception(format("no such resource type '{0}'", code));
     }
     return *it->second;
 }

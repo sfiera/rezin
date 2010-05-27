@@ -5,34 +5,22 @@
 
 #include "rezin/Sound.hpp"
 
-#include "rgos/JsonVisitor.hpp"
-#include "sfz/Foreach.hpp"
-#include "sfz/Format.hpp"
-#include "sfz/Formatter.hpp"
-#include "sfz/Range.hpp"
-#include "sfz/ReadItem.hpp"
-#include "sfz/ReadSource.hpp"
-#include "sfz/SmartPtr.hpp"
-#include "sfz/WriteItem.hpp"
-#include "sfz/WriteTarget.hpp"
+#include "rgos/rgos.hpp"
+#include "sfz/sfz.hpp"
 
 using rgos::Json;
 using rgos::JsonDefaultVisitor;
 using sfz::Bytes;
 using sfz::BytesPiece;
 using sfz::Exception;
-using sfz::FormatItem;
-using sfz::ReadItem;
 using sfz::ReadSource;
 using sfz::StringKey;
 using sfz::StringPiece;
-using sfz::WriteItem;
 using sfz::WriteTarget;
-using sfz::ascii_encoding;
+using sfz::format;
 using sfz::hex;
 using sfz::range;
 using sfz::read;
-using sfz::scoped_ptr;
 using sfz::write;
 using std::make_pair;
 using std::map;
@@ -49,19 +37,19 @@ void read_snd_format_1_header(ReadSource in) {
     uint16_t synthesizer_count;
     read(in, &synthesizer_count);
     if (synthesizer_count != 1) {
-        throw Exception("can only handle 1 synthesizer; {0} found", synthesizer_count);
+        throw Exception(format("can only handle 1 synthesizer; {0} found", synthesizer_count));
     }
 
     uint16_t type;
     read(in, &type);
     if (type != 5) {
-        throw Exception("can only handle sampledSynth; {0} found", type);
+        throw Exception(format("can only handle sampledSynth; {0} found", type));
     }
 
     uint32_t options;
     read(in, &options);
     if ((options & 0x00F0) != options) {
-        throw Exception("can only handle initMono and initStereo, not 0x{0}", hex(options));
+        throw Exception(format("can only handle initMono and initStereo, not 0x{0}", hex(options)));
     }
 }
 
@@ -128,21 +116,21 @@ void read_snd_samples(ReadSource in, int sample_count, vector<Json>* samples) {
 Json read_snd(const BytesPiece& in) {
     map<StringKey, Json> result;
     BytesPiece remainder(in);
-    uint16_t format;
-    read(&remainder, &format);
-    if (format == 1) {
+    uint16_t fmt;
+    read(&remainder, &fmt);
+    if (fmt == 1) {
         read_snd_format_1_header(&remainder);
-    } else if (format == 2) {
+    } else if (fmt == 2) {
         read_snd_format_2_header(&remainder);
     } else {
-        throw Exception("unknown 'snd ' format '{0}'", format);
+        throw Exception(format("unknown 'snd ' format '{0}'", fmt));
     }
-    result.insert(make_pair(StringKey("format", ascii_encoding()), Json::number(format)));
+    result.insert(make_pair("format", Json::number(fmt)));
 
     uint16_t command_count;
     read(&remainder, &command_count);
     if (command_count != 1) {
-        throw Exception("can only handle 1 command; {0} found", command_count);
+        throw Exception(format("can only handle 1 command; {0} found", command_count));
     }
 
     uint16_t command;
@@ -150,10 +138,10 @@ Json read_snd(const BytesPiece& in) {
     uint32_t offset;
     read_snd_command(&remainder, &command, &zero, &offset);
     if (command != 0x8051) {
-        throw Exception("can only handle bufferCmd; 0x{0} found", hex(command, 4));
+        throw Exception(format("can only handle bufferCmd; 0x{0} found", hex(command, 4)));
     }
     if (zero != 0) {
-        throw Exception("param1 must be zero; {0} found", zero);
+        throw Exception(format("param1 must be zero; {0} found", zero));
     }
 
     BytesPiece sound(in.substr(offset));
@@ -161,14 +149,14 @@ Json read_snd(const BytesPiece& in) {
     uint32_t sample_count;
     double sample_rate;
     read_snd_data_table(&sound, &pointer, &sample_count, &sample_rate);
-    result.insert(make_pair(StringKey("channels", ascii_encoding()), Json::number(1)));
-    result.insert(make_pair(StringKey("sample_bits", ascii_encoding()), Json::number(8)));
-    result.insert(make_pair(StringKey("sample_rate", ascii_encoding()), Json::number(sample_rate)));
+    result.insert(make_pair("channels", Json::number(1)));
+    result.insert(make_pair("sample_bits", Json::number(8)));
+    result.insert(make_pair("sample_rate", Json::number(sample_rate)));
 
     vector<Json> samples;
     BytesPiece sample(in.substr(offset + 22 + pointer, sample_count));
     read_snd_samples(&sample, sample_count, &samples);
-    result.insert(make_pair(StringKey("samples", ascii_encoding()), Json::array(samples)));
+    result.insert(make_pair("samples", Json::array(samples)));
     return Json::object(result);
 }
 
@@ -187,7 +175,7 @@ class GetNumberVisitor : public JsonDefaultVisitor {
 
   private:
     virtual void visit_default(const char* type) {
-        throw Exception("need number, found {0}", type);
+        throw Exception(format("need number, found {0}", type));
     }
 
     T* _out;
@@ -211,7 +199,7 @@ class GetSamplesVisitor : public JsonDefaultVisitor {
 
   public:
     virtual void visit_default(const char* type) {
-        throw Exception("need array, found {0}", type);
+        throw Exception(format("need array, found {0}", type));
     }
 
     vector<uint8_t>* _out;
@@ -238,23 +226,24 @@ class SoundInfoVisitor : public JsonDefaultVisitor {
         GetNumberVisitor<int> get_sample_bits(&_out->sample_bits);
         GetNumberVisitor<double> get_sample_rate(&_out->sample_rate);
         GetSamplesVisitor get_samples(&_out->samples);
-        checked_get(value, StringKey("channels", ascii_encoding())).accept(&get_channels);
-        checked_get(value, StringKey("sample_bits", ascii_encoding())).accept(&get_sample_bits);
-        checked_get(value, StringKey("sample_rate", ascii_encoding())).accept(&get_sample_rate);
-        checked_get(value, StringKey("samples", ascii_encoding())).accept(&get_samples);
+        checked_get(value, "channels").accept(&get_channels);
+        checked_get(value, "sample_bits").accept(&get_sample_bits);
+        checked_get(value, "sample_rate").accept(&get_sample_rate);
+        checked_get(value, "samples").accept(&get_samples);
     }
 
   private:
-    const Json& checked_get(const map<StringKey, Json>& value, const StringKey& key) {
-        map<StringKey, Json>::const_iterator it = value.find(key);
+    const Json& checked_get(const map<StringKey, Json>& value, const char* key) {
+        StringKey string_key(key);
+        map<StringKey, Json>::const_iterator it = value.find(string_key);
         if (it == value.end()) {
-            throw Exception("missing key '{0}'", key);
+            throw Exception(format("missing key '{0}'", key));
         }
         return it->second;
     }
 
     virtual void visit_default(const char* type) {
-        throw Exception("need object, found {0}", type);
+        throw Exception(format("need object, found {0}", type));
     }
 
     SoundInfo* _out;

@@ -8,10 +8,7 @@
 
 #include <map>
 #include <stdint.h>
-#include "sfz/Bytes.hpp"
-#include "sfz/Exception.hpp"
-#include "sfz/Macros.hpp"
-#include "sfz/String.hpp"
+#include "sfz/sfz.hpp"
 
 namespace rezin {
 

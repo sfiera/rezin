@@ -6,25 +6,18 @@
 #include "rezin/ResourceType.hpp"
 
 #include <stdexcept>
-#include "rezin/MacRoman.hpp"
 #include "rezin/ResourceEntry.hpp"
-#include "sfz/Foreach.hpp"
-#include "sfz/Format.hpp"
-#include "sfz/Range.hpp"
-#include "sfz/ReadItem.hpp"
-#include "sfz/ReadSource.hpp"
-#include "sfz/SmartPtr.hpp"
+#include "sfz/sfz.hpp"
 
 using sfz::BytesPiece;
 using sfz::Exception;
-using sfz::ReadItem;
-using sfz::ReadSource;
-using sfz::StringPiece;
-using sfz::ascii_encoding;
+using sfz::format;
 using sfz::range;
 using sfz::read;
 using sfz::scoped_ptr;
 using std::map;
+
+namespace macroman = sfz::macroman;
 
 namespace rezin {
 
@@ -39,7 +32,7 @@ const sfz::String& ResourceType::code() const { return _code; }
 const ResourceEntry& ResourceType::at(int16_t i) const {
     map<int16_t, ResourceEntry*>::const_iterator it = _entries.find(i);
     if (it == _entries.end()) {
-        throw Exception("no such resource entry '{0}' {1}", _code, i);
+        throw Exception(format("no such resource entry '{0}' {1}", _code, i));
     }
     return *it->second;
 }
@@ -55,7 +48,7 @@ ResourceType::const_iterator ResourceType::end() const {
 ResourceType::ResourceType(
         const BytesPiece& type_data, int index, const BytesPiece& name_data,
         const BytesPiece& data_data) {
-    _code.assign(type_data.substr(2 + index * 8, 4), mac_roman_encoding());
+    _code.assign(macroman::decode(type_data.substr(2 + index * 8, 4)));
     BytesPiece type(type_data.substr(6 + index * 8, 4));
     uint16_t count;
     uint16_t offset;

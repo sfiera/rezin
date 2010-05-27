@@ -7,10 +7,7 @@
 #define REZIN_RESOURCE_FORK_HPP_
 
 #include <map>
-#include "sfz/Bytes.hpp"
-#include "sfz/Exception.hpp"
-#include "sfz/Macros.hpp"
-#include "sfz/String.hpp"
+#include "sfz/sfz.hpp"
 
 namespace rezin {
 

@@ -6,8 +6,8 @@
 #ifndef REZIN_STRING_LIST_HPP_
 #define REZIN_STRING_LIST_HPP_
 
-#include "rgos/Json.hpp"
-#include "sfz/Bytes.hpp"
+#include "rgos/rgos.hpp"
+#include "sfz/sfz.hpp"
 
 namespace rezin {
 

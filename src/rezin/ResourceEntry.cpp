@@ -6,13 +6,14 @@
 #include "rezin/ResourceEntry.hpp"
 
 #include <stdexcept>
-#include "rezin/MacRoman.hpp"
-#include "sfz/ReadItem.hpp"
-#include "sfz/ReadSource.hpp"
+#include "rezin/Cr2nl.hpp"
+#include "sfz/sfz.hpp"
 
 using sfz::BytesPiece;
 using sfz::String;
 using sfz::read;
+
+namespace macroman = sfz::macroman;
 
 namespace rezin {
 
@@ -42,7 +43,7 @@ ResourceEntry::ResourceEntry(
 
     if (name_offset != (uint16_t)-1) {
         uint8_t name_size = name_data.at(name_offset);
-        _name.assign(name_data.substr(name_offset + 1, name_size), mac_roman_encoding());
+        _name.assign(macroman::decode(name_data.substr(name_offset + 1, name_size)));
         cr2nl(&_name);
     }
 

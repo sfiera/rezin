@@ -38,7 +38,7 @@
             'type': '<(library)',
             'sources': [
                 'src/rezin/AppleSingle.cpp',
-                'src/rezin/MacRoman.cpp',
+                'src/rezin/Cr2nl.cpp',
                 'src/rezin/ResourceEntry.cpp',
                 'src/rezin/ResourceFork.cpp',
                 'src/rezin/ResourceType.cpp',

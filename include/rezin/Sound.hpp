@@ -9,12 +9,8 @@
 #include <exception>
 #include <stdint.h>
 #include <stdlib.h>
-#include "rgos/Json.hpp"
-#include "sfz/Bytes.hpp"
-#include "sfz/Macros.hpp"
-#include "sfz/Exception.hpp"
-
-namespace sfz { class FormatItem; }
+#include "rgos/rgos.hpp"
+#include "sfz/sfz.hpp"
 
 namespace rezin {
 

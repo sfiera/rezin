@@ -6,18 +6,11 @@
 #include "rezin/AppleSingle.hpp"
 
 #include <libkern/OSByteOrder.h>
-#include "sfz/Foreach.hpp"
-#include "sfz/Format.hpp"
-#include "sfz/Formatter.hpp"
-#include "sfz/Range.hpp"
-#include "sfz/ReadItem.hpp"
-#include "sfz/ReadSource.hpp"
+#include "sfz/sfz.hpp"
 
 using sfz::BytesPiece;
 using sfz::Exception;
-using sfz::FormatItem;
-using sfz::StringPiece;;
-using sfz::ascii_encoding;
+using sfz::format;
 using sfz::hex;
 using sfz::range;
 using sfz::read;
@@ -65,7 +58,7 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
         break;
 
       default:
-        throw Exception("invalid magic number 0x{0}.", hex(magic, 8));
+        throw Exception(format("invalid magic number 0x{0}.", hex(magic, 8)));
     }
 
     uint32_t version;
@@ -105,14 +98,14 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
         break;
 
       default:
-        throw Exception("unknown version {0}.", version / 65536.0);
+        throw Exception(format("unknown version {0}.", version / 65536.0));
     }
 }
 
 const BytesPiece& AppleSingle::at(uint32_t id) {
     std::map<uint32_t, BytesPiece>::const_iterator it = _entries.find(id);
     if (it == _entries.end()) {
-        throw Exception("no such id '{0}'", id);
+        throw Exception(format("no such id '{0}'", id));
     }
     return it->second;
 }

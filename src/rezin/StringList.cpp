@@ -6,24 +6,19 @@
 #include "rezin/StringList.hpp"
 
 #include <vector>
-#include "rezin/MacRoman.hpp"
-#include "rgos/Json.hpp"
-#include "sfz/Foreach.hpp"
-#include "sfz/Range.hpp"
-#include "sfz/ReadItem.hpp"
-#include "sfz/ReadSource.hpp"
-#include "sfz/SmartPtr.hpp"
+#include "rezin/Cr2nl.hpp"
+#include "rgos/rgos.hpp"
+#include "sfz/sfz.hpp"
 
 using rgos::Json;
 using sfz::Bytes;
 using sfz::BytesPiece;
-using sfz::ReadItem;
-using sfz::ReadSource;
 using sfz::String;
 using sfz::range;
 using sfz::read;
-using sfz::scoped_ptr;
 using std::vector;
+
+namespace macroman = sfz::macroman;
 
 namespace rezin {
 
@@ -34,12 +29,12 @@ Json read_string_list(const BytesPiece& data) {
 
     vector<Json> result;
     foreach (i, range(array_size)) {
-        uint8_t data[256];
+        uint8_t data[255];
         uint8_t size;
         read(&in, &size);
         read(&in, data, size);
         Bytes utf8;
-        String string(BytesPiece(data, size), mac_roman_encoding());
+        String string(macroman::decode(BytesPiece(data, size)));
         cr2nl(&string);
         result.push_back(Json::string(string));
     }
