@@ -1,0 +1,119 @@
+.\" generated with Ronn/v0.5
+.\" http://github.com/rtomayko/ronn/
+.
+.TH "REZIN" "1" "April 2010" "" ""
+.
+.SH "NAME"
+\fBrezin\fR \-\- examine the resource fork of legacy files
+.
+.SH "SYNOPSIS"
+\fBrezin\fR [\fIoptions\fR] \fIfile\fR ls [\fItype\fR [\fIid\fR]]
+.
+.P
+\fBrezin\fR [\fIoptions\fR] \fIfile\fR cat \fItype\fR \fIid\fR
+.
+.P
+\fBrezin\fR [\fIoptions\fR] \fIfile\fR convert \fItype\fR \fIid\fR
+.
+.SH "DESCRIPTION"
+Rezin provides a set of commands allowing one to examine and extract data from the resource fork of
+legacy MacOS files.  It is capable of fetching the resource fork from a number of different
+sources, including some which are functional even on systems which do not themselves support the
+resource fork (see "Sources" below)
+.
+.P
+UTF\-8 encoding is used throughout the public interfaces of rezin.  Resource type codes will always
+be composed of four unicode characters, but as a consequence of UTF\-8 encoding, may not always be
+four bytes.  Additionally, carriage returns will be converted to newlines in cases where text data
+is expected.
+.
+.P
+The commands are as follows:
+.
+.TP
+\fBls\fR
+For each type in the resource fork of \fIfile\fR, print the code of that type to standard output,
+one per line.
+.
+.TP
+\fBls\fR \fItype\fR
+For each resource of type \fItype\fR in the resource fork of \fIfile\fR, print the ID and name
+of that resource to standard output, one per line.  The ID and name will be separated by a
+single tab character.
+.
+.TP
+\fBls\fR \fItype\fR \fIid\fR
+If there is a resource with type \fItype\fR and ID \fIid\fR in \fIfile\fR, print the ID and name of that
+resource to standard output, separated by a single tab character.
+.
+.TP
+\fBcat\fR \fItype\fR \fIid\fR
+Print the resource with type \fItype\fR and ID \fIid\fR to standard output.
+.
+.TP
+\fBconvert\fR \fItype\fR \fIid\fR
+If \fItype\fR is a known resource type (see "FORMATS" below), convert the resource with type \fItype\fR
+and ID \fIid\fR to a suitable output format, then print it to standard output.
+.
+.IP
+If \fItype\fR is not a known format, then print a warning to standard error, and dump the resource
+in raw form to standard output.
+.
+.SH "OPTIONS"
+.
+.SS "Sources"
+These options specify which resource fork to examine.  Exactly one of these options must be
+provided with each invocation of rezin.
+.
+.TP
+\fB\-a\fR \fIfile\fR | \fB\-\-apple\-single\fR=\fIfile\fR
+Read from the AppleSingle\-encoded file \fIfile\fR.  Both big\- and little\-endian AppleSingle files
+are supported.  Since rezin is concerned only with the resource fork, it will also accept the
+portion of a AppleDouble\-encoded file which contains the resource fork.
+.
+.TP
+\fB\-r\fR \fIfile\fR | \fB\-\-resource\-fork\fR=\fIfile\fR
+Read from the flat file \fIfile\fR.  On systems which support the resource fork natively, it is
+possible to read from a file's resource fork by appending "/rsrc" to the path of that file, as
+if it were a directory.
+.
+.TP
+\fB\-z\fR \fIarchive\fR,\fIfile\fR | \fB\-\-zip\-archive\fR=\fIarchive\fR,\fIfile\fR
+Read the resource fork of the file \fIfile\fR within the zip archive \fIarchive\fR.  This works even on
+systems which do not themselves support the resource fork.
+.
+.SH "FORMATS"
+The following resource types are supported by rezin:
+.
+.TP
+\fB'snd '\fR
+Sound data, stored in a MacOS\-specific format.  When using the 'convert' command, 'snd ' data
+will be converted to AIFF format.
+.
+.TP
+\fB'STR#'\fR
+Arrays of strings, stored in MacRoman encoding.  Each resource can store up to 65536 strings,
+with each string being up to 255 characters.  When using the /p>convert' command, 'STR#' data
+will be converted to a JSON array of strings.
+.
+.TP
+\fB'TEXT'\fR
+Text data, stored in MacRoman encoding.  When using the 'convert' command, /p>TEXT' data will be
+output as text.
+.
+.SH "BUGS"
+Rezin currently does not handle many different resource types.  In addition, it only supports
+monophonic 'snd ' data encoded using 8\-bit samples.
+.
+.SH "SEE ALSO"
+http://developer.apple.com/documentation/mac/MoreToolbox/MoreToolbox\-99.html
+.
+.SH "AUTHORS"
+Chris Pickel \fIsfiera@gmail.com\fR
+.
+.SH "COPYING"
+Copyright (c) 2009 Chris Pickel \fIsfiera@gmail.com\fR.
+.
+.P
+This file is part of rezin, a free software project.  You can redistribute it and/or modify it
+under the terms of the MIT License.

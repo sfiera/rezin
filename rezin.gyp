@@ -4,6 +4,7 @@
             'include',
             '<(DEPTH)/ext/libsfz/include',
             '<(DEPTH)/ext/librgos/include',
+            '<(DEPTH)/ext/libzipxx/include',
         ],
         'xcode_settings': {
             'GCC_TREAT_WARNINGS_AS_ERRORS': 'YES',
@@ -49,6 +50,20 @@
                 ':check-deps',
                 '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
                 '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
+            ],
+        },
+        {
+            'target_name': 'rezin',
+            'type': 'executable',
+            'sources': [
+                'src/rezin.cpp',
+            ],
+            'dependencies': [
+                ':check-deps',
+                ':librezin',
+                '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
+                '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
+                '<(DEPTH)/ext/libzipxx/libzipxx.gyp:libzipxx',
             ],
         },
     ],
