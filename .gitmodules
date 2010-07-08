@@ -16,3 +16,6 @@
 [submodule "ext/libzipxx"]
 	path = ext/libzipxx
 	url = git://github.com/sfiera/libzipxx.git
+[submodule "ext/gyputil"]
+	path = ext/gyputil
+	url = git://github.com/sfiera/gyputil.git
