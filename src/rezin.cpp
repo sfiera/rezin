@@ -35,7 +35,7 @@ using sfz::format;
 using sfz::quote;
 using sfz::range;
 using sfz::scoped_ptr;
-using sfz::string_to_int32_t;
+using sfz::string_to_int;
 using std::map;
 using std::vector;
 using zipxx::ZipArchive;
@@ -61,7 +61,7 @@ class LsCommand : public Command {
             throw Exception(format("too many arguments to command \"ls\"."));
         }
         if (args.size() > 2) {
-            if (!string_to_int32_t(args[2], &_id)) {
+            if (!string_to_int(args[2], &_id)) {
                 throw Exception(format("invalid resource ID {0}.", quote(args[2])));
             }
         }
@@ -89,7 +89,7 @@ class LsCommand : public Command {
   private:
     int _argc;
     String _code;
-    int _id;
+    int16_t _id;
 };
 
 class CatCommand : public Command {
@@ -99,7 +99,7 @@ class CatCommand : public Command {
             throw Exception(format("wrong number of arguments to command \"cat\"."));
         }
         _code.assign(args[1]);
-        if (!string_to_int32_t(args[2], &_id)) {
+        if (!string_to_int(args[2], &_id)) {
             throw Exception(format("invalid resource ID {0}.", quote(args[2])));
         }
     }
@@ -113,7 +113,7 @@ class CatCommand : public Command {
 
   private:
     String _code;
-    int _id;
+    int16_t _id;
 };
 
 class ConvertCommand : public Command {
@@ -123,7 +123,7 @@ class ConvertCommand : public Command {
             throw Exception(format("wrong number of arguments to command \"convert\"."));
         }
         _code.assign(args[1]);
-        if (!string_to_int32_t(args[2], &_id)) {
+        if (!string_to_int(args[2], &_id)) {
             throw Exception(format("invalid resource ID {0}.", quote(args[2])));
         }
     }
@@ -156,7 +156,7 @@ class ConvertCommand : public Command {
 
   private:
     String _code;
-    int _id;
+    int16_t _id;
 };
 
 class Source {
