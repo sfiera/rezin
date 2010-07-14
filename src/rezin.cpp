@@ -32,6 +32,7 @@ using sfz::Rune;
 using sfz::String;
 using sfz::StringPiece;
 using sfz::format;
+using sfz::path::basename;
 using sfz::quote;
 using sfz::range;
 using sfz::scoped_ptr;
@@ -236,6 +237,7 @@ int main(int argc, char** argv) {
     scoped_ptr<Source> source;
 
     try {
+        opterr = 0;
         const option longopts[] = {
             { "apple-single",   required_argument,  NULL,   'a' },
             { "resource-fork",  required_argument,  NULL,   'r' },
@@ -249,7 +251,10 @@ int main(int argc, char** argv) {
                 break;
             }
 
-            String arg(utf8::decode(optarg));
+            String arg;
+            if (optarg) {
+                arg.assign(utf8::decode(optarg));
+            }
             switch (ch) {
               case 'a':
                 if (source.get() != NULL) {
@@ -274,8 +279,13 @@ int main(int argc, char** argv) {
 
               default:
                 {
-                    String opt(utf8::decode(argv[optind]));
-                    throw Exception(format("unknown argument {0}.", opt));
+                    String opt;
+                    if (optopt == '\0') {
+                        opt.assign(utf8::decode(argv[optind - 1]));
+                    } else {
+                        opt.assign(format("-{0}", char(optopt)));
+                    }
+                    throw Exception(format("unrecognized option {0}.", quote(opt)));
                 }
                 break;
             }
@@ -317,7 +327,7 @@ int main(int argc, char** argv) {
                     "    -a|--apple-single=FILE\n"
                     "    -r|--resource-fork=FILE\n"
                     "    -z|--zip-file=ZIP,FILE\n",
-                    binary_name, e.message()));
+                    basename(binary_name), e.message()));
         return 1;
     }
 
