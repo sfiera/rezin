@@ -3,11 +3,11 @@ rezin(1) -- examine the resource fork of legacy files
 
 ## SYNOPSIS
 
-`rezin` [<options>] <file> ls [<type> [<id>]]
+`rezin` [<options>] ls [<type> [<id>]]
 
-`rezin` [<options>] <file> cat <type> <id>
+`rezin` [<options>] cat <type> <id>
 
-`rezin` [<options>] <file> convert <type> <id>
+`rezin` [<options>] convert <type> <id>
 
 ## DESCRIPTION
 
