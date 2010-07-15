@@ -16,7 +16,7 @@
 \fBrezin\fR [\fIoptions\fR] \fIfile\fR convert \fItype\fR \fIid\fR
 .
 .SH "DESCRIPTION"
-Rezin provides a set of commands allowing one to examine and extract data from the resource fork of legacy MacOS files\. It is capable of fetching the resource fork from a number of different sources, including some which are functional even on systems which do not themselves support the resource fork (see "Sources" below)
+Rezin provides a set of commands allowing one to examine and extract data from the resource fork of legacy MacOS files\. It is capable of fetching the resource fork from a number of different sources, including some which are functional even on systems which do not themselves support the resource fork (see "\fISources\fR" below)
 .
 .P
 UTF\-8 encoding is used throughout the public interfaces of rezin\. Resource type codes will always be composed of four unicode characters, but as a consequence of UTF\-8 encoding, may not always be four bytes\. Additionally, carriage returns will be converted to newlines in cases where text data is expected\.
@@ -42,7 +42,7 @@ Print the resource with type \fItype\fR and ID \fIid\fR to standard output\.
 .
 .TP
 \fBconvert\fR \fItype\fR \fIid\fR
-If \fItype\fR is a known resource type (see "FORMATS" below), convert the resource with type \fItype\fR and ID \fIid\fR to a suitable output format, then print it to standard output\.
+If \fItype\fR is a known resource type (see "\fIFORMATS\fR" below), convert the resource with type \fItype\fR and ID \fIid\fR to a suitable output format, then print it to standard output\.
 .
 .IP
 If \fItype\fR is not a known format, then print a warning to standard error, and dump the resource in raw form to standard output\.
@@ -83,13 +83,13 @@ Text data, stored in MacRoman encoding\. When using the \'convert\' command, \'T
 Rezin currently does not handle many different resource types\. In addition, it only supports monophonic \'snd \' data encoded using 8\-bit samples\.
 .
 .SH "SEE ALSO"
-http://developer\.apple\.com/documentation/mac/MoreToolbox/MoreToolbox\-99\.html
+\fIhttp://developer\.apple\.com/documentation/mac/MoreToolbox/MoreToolbox\-99\.html\fR
 .
 .SH "AUTHORS"
 Chris Pickel <sfiera@gmail\.com>
 .
 .SH "COPYING"
-Copyright (c) 2009 Chris Pickel \fIsfiera@gmail\.com\fR\.
+Copyright (c) 2009 Chris Pickel <sfiera@gmail\.com>\.
 .
 .P
 This file is part of rezin, a free software project\. You can redistribute it and/or modify it under the terms of the MIT License\.

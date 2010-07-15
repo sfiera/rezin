@@ -14,7 +14,7 @@ rezin(1) -- examine the resource fork of legacy files
 Rezin provides a set of commands allowing one to examine and extract data from the resource fork of
 legacy MacOS files.  It is capable of fetching the resource fork from a number of different
 sources, including some which are functional even on systems which do not themselves support the
-resource fork (see "Sources" below)
+resource fork (see "[Sources][]" below)
 
 UTF-8 encoding is used throughout the public interfaces of rezin.  Resource type codes will always
 be composed of four unicode characters, but as a consequence of UTF-8 encoding, may not always be
@@ -39,8 +39,8 @@ The commands are as follows:
    Print the resource with type <type> and ID <id> to standard output.
 
  * `convert` <type> <id>:
-   If <type> is a known resource type (see "FORMATS" below), convert the resource with type <type>
-   and ID <id> to a suitable output format, then print it to standard output.
+   If <type> is a known resource type (see "[FORMATS][]" below), convert the resource with type
+   <type> and ID <id> to a suitable output format, then print it to standard output.
 
    If <type> is not a known format, then print a warning to standard error, and dump the resource
    in raw form to standard output.
@@ -90,7 +90,7 @@ monophonic 'snd ' data encoded using 8-bit samples.
 
 ## SEE ALSO
 
-http://developer.apple.com/documentation/mac/MoreToolbox/MoreToolbox-99.html
+<http://developer.apple.com/documentation/mac/MoreToolbox/MoreToolbox-99.html>
 
 ## AUTHORS
 
@@ -98,7 +98,7 @@ Chris Pickel \<sfiera@gmail.com\>
 
 ## COPYING
 
-Copyright (c) 2009 Chris Pickel <sfiera@gmail.com>.
+Copyright (c) 2009 Chris Pickel \<sfiera@gmail.com\>.
 
 This file is part of rezin, a free software project.  You can redistribute it and/or modify it
 under the terms of the MIT License.
