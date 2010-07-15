@@ -20,6 +20,7 @@ using rezin::ResourceEntry;
 using rezin::ResourceFork;
 using rezin::ResourceType;
 using rezin::cr2nl;
+using rezin::read_clut;
 using rezin::read_snd;
 using rezin::read_string_list;
 using rezin::write_aiff;
@@ -144,6 +145,11 @@ class ConvertCommand : public Command {
             converted.assign(utf8::encode(string));
         } else if (_code == "STR#") {
             Json list = read_string_list(data);
+            String decoded_string;
+            print_to(&decoded_string, pretty_print(list));
+            converted.assign(utf8::encode(decoded_string));
+        } else if (_code == "clut") {
+            Json list = read_clut(data);
             String decoded_string;
             print_to(&decoded_string, pretty_print(list));
             converted.assign(utf8::encode(decoded_string));

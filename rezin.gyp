@@ -10,6 +10,7 @@
             'type': '<(library)',
             'sources': [
                 'src/rezin/AppleSingle.cpp',
+                'src/rezin/ColorTable.cpp',
                 'src/rezin/Cr2nl.cpp',
                 'src/rezin/ResourceEntry.cpp',
                 'src/rezin/ResourceFork.cpp',

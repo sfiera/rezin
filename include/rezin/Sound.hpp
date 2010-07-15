@@ -14,7 +14,7 @@
 
 namespace rezin {
 
-// Converts 'snd ' resource data into a caller-owned JSON object.
+// Converts 'snd ' resource data into a JSON object.
 //
 // The returned data is in the following format:
 //

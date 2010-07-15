@@ -68,6 +68,10 @@ Read the resource fork of the file \fIfile\fR within the zip archive \fIarchive\
 The following resource types are supported by rezin:
 .
 .TP
+\fB\'clut\'\fR
+A color table, stored in a MacOS\-specific format\. Each resource can store up to 65536 RGB colors\. When using the \'convert\' command, \'clut\' data will be converted to a JSON array of strings\.
+.
+.TP
 \fB\'snd \'\fR
 Sound data, stored in a MacOS\-specific format\. When using the \'convert\' command, \'snd \' data will be converted to AIFF format\.
 .

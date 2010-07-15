@@ -70,6 +70,11 @@ provided with each invocation of rezin.
 
 The following resource types are supported by rezin:
 
+ * `'clut'`:
+   A color table, stored in a MacOS-specific format.  Each resource can store up to 65536 RGB
+   colors.  When using the 'convert' command, 'clut' data will be converted to a JSON array of
+   strings.
+
  * `'snd '`:
    Sound data, stored in a MacOS-specific format.  When using the 'convert' command, 'snd ' data
    will be converted to AIFF format.
