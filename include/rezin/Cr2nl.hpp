@@ -6,7 +6,7 @@
 #ifndef REZIN_CR2NL_HPP_
 #define REZIN_CR2NL_HPP_
 
-#include "sfz/sfz.hpp"
+#include <sfz/sfz.hpp>
 
 namespace rezin {
 

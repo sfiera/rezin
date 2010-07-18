@@ -7,7 +7,7 @@
 #define REZIN_RESOURCE_ENTRY_HPP_
 
 #include <stdint.h>
-#include "sfz/sfz.hpp"
+#include <sfz/sfz.hpp>
 
 namespace rezin {
 

@@ -6,8 +6,8 @@
 #include "rezin/ResourceEntry.hpp"
 
 #include <stdexcept>
+#include <sfz/sfz.hpp>
 #include "rezin/Cr2nl.hpp"
-#include "sfz/sfz.hpp"
 
 using sfz::BytesPiece;
 using sfz::String;

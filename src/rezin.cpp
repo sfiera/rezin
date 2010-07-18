@@ -8,11 +8,11 @@
 #include <exception>
 #include <map>
 #include <vector>
+#include <rgos/rgos.hpp>
+#include <sfz/sfz.hpp>
+#include <zipxx/zipxx.hpp>
 
 #include "rezin/rezin.hpp"
-#include "rgos/rgos.hpp"
-#include "sfz/sfz.hpp"
-#include "zipxx/zipxx.hpp"
 
 using rgos::Json;
 using sfz::Bytes;

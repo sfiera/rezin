@@ -8,7 +8,7 @@
 
 #include <map>
 #include <stdint.h>
-#include "sfz/sfz.hpp"
+#include <sfz/sfz.hpp>
 
 namespace rezin {
 

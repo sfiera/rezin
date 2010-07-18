@@ -5,7 +5,7 @@
 
 #include "rezin/Cr2nl.hpp"
 
-#include "sfz/sfz.hpp"
+#include <sfz/sfz.hpp>
 
 using sfz::String;
 

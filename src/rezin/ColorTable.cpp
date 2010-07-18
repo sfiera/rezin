@@ -5,8 +5,8 @@
 
 #include "rezin/Sound.hpp"
 
-#include "rgos/rgos.hpp"
-#include "sfz/sfz.hpp"
+#include <rgos/rgos.hpp>
+#include <sfz/sfz.hpp>
 
 using rgos::Json;
 using sfz::BytesPiece;

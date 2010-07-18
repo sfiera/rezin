@@ -6,7 +6,7 @@
 #include "rezin/AppleSingle.hpp"
 
 #include <libkern/OSByteOrder.h>
-#include "sfz/sfz.hpp"
+#include <sfz/sfz.hpp>
 
 using sfz::BytesPiece;
 using sfz::Exception;

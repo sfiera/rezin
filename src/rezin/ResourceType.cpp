@@ -6,8 +6,8 @@
 #include "rezin/ResourceType.hpp"
 
 #include <stdexcept>
+#include <sfz/sfz.hpp>
 #include "rezin/ResourceEntry.hpp"
-#include "sfz/sfz.hpp"
 
 using sfz::BytesPiece;
 using sfz::Exception;

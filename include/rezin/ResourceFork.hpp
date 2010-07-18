@@ -7,7 +7,7 @@
 #define REZIN_RESOURCE_FORK_HPP_
 
 #include <map>
-#include "sfz/sfz.hpp"
+#include <sfz/sfz.hpp>
 
 namespace rezin {
 

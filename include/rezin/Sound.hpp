@@ -9,8 +9,8 @@
 #include <exception>
 #include <stdint.h>
 #include <stdlib.h>
-#include "rgos/rgos.hpp"
-#include "sfz/sfz.hpp"
+#include <rgos/rgos.hpp>
+#include <sfz/sfz.hpp>
 
 namespace rezin {
 
