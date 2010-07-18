@@ -98,7 +98,6 @@ class CatCommand : public Command {
     }
 
     virtual void run(const ResourceFork& rsrc) {
-        // TODO(sfiera): fix potentially surprising results of integer truncation here.
         const ResourceEntry& entry = rsrc.at(_code).at(_id);
         BytesPiece data = entry.data();
         write(1, data.data(), data.size());
@@ -122,7 +121,6 @@ class ConvertCommand : public Command {
     }
 
     virtual void run(const ResourceFork& rsrc) {
-        // TODO(sfiera): fix potentially surprising results of integer truncation here.
         const ResourceEntry& entry = rsrc.at(_code).at(_id);
         BytesPiece data = entry.data();
         Bytes converted;
