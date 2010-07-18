@@ -14,16 +14,6 @@
 #include "sfz/sfz.hpp"
 #include "zipxx/zipxx.hpp"
 
-using rezin::AppleSingle;
-using rezin::AppleDouble;
-using rezin::ResourceEntry;
-using rezin::ResourceFork;
-using rezin::ResourceType;
-using rezin::cr2nl;
-using rezin::read_clut;
-using rezin::read_snd;
-using rezin::read_string_list;
-using rezin::write_aiff;
 using rgos::Json;
 using sfz::Bytes;
 using sfz::BytesPiece;
@@ -47,6 +37,7 @@ namespace io = sfz::io;
 namespace macroman = sfz::macroman;
 namespace utf8 = sfz::utf8;
 
+namespace rezin {
 namespace {
 
 class Command {
@@ -235,8 +226,6 @@ class ZipSource : public Source {
     scoped_ptr<AppleDouble> _apple_double;
 };
 
-}  // namespace
-
 int main(int argc, char** argv) {
     const String binary_name(utf8::decode(argv[0]));
     scoped_ptr<Command> command;
@@ -346,4 +335,11 @@ int main(int argc, char** argv) {
     }
 
     return 0;
+}
+
+}  // namespace
+}  // namespace rezin
+
+int main(int argc, char** argv) {
+    return rezin::main(argc, argv);
 }
