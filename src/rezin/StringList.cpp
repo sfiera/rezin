@@ -8,7 +8,7 @@
 #include <vector>
 #include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
-#include "rezin/Cr2nl.hpp"
+#include "rezin/Options.hpp"
 
 using rgos::Json;
 using sfz::Bytes;
@@ -18,11 +18,9 @@ using sfz::range;
 using sfz::read;
 using std::vector;
 
-namespace macroman = sfz::macroman;
-
 namespace rezin {
 
-Json read_string_list(const BytesPiece& data) {
+Json read_string_list(const BytesPiece& data, const Options& options) {
     BytesPiece in(data);
     uint16_t array_size;
     read(&in, &array_size);
@@ -34,8 +32,7 @@ Json read_string_list(const BytesPiece& data) {
         read(&in, &size);
         read(&in, data, size);
         Bytes utf8;
-        String string(macroman::decode(BytesPiece(data, size)));
-        cr2nl(&string);
+        String string(options.decode(BytesPiece(data, size)));
         result.push_back(Json::string(string));
     }
     return Json::array(result);

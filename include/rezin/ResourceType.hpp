@@ -12,6 +12,7 @@
 
 namespace rezin {
 
+class Options;
 class ResourceEntry;
 
 // Represents a collection of resources with the same type within the resource fork.
@@ -70,9 +71,10 @@ class ResourceType {
     // @param [in] index    The index of the particular type to read in.
     // @param [in] name_data The block of data containing all resource names.
     // @param [in] data_data The block of data containing all resource data.
+    // @param [in] options  Miscellaneous options.
     ResourceType(
             const sfz::BytesPiece& type_data, int index, const sfz::BytesPiece& name_data,
-            const sfz::BytesPiece& data_data);
+            const sfz::BytesPiece& data_data, const Options& options);
 
     // The 4-character code of this resource type.
     sfz::String _code;

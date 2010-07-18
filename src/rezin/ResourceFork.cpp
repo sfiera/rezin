@@ -22,7 +22,7 @@ using std::map;
 
 namespace rezin {
 
-ResourceFork::ResourceFork(const BytesPiece& data) {
+ResourceFork::ResourceFork(const BytesPiece& data, const Options& options) {
     // Resource header.
     BytesPiece header(data.substr(0, 16));
     uint32_t data_offset;
@@ -52,7 +52,8 @@ ResourceFork::ResourceFork(const BytesPiece& data) {
     BytesPiece name_data = map_data.substr(name_offset);
 
     foreach (i, range(type_count)) {
-        scoped_ptr<ResourceType> type(new ResourceType(type_data, i, name_data, data_data));
+        scoped_ptr<ResourceType> type(
+                new ResourceType(type_data, i, name_data, data_data, options));
         StringKey key(type->code());
         if (_types.find(key) != _types.end()) {
             throw Exception(format(

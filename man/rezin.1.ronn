@@ -66,6 +66,15 @@ provided with each invocation of rezin.
    Read the resource fork of the file <file> within the zip archive <archive>.  This works even on
    systems which do not themselves support the resource fork.
 
+### Output
+
+These options control the generated output of a rezin command.  These are optional.
+
+ * `-l` `cr`|`nl`|`crnl` | `--line-ending`=`cr`|`nl`|`crnl`:
+   By default, when reading strings, carriage returns will be converted to newlines, to follow the
+   Unix line-ending convention.  This option changes that behavior.  Valid values are `cr` (leave
+   them as carriage returns), `nl` (the default), and `crnl` (convert to DOS line-endings).
+
 ## FORMATS
 
 The following resource types are supported by rezin:

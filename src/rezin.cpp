@@ -34,7 +34,6 @@ using zipxx::ZipArchive;
 using zipxx::ZipFileReader;
 
 namespace io = sfz::io;
-namespace macroman = sfz::macroman;
 namespace utf8 = sfz::utf8;
 
 namespace rezin {
@@ -110,7 +109,8 @@ class CatCommand : public Command {
 
 class ConvertCommand : public Command {
   public:
-    ConvertCommand(const vector<StringPiece>& args) {
+    ConvertCommand(const vector<StringPiece>& args, const Options& options)
+            : _options(options) {
         if (args.size() != 3) {
             throw Exception(format("wrong number of arguments to command \"convert\"."));
         }
@@ -129,11 +129,10 @@ class ConvertCommand : public Command {
             Json snd = read_snd(data);
             write_aiff(snd, &converted);
         } else if (_code == "TEXT") {
-            String string(macroman::decode(data));
-            cr2nl(&string);
+            String string(_options.decode(data));
             converted.assign(utf8::encode(string));
         } else if (_code == "STR#") {
-            Json list = read_string_list(data);
+            Json list = read_string_list(data, _options);
             String decoded_string;
             print_to(&decoded_string, pretty_print(list));
             converted.assign(utf8::encode(decoded_string));
@@ -153,6 +152,7 @@ class ConvertCommand : public Command {
   private:
     String _code;
     int16_t _id;
+    Options _options;
 };
 
 class Source {
@@ -228,6 +228,7 @@ int main(int argc, char** argv) {
     const String binary_name(utf8::decode(argv[0]));
     scoped_ptr<Command> command;
     scoped_ptr<Source> source;
+    Options options;
 
     try {
         opterr = 0;
@@ -235,11 +236,12 @@ int main(int argc, char** argv) {
             { "apple-single",   required_argument,  NULL,   'a' },
             { "resource-fork",  required_argument,  NULL,   'r' },
             { "zip-file",       required_argument,  NULL,   'z' },
+            { "line-ending",    no_argument,        NULL,   'l' },
             { NULL,             0,                  NULL,   0 }
         };
 
         while (true) {
-            const char ch = getopt_long(argc, argv, "a:r:z:", longopts, NULL);
+            const char ch = getopt_long(argc, argv, "a:r:z:l:", longopts, NULL);
             if (ch == -1) {
                 break;
             }
@@ -268,6 +270,18 @@ int main(int argc, char** argv) {
                     throw Exception(format("more than one source specified."));
                 }
                 source.reset(new ZipSource(arg));
+                break;
+
+              case 'l':
+                if (arg == "cr") {
+                    options.set_line_ending(Options::CR);
+                } else if (arg == "nl") {
+                    options.set_line_ending(Options::NL);
+                } else if (arg == "crnl") {
+                    options.set_line_ending(Options::CRNL);
+                } else {
+                    throw Exception(format("unrecognized line ending {0}.", quote(arg)));
+                }
                 break;
 
               default:
@@ -306,7 +320,7 @@ int main(int argc, char** argv) {
         } else if (args[0] == "cat") {
             command.reset(new CatCommand(args));
         } else if (args[0] == "convert") {
-            command.reset(new ConvertCommand(args));
+            command.reset(new ConvertCommand(args, options));
         } else {
             throw Exception(format("unknown command '{0}'.", args[0]));
         }
@@ -319,13 +333,14 @@ int main(int argc, char** argv) {
                     "options:\n"
                     "    -a|--apple-single=FILE\n"
                     "    -r|--resource-fork=FILE\n"
-                    "    -z|--zip-file=ZIP,FILE\n",
+                    "    -z|--zip-file=ZIP,FILE\n"
+                    "    -l|--line-ending=cr|nl|crnl\n",
                     basename(binary_name), e.message()));
         return 1;
     }
 
     try {
-        ResourceFork rsrc(source->load());
+        ResourceFork rsrc(source->load(), options);
         command->run(rsrc);
     } catch (Exception& e) {
         print(io::err, format("{0}: {1}\n", binary_name, e.message()));

@@ -7,13 +7,11 @@
 
 #include <stdexcept>
 #include <sfz/sfz.hpp>
-#include "rezin/Cr2nl.hpp"
+#include "rezin/Options.hpp"
 
 using sfz::BytesPiece;
 using sfz::String;
 using sfz::read;
-
-namespace macroman = sfz::macroman;
 
 namespace rezin {
 
@@ -31,7 +29,7 @@ const BytesPiece& ResourceEntry::data() const {
 
 ResourceEntry::ResourceEntry(
         const BytesPiece& entry_data, int index, const BytesPiece& name_data,
-        const BytesPiece& data_data) {
+        const BytesPiece& data_data, const Options& options) {
     BytesPiece entry_remainder(entry_data.substr(index * 12, 12));
     read(&entry_remainder, &_id);
     uint16_t name_offset;
@@ -43,8 +41,7 @@ ResourceEntry::ResourceEntry(
 
     if (name_offset != (uint16_t)-1) {
         uint8_t name_size = name_data.at(name_offset);
-        _name.assign(macroman::decode(name_data.substr(name_offset + 1, name_size)));
-        cr2nl(&_name);
+        _name.assign(options.decode(name_data.substr(name_offset + 1, name_size)));
     }
 
     BytesPiece data_remainder(data_data.substr(data_offset, 4));

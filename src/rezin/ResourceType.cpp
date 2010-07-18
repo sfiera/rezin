@@ -47,7 +47,7 @@ ResourceType::const_iterator ResourceType::end() const {
 
 ResourceType::ResourceType(
         const BytesPiece& type_data, int index, const BytesPiece& name_data,
-        const BytesPiece& data_data) {
+        const BytesPiece& data_data, const Options& options) {
     _code.assign(macroman::decode(type_data.substr(2 + index * 8, 4)));
     BytesPiece type(type_data.substr(6 + index * 8, 4));
     uint16_t count;
@@ -58,7 +58,8 @@ ResourceType::ResourceType(
 
     BytesPiece entry_data = type_data.substr(offset);
     foreach (i, range(count)) {
-        scoped_ptr<ResourceEntry> entry(new ResourceEntry(entry_data, i, name_data, data_data));
+        scoped_ptr<ResourceEntry> entry(
+                new ResourceEntry(entry_data, i, name_data, data_data, options));
         int16_t id = entry->id();
         _entries.insert(std::make_pair(id, entry.release()));
     }

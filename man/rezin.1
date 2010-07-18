@@ -64,6 +64,13 @@ Read from the flat file \fIfile\fR\. On systems which support the resource fork 
 \fB\-z\fR \fIarchive\fR,\fIfile\fR | \fB\-\-zip\-archive\fR=\fIarchive\fR,\fIfile\fR
 Read the resource fork of the file \fIfile\fR within the zip archive \fIarchive\fR\. This works even on systems which do not themselves support the resource fork\.
 .
+.SS "Output"
+These options control the generated output of a rezin command\. These are optional\.
+.
+.TP
+\fB\-l\fR \fBcr\fR|\fBnl\fR|\fBcrnl\fR | \fB\-\-line\-ending\fR=\fBcr\fR|\fBnl\fR|\fBcrnl\fR
+By default, when reading strings, carriage returns will be converted to newlines, to follow the Unix line\-ending convention\. This option changes that behavior\. Valid values are \fBcr\fR (leave them as carriage returns), \fBnl\fR (the default), and \fBcrnl\fR (convert to DOS line\-endings)\.
+.
 .SH "FORMATS"
 The following resource types are supported by rezin:
 .

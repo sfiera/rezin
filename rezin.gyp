@@ -11,7 +11,7 @@
             'sources': [
                 'src/rezin/AppleSingle.cpp',
                 'src/rezin/ColorTable.cpp',
-                'src/rezin/Cr2nl.cpp',
+                'src/rezin/Options.cpp',
                 'src/rezin/ResourceEntry.cpp',
                 'src/rezin/ResourceFork.cpp',
                 'src/rezin/ResourceType.cpp',

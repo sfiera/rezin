@@ -11,6 +11,8 @@
 
 namespace rezin {
 
+class Options;
+
 // Represents an individual entry within the resource fork.
 //
 // A ResourceType object is presented roughly as a STL map from 16-bit integers to ResourceEntry
@@ -37,9 +39,10 @@ class ResourceEntry {
     // @param [in] index    The index of the particular entry to read in.
     // @param [in] name_data The block of data containing all resource names.
     // @param [in] data_data The block of data containing all resource data.
+    // @param [in] options  Miscellaneous options.
     ResourceEntry(
             const sfz::BytesPiece& entry_data, int index, const sfz::BytesPiece& name_data,
-            const sfz::BytesPiece& data_data);
+            const sfz::BytesPiece& data_data, const Options& options);
 
     // The ID of this resource entry.
     int16_t _id;

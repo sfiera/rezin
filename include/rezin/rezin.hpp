@@ -8,7 +8,7 @@
 
 #include <rezin/AppleSingle.hpp>
 #include <rezin/ColorTable.hpp>
-#include <rezin/Cr2nl.hpp>
+#include <rezin/Options.hpp>
 #include <rezin/ResourceEntry.hpp>
 #include <rezin/ResourceFork.hpp>
 #include <rezin/ResourceType.hpp>

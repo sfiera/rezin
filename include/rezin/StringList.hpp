@@ -11,13 +11,16 @@
 
 namespace rezin {
 
+class Options;
+
 // Converts 'STR#' resource data into a caller-owned JSON object.
 //
 // The returned data is an array of strings.
 //
 // @param [in] data     The content of a 'STR#' resource.
+// @param [in] options  Miscellaneous options.
 // @returns             A JSON object representing the content of `in`.
-rgos::Json read_string_list(const sfz::BytesPiece& data);
+rgos::Json read_string_list(const sfz::BytesPiece& data, const Options& options);
 
 }  // namespace rezin
 

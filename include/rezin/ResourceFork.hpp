@@ -11,6 +11,7 @@
 
 namespace rezin {
 
+class Options;
 class ResourceType;
 
 // Represents the resource fork of a file.
@@ -26,7 +27,8 @@ class ResourceFork {
     // Reads the resource fork from a block of memory.
     //
     // @param [in] data     A block of memory containing the resource fork of a file.
-    ResourceFork(const sfz::BytesPiece& data);
+    // @param [in] options  Miscellaneous options.
+    ResourceFork(const sfz::BytesPiece& data, const Options& options);
 
     ~ResourceFork();
 
