@@ -5,7 +5,7 @@
 
 #include "rezin/AppleSingle.hpp"
 
-#include <libkern/OSByteOrder.h>
+#include <arpa/inet.h>
 #include <sfz/sfz.hpp>
 
 using sfz::BytesPiece;
@@ -64,7 +64,7 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
     uint32_t version;
     read(&remainder, &version);
     if (little_endian) {
-        version = OSSwapInt32(version);
+        version = htonl(version);
     }
 
     switch (version) {
@@ -75,7 +75,7 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
             uint16_t entry_count;
             read(&remainder, &entry_count);
             if (little_endian) {
-                entry_count = OSSwapInt16(entry_count);
+                entry_count = htons(entry_count);
             }
 
             foreach (i, range(entry_count)) {
@@ -87,9 +87,9 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
                 read(&remainder, &length);
 
                 if (little_endian) {
-                    id = OSSwapInt32(id);
-                    offset = OSSwapInt32(offset);
-                    length = OSSwapInt32(length);
+                    id = htonl(id);
+                    offset = htonl(offset);
+                    length = htonl(length);
                 }
 
                 _entries.insert(std::make_pair(id, data.substr(offset, length)));
