@@ -10,11 +10,11 @@
 
 using rgos::Json;
 using rgos::JsonDefaultVisitor;
+using rgos::StringMap;
 using sfz::Bytes;
 using sfz::BytesPiece;
 using sfz::Exception;
 using sfz::ReadSource;
-using sfz::StringKey;
 using sfz::StringPiece;
 using sfz::WriteTarget;
 using sfz::format;
@@ -114,7 +114,7 @@ void read_snd_samples(ReadSource in, int sample_count, vector<Json>* samples) {
 }  // namespace
 
 Json read_snd(const BytesPiece& in) {
-    map<StringKey, Json> result;
+    StringMap<Json> result;
     BytesPiece remainder(in);
     uint16_t fmt;
     read(&remainder, &fmt);
@@ -221,7 +221,7 @@ class SoundInfoVisitor : public JsonDefaultVisitor {
     SoundInfoVisitor(SoundInfo* out)
             : _out(out) { }
 
-    void visit_object(const map<StringKey, Json>& value) {
+    void visit_object(const StringMap<Json>& value) {
         GetNumberVisitor<int> get_channels(&_out->channels);
         GetNumberVisitor<int> get_sample_bits(&_out->sample_bits);
         GetNumberVisitor<double> get_sample_rate(&_out->sample_rate);
@@ -233,9 +233,8 @@ class SoundInfoVisitor : public JsonDefaultVisitor {
     }
 
   private:
-    const Json& checked_get(const map<StringKey, Json>& value, const char* key) {
-        StringKey string_key(key);
-        map<StringKey, Json>::const_iterator it = value.find(string_key);
+    const Json& checked_get(const StringMap<Json>& value, const char* key) {
+        StringMap<Json>::const_iterator it = value.find(key);
         if (it == value.end()) {
             throw Exception(format("missing key '{0}'", key));
         }

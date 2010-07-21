@@ -9,16 +9,15 @@
 #include <sfz/sfz.hpp>
 #include "rezin/ResourceType.hpp"
 
+using rgos::StringMap;
 using sfz::BytesPiece;
 using sfz::Exception;
-using sfz::StringKey;
 using sfz::StringPiece;
 using sfz::format;
 using sfz::quote;
 using sfz::range;
 using sfz::read;
-using sfz::scoped_ptr;
-using std::map;
+using sfz::linked_ptr;
 
 namespace rezin {
 
@@ -52,25 +51,16 @@ ResourceFork::ResourceFork(const BytesPiece& data, const Options& options) {
     BytesPiece name_data = map_data.substr(name_offset);
 
     foreach (i, range(type_count)) {
-        scoped_ptr<ResourceType> type(
+        linked_ptr<ResourceType> type(
                 new ResourceType(type_data, i, name_data, data_data, options));
-        StringKey key(type->code());
-        if (_types.find(key) != _types.end()) {
-            throw Exception(format(
-                        "duplicate resource type in resource fork {0}", quote(type->code())));
-        }
-        _types[key] = type.release();
+        _types[StringPiece(type->code())] = type;
     }
 }
 
-ResourceFork::~ResourceFork() {
-    foreach (it, _types) {
-        delete it->second;
-    }
-}
+ResourceFork::~ResourceFork() { }
 
 const ResourceType& ResourceFork::at(const StringPiece& code) const {
-    map<StringKey, ResourceType*>::const_iterator it = _types.find(code);
+    StringMap<linked_ptr<ResourceType> >::const_iterator it = _types.find(code);
     if (it == _types.end()) {
         throw Exception(format("no such resource type '{0}'", code));
     }

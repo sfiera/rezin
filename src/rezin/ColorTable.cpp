@@ -9,14 +9,13 @@
 #include <sfz/sfz.hpp>
 
 using rgos::Json;
+using rgos::StringMap;
 using sfz::BytesPiece;
 using sfz::Exception;
-using sfz::StringKey;
 using sfz::format;
 using sfz::range;
 using sfz::read;
 using std::make_pair;
-using std::map;
 using std::vector;
 
 namespace rezin {
@@ -25,7 +24,7 @@ namespace {
 
 // Reads a single ColorSpec entry from a 'clut' resource.
 Json read_color_spec(BytesPiece* in) {
-    map<StringKey, Json> result;
+    StringMap<Json> result;
     uint16_t id, red, green, blue;
     read(in, &id);
     read(in, &red);

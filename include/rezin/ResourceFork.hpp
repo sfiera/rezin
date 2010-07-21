@@ -7,6 +7,7 @@
 #define REZIN_RESOURCE_FORK_HPP_
 
 #include <map>
+#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
@@ -48,16 +49,16 @@ class ResourceFork {
         typedef const ResourceType& const_reference;
 
         const_reference operator*() const { return *_it->second; }
-        const_pointer operator->() const { return _it->second; }
+        const_pointer operator->() const { return _it->second.get(); }
         const_iterator& operator++() { ++_it; return *this; }
-        const_iterator operator++(int) { return iterator(_it++); }
+        const_iterator operator++(int) { const_iterator old = *this; ++_it; return old; }
         bool operator==(const_iterator it) { return _it == it._it; }
         bool operator!=(const_iterator it) { return _it != it._it; }
 
       private:
         friend class ResourceFork;
-        const_iterator(std::map<sfz::StringKey, ResourceType*>::const_iterator it) : _it(it) { }
-        std::map<sfz::StringKey, ResourceType*>::const_iterator _it;
+        const_iterator(rgos::StringMap<sfz::linked_ptr<ResourceType> >::const_iterator it) : _it(it) { }
+        rgos::StringMap<sfz::linked_ptr<ResourceType> >::const_iterator _it;
     };
     typedef const_iterator iterator;
 
@@ -67,7 +68,7 @@ class ResourceFork {
 
   private:
     // The map represented by this object.
-    std::map<sfz::StringKey, ResourceType*> _types;
+    rgos::StringMap<sfz::linked_ptr<ResourceType> > _types;
 
     DISALLOW_COPY_AND_ASSIGN(ResourceFork);
 };

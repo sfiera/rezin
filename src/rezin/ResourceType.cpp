@@ -12,25 +12,21 @@
 using sfz::BytesPiece;
 using sfz::Exception;
 using sfz::format;
+using sfz::linked_ptr;
 using sfz::range;
 using sfz::read;
-using sfz::scoped_ptr;
 using std::map;
 
 namespace macroman = sfz::macroman;
 
 namespace rezin {
 
-ResourceType::~ResourceType() {
-    foreach (it, _entries) {
-        delete it->second;
-    }
-}
+ResourceType::~ResourceType() { }
 
 const sfz::String& ResourceType::code() const { return _code; }
 
 const ResourceEntry& ResourceType::at(int16_t i) const {
-    map<int16_t, ResourceEntry*>::const_iterator it = _entries.find(i);
+    map<int16_t, linked_ptr<ResourceEntry> >::const_iterator it = _entries.find(i);
     if (it == _entries.end()) {
         throw Exception(format("no such resource entry '{0}' {1}", _code, i));
     }
@@ -58,10 +54,9 @@ ResourceType::ResourceType(
 
     BytesPiece entry_data = type_data.substr(offset);
     foreach (i, range(count)) {
-        scoped_ptr<ResourceEntry> entry(
+        linked_ptr<ResourceEntry> entry(
                 new ResourceEntry(entry_data, i, name_data, data_data, options));
-        int16_t id = entry->id();
-        _entries.insert(std::make_pair(id, entry.release()));
+        _entries[entry->id()] = entry;
     }
 }
 

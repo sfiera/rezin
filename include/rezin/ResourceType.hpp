@@ -45,7 +45,7 @@ class ResourceType {
         typedef const ResourceEntry& const_reference;
 
         const ResourceEntry& operator*() const { return *_it->second; }
-        const ResourceEntry* operator->() const { return _it->second; }
+        const ResourceEntry* operator->() const { return _it->second.get(); }
         const_iterator& operator++() { ++_it; return *this; }
         const_iterator operator++(int) { return iterator(_it++); }
         bool operator==(const_iterator it) { return _it == it._it; }
@@ -53,8 +53,8 @@ class ResourceType {
 
       private:
         friend class ResourceType;
-        const_iterator(std::map<int16_t, ResourceEntry*>::const_iterator it) : _it(it) { }
-        std::map<int16_t, ResourceEntry*>::const_iterator _it;
+        const_iterator(std::map<int16_t, sfz::linked_ptr<ResourceEntry> >::const_iterator it) : _it(it) { }
+        std::map<int16_t, sfz::linked_ptr<ResourceEntry> >::const_iterator _it;
     };
     typedef const_iterator iterator;
 
@@ -80,7 +80,7 @@ class ResourceType {
     sfz::String _code;
 
     // The map represented by this object.
-    std::map<int16_t, ResourceEntry*> _entries;
+    std::map<int16_t, sfz::linked_ptr<ResourceEntry> > _entries;
 
     DISALLOW_COPY_AND_ASSIGN(ResourceType);
 };
