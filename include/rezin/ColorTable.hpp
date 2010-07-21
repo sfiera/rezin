@@ -6,9 +6,6 @@
 #ifndef REZIN_COLOR_TABLE_HPP_
 #define REZIN_COLOR_TABLE_HPP_
 
-#include <exception>
-#include <stdint.h>
-#include <stdlib.h>
 #include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 

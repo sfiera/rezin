@@ -6,7 +6,6 @@
 #ifndef REZIN_RESOURCE_FORK_HPP_
 #define REZIN_RESOURCE_FORK_HPP_
 
-#include <map>
 #include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 

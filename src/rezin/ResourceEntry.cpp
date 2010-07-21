@@ -5,7 +5,6 @@
 
 #include "rezin/ResourceEntry.hpp"
 
-#include <stdexcept>
 #include <sfz/sfz.hpp>
 #include "rezin/Options.hpp"
 

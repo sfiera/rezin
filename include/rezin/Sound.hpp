@@ -6,9 +6,6 @@
 #ifndef REZIN_SOUND_HPP_
 #define REZIN_SOUND_HPP_
 
-#include <exception>
-#include <stdint.h>
-#include <stdlib.h>
 #include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
