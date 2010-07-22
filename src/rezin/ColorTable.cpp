@@ -12,6 +12,7 @@ using rgos::Json;
 using rgos::StringMap;
 using sfz::BytesPiece;
 using sfz::Exception;
+using sfz::ReadSource;
 using sfz::format;
 using sfz::range;
 using sfz::read;
@@ -20,43 +21,60 @@ using std::vector;
 
 namespace rezin {
 
-namespace {
-
-// Reads a single ColorSpec entry from a 'clut' resource.
-Json read_color_spec(BytesPiece* in) {
+Json RgbColor::to_json() const {
     StringMap<Json> result;
-    uint16_t id, red, green, blue;
-    read(in, &id);
-    read(in, &red);
-    read(in, &green);
-    read(in, &blue);
-    result.insert(make_pair("id", Json::number(id)));
-    result.insert(make_pair("red", Json::number(red)));
-    result.insert(make_pair("green", Json::number(green)));
-    result.insert(make_pair("blue", Json::number(blue)));
+    result["red"]   = Json::number(red);
+    result["green"] = Json::number(green);
+    result["blue"]  = Json::number(blue);
     return Json::object(result);
 }
 
-}  // namespace
+void read_from(ReadSource in, RgbColor* out) {
+    read(in, &out->red);
+    read(in, &out->green);
+    read(in, &out->blue);
+}
+
+Json ColorSpec::to_json() const {
+    StringMap<Json> result;
+    result["id"]    = Json::number(value);
+    result["red"]   = Json::number(rgb.red);
+    result["green"] = Json::number(rgb.green);
+    result["blue"]  = Json::number(rgb.blue);
+    return Json::object(result);
+}
+
+void read_from(ReadSource in, ColorSpec* out) {
+    read(in, &out->value);
+    read(in, &out->rgb);
+}
+
+Json ColorTable::to_json() const {
+    vector<Json> result;
+    foreach (i, range(ct_size + 1)) {
+        result.push_back(ct_table[i].to_json());
+    }
+    return Json::array(result);
+}
+
+void read_from(ReadSource in, ColorTable* out) {
+    read(in, &out->ct_seed);
+    read(in, &out->ct_flags);
+    read(in, &out->ct_size);
+    out->ct_table.resize(out->ct_size + 1);
+    foreach (i, range(out->ct_size + 1)) {
+        read(in, &out->ct_table[i]);
+    }
+}
 
 Json read_clut(const BytesPiece& in) {
-    vector<Json> result;
     BytesPiece remainder(in);
-
-    uint32_t seed;
-    uint16_t flags;
-    uint16_t size;
-    read(&remainder, &seed);
-    read(&remainder, &flags);
-    read(&remainder, &size);
-    foreach (i, range(size + 1)) {
-        result.push_back(read_color_spec(&remainder));
-    }
-
+    ColorTable clut;
+    read(&remainder, &clut);
     if (!remainder.empty()) {
         throw Exception(format("{0} extra bytes at end of 'clut' resource.", remainder.size()));
     }
-    return Json::array(result);
+    return clut.to_json();
 }
 
 }  // namespace rezin
