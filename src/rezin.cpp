@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
             { "apple-single",   required_argument,  NULL,   'a' },
             { "resource-fork",  required_argument,  NULL,   'r' },
             { "zip-file",       required_argument,  NULL,   'z' },
-            { "line-ending",    no_argument,        NULL,   'l' },
+            { "line-ending",    required_argument,  NULL,   'l' },
             { NULL,             0,                  NULL,   0 }
         };
 
