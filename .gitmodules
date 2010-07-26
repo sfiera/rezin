@@ -19,3 +19,6 @@
 [submodule "ext/gyputil"]
 	path = ext/gyputil
 	url = git://github.com/sfiera/gyputil.git
+[submodule "ext/libpng"]
+	path = ext/libpng
+	url = git://github.com/sfiera/libpng.git

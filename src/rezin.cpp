@@ -136,6 +136,9 @@ class ConvertCommand : public Command {
             String decoded_string;
             print_to(&decoded_string, pretty_print(list));
             converted.assign(utf8::encode(decoded_string));
+        } else if (_code == "cicn") {
+            Json cicn = read_cicn(data);
+            write_png(&converted, cicn);
         } else if (_code == "clut") {
             Json list = read_clut(data);
             String decoded_string;

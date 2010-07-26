@@ -7,6 +7,7 @@
 #define REZIN_REZIN_HPP_
 
 #include <rezin/AppleSingle.hpp>
+#include <rezin/ColorIcon.hpp>
 #include <rezin/ColorTable.hpp>
 #include <rezin/Options.hpp>
 #include <rezin/ResourceEntry.hpp>

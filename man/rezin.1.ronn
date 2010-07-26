@@ -79,6 +79,12 @@ These options control the generated output of a rezin command.  These are option
 
 The following resource types are supported by rezin:
 
+ * `'cicn'`:
+   A color icon.  Color icons are typically 256-color images with horizontal and vertical
+   dimensions of 16, 32, or 64 pixels.  However, this is not a technical limitation, and other
+   sizes and colorings are possible.  When using the 'convert' command, 'cicn' data will be
+   converted to PNG format.
+
  * `'clut'`:
    A color table, stored in a MacOS-specific format.  Each resource can store up to 65536 RGB
    colors.  When using the 'convert' command, 'clut' data will be converted to a JSON array of

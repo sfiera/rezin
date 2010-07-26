@@ -10,6 +10,9 @@
             'type': '<(library)',
             'sources': [
                 'src/rezin/AppleSingle.cpp',
+                'src/rezin/BasicTypes.cpp',
+                'src/rezin/BitsPiece.cpp',
+                'src/rezin/ColorIcon.cpp',
                 'src/rezin/ColorTable.cpp',
                 'src/rezin/Options.cpp',
                 'src/rezin/ResourceEntry.cpp',
@@ -22,6 +25,7 @@
                 ':check-deps',
                 '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
                 '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
+                '<(DEPTH)/ext/libpng/libpng.gyp:libpng',
             ],
             'direct_dependent_settings': {
                 'include_dirs': [
@@ -31,6 +35,7 @@
             'export_dependent_settings': [
                 '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
                 '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
+                '<(DEPTH)/ext/libpng/libpng.gyp:libpng',
             ],
         },
         {
