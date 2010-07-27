@@ -47,7 +47,7 @@
                 'src/rezin/commands/ConvertCommand.cpp',
                 'src/rezin/commands/LsCommand.cpp',
                 'src/rezin/sources/AppleSingleSource.cpp',
-                'src/rezin/sources/ResourceForkSource.cpp',
+                'src/rezin/sources/FlatFileSource.cpp',
                 'src/rezin/sources/ZipSource.cpp',
             ],
             'dependencies': [

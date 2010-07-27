@@ -57,7 +57,7 @@ provided with each invocation of rezin.
    are supported.  Since rezin is concerned only with the resource fork, it will also accept the
    portion of a AppleDouble-encoded file which contains the resource fork.
 
- * `-r` <file> | `--resource-fork`=<file>:
+ * `-f` <file> | `--flat-file`=<file>:
    Read from the flat file <file>.  On systems which support the resource fork natively, it is
    possible to read from a file's resource fork by appending "/rsrc" to the path of that file, as
    if it were a directory.

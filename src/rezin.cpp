@@ -14,7 +14,7 @@
 #include <rezin/commands/ConvertCommand.hpp>
 #include <rezin/commands/LsCommand.hpp>
 #include <rezin/sources/AppleSingleSource.hpp>
-#include <rezin/sources/ResourceForkSource.hpp>
+#include <rezin/sources/FlatFileSource.hpp>
 #include <rezin/sources/ZipSource.hpp>
 
 using sfz::Exception;
@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
         opterr = 0;
         const option longopts[] = {
             { "apple-single",   required_argument,  NULL,   'a' },
-            { "resource-fork",  required_argument,  NULL,   'r' },
+            { "flat-file",      required_argument,  NULL,   'f' },
             { "zip-file",       required_argument,  NULL,   'z' },
             { "line-ending",    required_argument,  NULL,   'l' },
             { NULL,             0,                  NULL,   0 }
@@ -65,11 +65,11 @@ int main(int argc, char** argv) {
                 source.reset(new AppleSingleSource(arg));
                 break;
 
-              case 'r':
+              case 'f':
                 if (source.get() != NULL) {
                     throw Exception(format("more than one source specified."));
                 }
-                source.reset(new ResourceForkSource(arg));
+                source.reset(new FlatFileSource(arg));
                 break;
 
               case 'z':
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
                     "       {0} [OPTIONS] convert TYPE ID\n"
                     "options:\n"
                     "    -a|--apple-single=FILE\n"
-                    "    -r|--resource-fork=FILE\n"
+                    "    -f|--flat-file=FILE\n"
                     "    -z|--zip-file=ZIP,FILE\n"
                     "    -l|--line-ending=cr|nl|crnl\n",
                     basename(binary_name), e.message()));
