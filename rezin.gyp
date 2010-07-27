@@ -1,9 +1,4 @@
 {
-    'target_defaults': {
-        'include_dirs': [
-            'include',
-        ],
-    },
     'targets': [
         {
             'target_name': 'librezin',
@@ -14,6 +9,7 @@
                 'src/rezin/BitsPiece.cpp',
                 'src/rezin/ColorIcon.cpp',
                 'src/rezin/ColorTable.cpp',
+                'src/rezin/ColorTableInternal.cpp',
                 'src/rezin/Options.cpp',
                 'src/rezin/ResourceEntry.cpp',
                 'src/rezin/ResourceFork.cpp',
@@ -27,9 +23,13 @@
                 '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
                 '<(DEPTH)/ext/libpng/libpng.gyp:libpng',
             ],
+            'include_dirs': [
+                'public',
+                'private',
+            ],
             'direct_dependent_settings': {
                 'include_dirs': [
-                    'include',
+                    'public',
                 ],
             },
             'export_dependent_settings': [

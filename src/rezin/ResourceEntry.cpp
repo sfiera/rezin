@@ -3,10 +3,10 @@
 // This file is part of librezin, a free software project.  You can redistribute it and/or modify
 // it under the terms of the MIT License.
 
-#include "rezin/ResourceEntry.hpp"
+#include <rezin/ResourceEntry.hpp>
 
+#include <rezin/Options.hpp>
 #include <sfz/sfz.hpp>
-#include "rezin/Options.hpp"
 
 using sfz::BytesPiece;
 using sfz::String;

@@ -3,17 +3,17 @@
 // This file is part of librezin, a free software project.  You can redistribute it and/or modify
 // it under the terms of the MIT License.
 
-#include "rezin/ColorIcon.hpp"
+#include <rezin/ColorIcon.hpp>
 
 #include <algorithm>
 #include <map>
 #include <vector>
 #include <png.h>
+#include <rezin/BasicTypes.hpp>
+#include <rezin/BitsPiece.hpp>
+#include <rezin/ColorTableInternal.hpp>
 #include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
-#include "rezin/BasicTypes.hpp"
-#include "rezin/BitsPiece.hpp"
-#include "rezin/ColorTable.hpp"
 
 using rgos::Json;
 using rgos::JsonDefaultVisitor;

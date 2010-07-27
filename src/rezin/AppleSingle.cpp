@@ -3,7 +3,7 @@
 // This file is part of librezin, a free software project.  You can redistribute it and/or modify
 // it under the terms of the MIT License.
 
-#include "rezin/AppleSingle.hpp"
+#include <rezin/AppleSingle.hpp>
 
 #include <arpa/inet.h>
 #include <sfz/sfz.hpp>
