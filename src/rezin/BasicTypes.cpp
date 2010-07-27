@@ -65,6 +65,10 @@ Json PixMap::to_json() const {
 }
 
 void PixMap::read_pixels(ReadSource in, vector<uint8_t>* out) const {
+    if (row_bytes == 0) {
+        return;
+    }
+
     size_t size = row_bytes * bounds.height();
     Bytes bytes(size, '\0');
     in.shift(bytes.mutable_data(), size);
@@ -134,6 +138,10 @@ Json BitMap::to_json() const {
 }
 
 void BitMap::read_pixels(ReadSource in, vector<uint8_t>* out) const {
+    if (row_bytes == 0) {
+        return;
+    }
+
     size_t size = row_bytes * bounds.height();
     Bytes bytes(size, '\0');
     in.shift(bytes.mutable_data(), size);
