@@ -43,6 +43,12 @@
             'type': 'executable',
             'sources': [
                 'src/rezin.cpp',
+                'src/rezin/commands/CatCommand.cpp',
+                'src/rezin/commands/ConvertCommand.cpp',
+                'src/rezin/commands/LsCommand.cpp',
+                'src/rezin/sources/AppleSingleSource.cpp',
+                'src/rezin/sources/ResourceForkSource.cpp',
+                'src/rezin/sources/ZipSource.cpp',
             ],
             'dependencies': [
                 ':check-deps',
@@ -50,6 +56,10 @@
                 '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
                 '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
                 '<(DEPTH)/ext/libzipxx/libzipxx.gyp:libzipxx',
+            ],
+            'include_dirs': [
+                'public',
+                'private',
             ],
         },
     ],
