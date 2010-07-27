@@ -41,9 +41,9 @@ rgos::Json read_snd(const sfz::BytesPiece& in);
 // restrictions on input as read_snd() does on output.
 //
 // @param [in] sound    Sound data as returned by read_snd().
-// @param [out] out     AIFF data is appended to this string.
+// @param [out] out     AIFF data is appended to this target.
 // @throws Exception    If the JSON data could not be interpreted.
-void write_aiff(const rgos::Json& sound, sfz::Bytes* out);
+void write_aiff(sfz::WriteTarget out, const rgos::Json& sound);
 
 }  // namespace rezin
 

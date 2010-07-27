@@ -127,7 +127,7 @@ class ConvertCommand : public Command {
 
         if (_code == "snd ") {
             Json snd = read_snd(data);
-            write_aiff(snd, &converted);
+            write_aiff(&converted, snd);
         } else if (_code == "TEXT") {
             String string(_options.decode(data));
             converted.assign(utf8::encode(string));

@@ -339,7 +339,7 @@ void write_form(WriteTarget out, const SoundInfo& info) {
 
 }  // namespace
 
-void write_aiff(const Json& sound, Bytes* out) {
+void write_aiff(WriteTarget out, const Json& sound) {
     SoundInfo info;
     SoundInfoVisitor visitor(&info);
     sound.accept(&visitor);
