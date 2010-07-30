@@ -22,3 +22,6 @@
 [submodule "ext/libpng"]
 	path = ext/libpng
 	url = git://github.com/sfiera/libpng.git
+[submodule "ext/gyp"]
+	path = ext/gyp
+	url = git://github.com/sfiera/gyp.git
