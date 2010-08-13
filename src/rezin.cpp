@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
         };
 
         while (true) {
-            const char ch = getopt_long(argc, argv, "a:r:z:l:", longopts, NULL);
+            const char ch = getopt_long(argc, argv, "a:f:z:l:", longopts, NULL);
             if (ch == -1) {
                 break;
             }
