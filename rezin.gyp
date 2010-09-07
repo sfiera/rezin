@@ -18,7 +18,6 @@
                 'src/rezin/StringList.cpp',
             ],
             'dependencies': [
-                ':check-deps',
                 '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
                 '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
                 '<(DEPTH)/ext/libpng/libpng.gyp:libpng',
@@ -51,7 +50,6 @@
                 'src/rezin/sources/ZipSource.cpp',
             ],
             'dependencies': [
-                ':check-deps',
                 ':librezin',
                 '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
                 '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
