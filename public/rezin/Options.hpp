@@ -19,14 +19,14 @@ class Options {
     void set_line_ending(LineEnding line_ending);
 
     struct EncodedString;
-    EncodedString decode(const sfz::BytesPiece& bytes) const;
+    EncodedString decode(const sfz::BytesSlice& bytes) const;
 
   private:
     LineEnding _line_ending;
 };
 
 struct Options::EncodedString {
-    const sfz::BytesPiece& bytes;
+    const sfz::BytesSlice& bytes;
     LineEnding line_ending;
 };
 void print_to(sfz::PrintTarget out, const Options::EncodedString& encoded);

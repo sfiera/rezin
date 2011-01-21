@@ -52,7 +52,7 @@ class AppleSingle {
     //                      AppleDouble-encoded file.  The block of memory must continue to remain
     //                      valid for the lifetime of this object; it is not copied.
     // @throws Exception    If the contents of `data` could not be parsed.
-    AppleSingle(const sfz::BytesPiece& data);
+    AppleSingle(const sfz::BytesSlice& data);
 
     // Returns the chunk of data corresponding to the given identifier.  Identifiers 1-0x7FFFFFFF
     // are reserved by Apple in the specification, and several such well-known chunk identifiers
@@ -61,11 +61,11 @@ class AppleSingle {
     // @param [in] data     The identifier of the chunk to fetch.
     // @returns             The requested chunk of data.
     // @throws Exception    If there is no such chunk in the file.
-    const sfz::BytesPiece& at(uint32_t id);
+    const sfz::BytesSlice& at(uint32_t id);
 
   private:
     // Map from chunk identifiers to chunk data blocks.
-    std::map<uint32_t, sfz::BytesPiece> _entries;
+    std::map<uint32_t, sfz::BytesSlice> _entries;
 
     DISALLOW_COPY_AND_ASSIGN(AppleSingle);
 };

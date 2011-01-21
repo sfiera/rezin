@@ -19,7 +19,7 @@
 
 using sfz::Exception;
 using sfz::String;
-using sfz::StringPiece;
+using sfz::StringSlice;
 using sfz::format;
 using sfz::path::basename;
 using sfz::scoped_ptr;
@@ -115,11 +115,11 @@ int main(int argc, char** argv) {
         }
 
         String storage;
-        vector<StringPiece> args;
+        vector<StringSlice> args;
         for (int i = 0; i < argc; ++i) {
             String arg(utf8::decode(argv[i]));
             storage.append(arg);
-            args.push_back(StringPiece(storage).substr(storage.size() - arg.size()));
+            args.push_back(StringSlice(storage).slice(storage.size() - arg.size()));
         }
 
         if (args[0] == "ls") {

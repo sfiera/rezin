@@ -8,18 +8,18 @@
 #include <rezin/AppleSingle.hpp>
 #include <sfz/sfz.hpp>
 
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::MappedFile;
-using sfz::StringPiece;
+using sfz::StringSlice;
 
 namespace rezin {
 
-AppleSingleSource::AppleSingleSource(const StringPiece& arg)
+AppleSingleSource::AppleSingleSource(const StringSlice& arg)
         : _path(arg) { }
 
 AppleSingleSource::~AppleSingleSource() { }
 
-BytesPiece AppleSingleSource::load() {
+BytesSlice AppleSingleSource::load() {
     _file.reset(new MappedFile(_path));
     _apple_single.reset(new AppleSingle(_file->data()));
     return _apple_single->at(AppleSingle::RESOURCE_FORK);

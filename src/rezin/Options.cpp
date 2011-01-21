@@ -5,26 +5,27 @@
 
 #include <rezin/Options.hpp>
 
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::PrintTarget;
+using sfz::Rune;
 using sfz::String;
-using sfz::StringPiece;
+using sfz::StringSlice;
 namespace macroman = sfz::macroman;
 
 namespace rezin {
 
 namespace {
 
-void convert_cr(String* string, const StringPiece& replacement) {
+void convert_cr(String* string, const StringSlice& replacement) {
     String result;
-    foreach (it, *string) {
-        if (*it == '\r') {
+    foreach (Rune r, *string) {
+        if (r == '\r') {
             result.append(replacement);
         } else {
-            result.append(1, *it);
+            result.append(1, r);
         }
     }
-    result.swap(string);
+    swap(result, *string);
 }
 
 }  // namespace
@@ -40,7 +41,7 @@ void Options::set_line_ending(LineEnding line_ending) {
     _line_ending = line_ending;
 }
 
-Options::EncodedString Options::decode(const sfz::BytesPiece& bytes) const {
+Options::EncodedString Options::decode(const sfz::BytesSlice& bytes) const {
     EncodedString result = { bytes, _line_ending };
     return result;
 }
@@ -60,7 +61,7 @@ void print_to(PrintTarget out, const Options::EncodedString& encoded) {
         convert_cr(&result, "\r\n");
         break;
     }
-    out.append(result);
+    out.push(result);
 }
 
 }  // namespace rezin

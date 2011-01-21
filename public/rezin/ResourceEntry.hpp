@@ -28,7 +28,7 @@ class ResourceEntry {
     const sfz::String& name() const;
 
     // @returns             The block of data corresponding to this entry.
-    const sfz::BytesPiece& data() const;
+    const sfz::BytesSlice& data() const;
 
   private:
     friend class ResourceType;
@@ -41,8 +41,8 @@ class ResourceEntry {
     // @param [in] data_data The block of data containing all resource data.
     // @param [in] options  Miscellaneous options.
     ResourceEntry(
-            const sfz::BytesPiece& entry_data, int index, const sfz::BytesPiece& name_data,
-            const sfz::BytesPiece& data_data, const Options& options);
+            const sfz::BytesSlice& entry_data, int index, const sfz::BytesSlice& name_data,
+            const sfz::BytesSlice& data_data, const Options& options);
 
     // The ID of this resource entry.
     int16_t _id;
@@ -51,7 +51,7 @@ class ResourceEntry {
     sfz::String _name;
 
     // The block of data corresponding to this entry.
-    sfz::BytesPiece _data;
+    sfz::BytesSlice _data;
 
     DISALLOW_COPY_AND_ASSIGN(ResourceEntry);
 };

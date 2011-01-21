@@ -3,11 +3,11 @@
 // This file is part of librezin, a free software project.  You can redistribute it and/or modify
 // it under the terms of the MIT License.
 
-#include <rezin/BitsPiece.hpp>
+#include <rezin/BitsSlice.hpp>
 
 #include <sfz/sfz.hpp>
 
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::Exception;
 using sfz::format;
 
@@ -24,24 +24,24 @@ uint8_t bits(uint8_t byte, int begin, int end) {
 
 }  // namespace
 
-BitsPiece::BitsPiece(const BytesPiece& bytes)
+BitsSlice::BitsSlice(const BytesSlice& bytes)
         : _bytes(bytes),
           _bit_index(0) { }
 
-void BitsPiece::shift(int size) {
+void BitsSlice::shift(int size) {
     _bit_index += size;
     _bytes.shift(_bit_index / 8);
     _bit_index = _bit_index % 8;
 }
 
-void BitsPiece::shift(uint8_t* data, size_t size) {
+void BitsSlice::shift(uint8_t* data, size_t size) {
     if (size == 0) {
         return;
     } else if (size + _bit_index > 8) {
         throw Exception(format("unhandled case ({0} + {1})", size, _bit_index));
     }
 
-    uint8_t byte = _bytes.front();
+    uint8_t byte = _bytes.at(0);
     *data = bits(byte, _bit_index, _bit_index + size);
 
     _bit_index += size;

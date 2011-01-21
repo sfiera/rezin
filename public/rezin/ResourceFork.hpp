@@ -28,7 +28,7 @@ class ResourceFork {
     //
     // @param [in] data     A block of memory containing the resource fork of a file.
     // @param [in] options  Miscellaneous options.
-    ResourceFork(const sfz::BytesPiece& data, const Options& options);
+    ResourceFork(const sfz::BytesSlice& data, const Options& options);
 
     ~ResourceFork();
 
@@ -36,7 +36,7 @@ class ResourceFork {
     //
     // @param [in] code     The 4-character code of the resource type to get.
     // @throws Exception    If the resource fork does not contain the given type.
-    const ResourceType& at(const sfz::StringPiece& code) const;
+    const ResourceType& at(const sfz::StringSlice& code) const;
 
     // STL-like iterator type.
     class const_iterator {

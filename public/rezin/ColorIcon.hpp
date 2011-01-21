@@ -33,7 +33,7 @@ namespace rezin {
 // @param [in] in       The content of a 'cicn' resource.
 // @returns             A JSON object representing the content of `in`.
 // @throws Exception    If the 'cicn' data could not be read.
-rgos::Json read_cicn(const sfz::BytesPiece& in);
+rgos::Json read_cicn(const sfz::BytesSlice& in);
 
 // Converts a JSON image into a PNG image.
 //

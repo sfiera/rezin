@@ -13,7 +13,7 @@ namespace rezin {
 class Source {
   public:
     virtual ~Source() { }
-    virtual sfz::BytesPiece load() = 0;
+    virtual sfz::BytesSlice load() = 0;
 };
 
 }  // namespace rezin

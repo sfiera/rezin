@@ -10,15 +10,15 @@
 
 namespace rezin {
 
-class BitsPiece {
+class BitsSlice {
   public:
-    explicit BitsPiece(const sfz::BytesPiece& bytes);
+    explicit BitsSlice(const sfz::BytesSlice& bytes);
 
     void shift(int size);
     void shift(uint8_t* data, size_t size);
 
   private:
-    sfz::BytesPiece _bytes;
+    sfz::BytesSlice _bytes;
     int _bit_index;
 };
 

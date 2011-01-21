@@ -6,14 +6,14 @@
 #include <rezin/BasicTypes.hpp>
 
 #include <vector>
-#include <rezin/BitsPiece.hpp>
+#include <rezin/BitsSlice.hpp>
 #include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
 using rgos::Json;
 using rgos::StringMap;
 using sfz::Bytes;
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::Exception;
 using sfz::ReadSource;
 using sfz::format;
@@ -71,11 +71,11 @@ void PixMap::read_pixels(ReadSource in, vector<uint8_t>* out) const {
 
     size_t size = row_bytes * bounds.height();
     Bytes bytes(size, '\0');
-    in.shift(bytes.mutable_data(), size);
+    in.shift(bytes.data(), size);
 
-    BytesPiece remainder = bytes;
+    BytesSlice remainder = bytes;
     for (int i = 0; i < bounds.height(); ++i) {
-        BitsPiece bits(remainder.substr(0, row_bytes));
+        BitsSlice bits(remainder.slice(0, row_bytes));
         for (int j = 0; j < bounds.width(); ++j) {
             uint8_t value;
             bits.shift(&value, pixel_size);
@@ -144,11 +144,11 @@ void BitMap::read_pixels(ReadSource in, vector<uint8_t>* out) const {
 
     size_t size = row_bytes * bounds.height();
     Bytes bytes(size, '\0');
-    in.shift(bytes.mutable_data(), size);
+    in.shift(bytes.data(), size);
 
-    BytesPiece remainder = bytes;
+    BytesSlice remainder = bytes;
     for (int i = 0; i < bounds.height(); ++i) {
-        BitsPiece bits(remainder.substr(0, row_bytes));
+        BitsSlice bits(remainder.slice(0, row_bytes));
         for (int j = 0; j < bounds.width(); ++j) {
             uint8_t value;
             bits.shift(&value, 1);

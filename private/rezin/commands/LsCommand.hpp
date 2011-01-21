@@ -16,7 +16,7 @@ class ResourceFork;
 
 class LsCommand : public Command {
   public:
-    LsCommand(const std::vector<sfz::StringPiece>& args);
+    LsCommand(const std::vector<sfz::StringSlice>& args);
 
     virtual void run(const ResourceFork& rsrc);
 

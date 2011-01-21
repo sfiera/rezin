@@ -15,10 +15,10 @@ class AppleSingle;
 
 class AppleSingleSource : public Source {
   public:
-    AppleSingleSource(const sfz::StringPiece& arg);
+    AppleSingleSource(const sfz::StringSlice& arg);
     ~AppleSingleSource();
 
-    virtual sfz::BytesPiece load();
+    virtual sfz::BytesSlice load();
 
   private:
     const sfz::String _path;

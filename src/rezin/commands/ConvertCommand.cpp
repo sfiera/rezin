@@ -11,10 +11,10 @@
 
 using rgos::Json;
 using sfz::Bytes;
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::Exception;
 using sfz::String;
-using sfz::StringPiece;
+using sfz::StringSlice;
 using sfz::format;
 using sfz::string_to_int;
 using std::vector;
@@ -24,7 +24,7 @@ namespace utf8 = sfz::utf8;
 
 namespace rezin {
 
-ConvertCommand::ConvertCommand(const vector<StringPiece>& args, const Options& options)
+ConvertCommand::ConvertCommand(const vector<StringSlice>& args, const Options& options)
         : _options(options) {
     if (args.size() != 3) {
         throw Exception(format("wrong number of arguments to command \"convert\"."));
@@ -37,7 +37,7 @@ ConvertCommand::ConvertCommand(const vector<StringPiece>& args, const Options& o
 
 void ConvertCommand::run(const ResourceFork& rsrc) {
     const ResourceEntry& entry = rsrc.at(_code).at(_id);
-    BytesPiece data = entry.data();
+    BytesSlice data = entry.data();
     Bytes converted;
 
     if (_code == "snd ") {

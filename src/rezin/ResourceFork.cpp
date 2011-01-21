@@ -9,9 +9,9 @@
 #include <sfz/sfz.hpp>
 
 using rgos::StringMap;
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::Exception;
-using sfz::StringPiece;
+using sfz::StringSlice;
 using sfz::format;
 using sfz::quote;
 using sfz::range;
@@ -20,9 +20,9 @@ using sfz::linked_ptr;
 
 namespace rezin {
 
-ResourceFork::ResourceFork(const BytesPiece& data, const Options& options) {
+ResourceFork::ResourceFork(const BytesSlice& data, const Options& options) {
     // Resource header.
-    BytesPiece header(data.substr(0, 16));
+    BytesSlice header(data.slice(0, 16));
     uint32_t data_offset;
     uint32_t map_offset;
     uint32_t data_length;
@@ -32,11 +32,11 @@ ResourceFork::ResourceFork(const BytesPiece& data, const Options& options) {
     read(&header, &data_length);
     read(&header, &map_length);
 
-    BytesPiece map_data = data.substr(map_offset, map_length);
-    BytesPiece data_data = data.substr(data_offset, data_length);
+    BytesSlice map_data = data.slice(map_offset, map_length);
+    BytesSlice data_data = data.slice(data_offset, data_length);
 
     // Map header.
-    BytesPiece map(map_data.substr(16, 14));
+    BytesSlice map(map_data.slice(16, 14));
     uint16_t type_offset;
     uint16_t name_offset;
     uint16_t type_count;
@@ -46,19 +46,19 @@ ResourceFork::ResourceFork(const BytesPiece& data, const Options& options) {
     read(&map, &type_count);
     ++type_count;
 
-    BytesPiece type_data = map_data.substr(type_offset);
-    BytesPiece name_data = map_data.substr(name_offset);
+    BytesSlice type_data = map_data.slice(type_offset);
+    BytesSlice name_data = map_data.slice(name_offset);
 
-    foreach (i, range(type_count)) {
+    foreach (uint16_t i, range(type_count)) {
         linked_ptr<ResourceType> type(
                 new ResourceType(type_data, i, name_data, data_data, options));
-        _types[StringPiece(type->code())] = type;
+        _types[StringSlice(type->code())] = type;
     }
 }
 
 ResourceFork::~ResourceFork() { }
 
-const ResourceType& ResourceFork::at(const StringPiece& code) const {
+const ResourceType& ResourceFork::at(const StringSlice& code) const {
     StringMap<linked_ptr<ResourceType> >::const_iterator it = _types.find(code);
     if (it == _types.end()) {
         throw Exception(format("no such resource type '{0}'", code));

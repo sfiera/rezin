@@ -18,7 +18,7 @@ class ResourceFork;
 
 class ConvertCommand : public Command {
   public:
-    ConvertCommand(const std::vector<sfz::StringPiece>& args, const Options& options);
+    ConvertCommand(const std::vector<sfz::StringSlice>& args, const Options& options);
 
     virtual void run(const ResourceFork& rsrc);
 

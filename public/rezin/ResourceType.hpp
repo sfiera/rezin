@@ -73,8 +73,8 @@ class ResourceType {
     // @param [in] data_data The block of data containing all resource data.
     // @param [in] options  Miscellaneous options.
     ResourceType(
-            const sfz::BytesPiece& type_data, int index, const sfz::BytesPiece& name_data,
-            const sfz::BytesPiece& data_data, const Options& options);
+            const sfz::BytesSlice& type_data, int index, const sfz::BytesSlice& name_data,
+            const sfz::BytesSlice& data_data, const Options& options);
 
     // The 4-character code of this resource type.
     sfz::String _code;

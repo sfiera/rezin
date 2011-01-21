@@ -12,7 +12,7 @@
 
 using rgos::Json;
 using sfz::Bytes;
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::String;
 using sfz::range;
 using sfz::read;
@@ -20,19 +20,19 @@ using std::vector;
 
 namespace rezin {
 
-Json read_string_list(const BytesPiece& data, const Options& options) {
-    BytesPiece in(data);
+Json read_string_list(const BytesSlice& data, const Options& options) {
+    BytesSlice in(data);
     uint16_t array_size;
     read(&in, &array_size);
 
     vector<Json> result;
-    foreach (i, range(array_size)) {
+    foreach (uint16_t i, range(array_size)) {
         uint8_t data[255];
         uint8_t size;
         read(&in, &size);
         read(&in, data, size);
         Bytes utf8;
-        String string(options.decode(BytesPiece(data, size)));
+        String string(options.decode(BytesSlice(data, size)));
         result.push_back(Json::string(string));
     }
     return Json::array(result);

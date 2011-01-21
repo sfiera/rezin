@@ -13,9 +13,9 @@ namespace rezin {
 
 class FlatFileSource : public Source {
   public:
-    FlatFileSource(const sfz::StringPiece& arg);
+    FlatFileSource(const sfz::StringSlice& arg);
 
-    virtual sfz::BytesPiece load();
+    virtual sfz::BytesSlice load();
 
   private:
     const sfz::String _path;

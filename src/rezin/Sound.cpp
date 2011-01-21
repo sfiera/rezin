@@ -12,10 +12,10 @@ using rgos::Json;
 using rgos::JsonDefaultVisitor;
 using rgos::StringMap;
 using sfz::Bytes;
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::Exception;
 using sfz::ReadSource;
-using sfz::StringPiece;
+using sfz::StringSlice;
 using sfz::WriteTarget;
 using sfz::format;
 using sfz::hex;
@@ -103,8 +103,8 @@ void read_snd_data_table(ReadSource in, uint32_t* pointer, uint32_t* size, doubl
 // @param [in] in       The ReadSource to read from.
 // @param [in] sample_count The number of samples to read.
 // @param [out] samples The array to read the samples into.
-void read_snd_samples(ReadSource in, int sample_count, vector<Json>* samples) {
-    foreach (i, range(sample_count)) {
+void read_snd_samples(ReadSource in, uint32_t sample_count, vector<Json>* samples) {
+    foreach (uint32_t i, range(sample_count)) {
         uint8_t sample;
         read(in, &sample);
         samples->push_back(Json::number(sample));
@@ -113,9 +113,9 @@ void read_snd_samples(ReadSource in, int sample_count, vector<Json>* samples) {
 
 }  // namespace
 
-Json read_snd(const BytesPiece& in) {
+Json read_snd(const BytesSlice& in) {
     StringMap<Json> result;
-    BytesPiece remainder(in);
+    BytesSlice remainder(in);
     uint16_t fmt;
     read(&remainder, &fmt);
     if (fmt == 1) {
@@ -144,7 +144,7 @@ Json read_snd(const BytesPiece& in) {
         throw Exception(format("param1 must be zero; {0} found", zero));
     }
 
-    BytesPiece sound(in.substr(offset));
+    BytesSlice sound(in.slice(offset));
     uint32_t pointer;
     uint32_t sample_count;
     double sample_rate;
@@ -154,7 +154,7 @@ Json read_snd(const BytesPiece& in) {
     result.insert(make_pair("sample_rate", Json::number(sample_rate)));
 
     vector<Json> samples;
-    BytesPiece sample(in.substr(offset + 22 + pointer, sample_count));
+    BytesSlice sample(in.slice(offset + 22 + pointer, sample_count));
     read_snd_samples(&sample, sample_count, &samples);
     result.insert(make_pair("samples", Json::array(samples)));
     return Json::object(result);
@@ -190,10 +190,10 @@ class GetSamplesVisitor : public JsonDefaultVisitor {
             : _out(out) { }
 
     virtual void visit_array(const vector<Json>& value) {
-        foreach (it, value) {
+        foreach (const Json& item, value) {
             _out->push_back(0);
             GetNumberVisitor<uint8_t> visitor(&_out->back());
-            it->accept(&visitor);
+            item.accept(&visitor);
         }
     }
 
@@ -280,7 +280,7 @@ void write_float80(WriteTarget out, double d) {
 // @param [out] out     The WriteTarget to write the chunk to.
 // @param [in] name     A four-byte chunk name.
 // @param [in] data     The content of the chunk.
-void write_chunk(WriteTarget out, const char* name, const BytesPiece& data) {
+void write_chunk(WriteTarget out, const char* name, const BytesSlice& data) {
     write(out, name, 4);
     write<uint32_t>(out, data.size());
     write(out, data.data(), data.size());
@@ -312,8 +312,8 @@ void write_ssnd(WriteTarget out, const SoundInfo& info) {
     Bytes ssnd;
     write<uint32_t>(&ssnd, 0);
     write<uint32_t>(&ssnd, 0);
-    foreach (it, info.samples) {
-        write<int8_t>(&ssnd, *it - 0x80);
+    foreach (uint8_t sample, info.samples) {
+        write<int8_t>(&ssnd, sample - 0x80);
     }
 
     write_chunk(out, "SSND", ssnd);

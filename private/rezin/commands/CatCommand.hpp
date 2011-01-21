@@ -16,7 +16,7 @@ class ResourceFork;
 
 class CatCommand : public Command {
   public:
-    CatCommand(const std::vector<sfz::StringPiece>& args);
+    CatCommand(const std::vector<sfz::StringSlice>& args);
 
     virtual void run(const ResourceFork& rsrc);
 

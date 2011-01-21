@@ -18,10 +18,10 @@ class AppleSingle;
 
 class ZipSource : public Source {
   public:
-    ZipSource(const sfz::StringPiece& arg);
+    ZipSource(const sfz::StringSlice& arg);
     ~ZipSource();
 
-    virtual sfz::BytesPiece load();
+    virtual sfz::BytesSlice load();
 
   private:
     sfz::String _archive_path;

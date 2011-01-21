@@ -10,7 +10,7 @@
 #include <vector>
 #include <png.h>
 #include <rezin/BasicTypes.hpp>
-#include <rezin/BitsPiece.hpp>
+#include <rezin/BitsSlice.hpp>
 #include <rezin/ColorTableInternal.hpp>
 #include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
@@ -19,10 +19,10 @@ using rgos::Json;
 using rgos::JsonDefaultVisitor;
 using rgos::StringMap;
 using sfz::Bytes;
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::Exception;
 using sfz::ReadSource;
-using sfz::StringPiece;
+using sfz::StringSlice;
 using sfz::WriteTarget;
 using sfz::format;
 using sfz::range;
@@ -60,9 +60,9 @@ Json ColorIcon::to_json() const {
     vector<uint8_t>::const_iterator icon_it = icon_pixmap_pixels.begin();
 
     vector<Json> pixels;
-    foreach (i, range(height)) {
+    foreach (int i, range(height)) {
         vector<Json> row;
-        foreach (j, range(width)) {
+        foreach (int j, range(width)) {
             if (*mask_it) {
                 row.push_back(Json::number(*icon_it));
             } else {
@@ -91,8 +91,8 @@ void read_from(ReadSource in, ColorIcon* cicn) {
 
 }  // namespace
 
-rgos::Json read_cicn(const BytesPiece& in) {
-    BytesPiece remainder(in);
+rgos::Json read_cicn(const BytesSlice& in) {
+    BytesSlice remainder(in);
     ColorIcon cicn;
     read(&remainder, &cicn);
     if (!remainder.empty()) {
@@ -177,8 +177,8 @@ class JsonToPngVisitor : public JsonDefaultVisitor {
     virtual void visit_array(const vector<Json>& value) {
         switch (_state) {
           case COLOR_TABLE:
-            foreach (it, value) {
-                descend(COLOR, *it);
+            foreach (const Json& item, value) {
+                descend(COLOR, item);
             }
             break;
 
@@ -198,8 +198,8 @@ class JsonToPngVisitor : public JsonDefaultVisitor {
             break;
 
           case PIXELS:
-            foreach (it, value) {
-                descend(PIXEL_ROW, *it);
+            foreach (const Json& item, value) {
+                descend(PIXEL_ROW, item);
             }
             break;
 
@@ -208,10 +208,10 @@ class JsonToPngVisitor : public JsonDefaultVisitor {
                 throw Exception("Image must be rectangular");
             }
             _row_data.clear();
-            foreach (it, value) {
-                descend(PIXEL, *it);
+            foreach (const Json& item, value) {
+                descend(PIXEL, item);
             }
-            png_write_row(_png, _row_data.mutable_data());
+            png_write_row(_png, _row_data.data());
             break;
 
           default:
@@ -313,8 +313,8 @@ class JsonToPngVisitor : public JsonDefaultVisitor {
     // Changes state to `state`, then visits `object[field]`.  If `field` is not an element of
     // `object`, throws an exception, using `name` to describe `object` in the error description.
     void descend_field(
-            State state, const StringMap<Json>& object, const StringPiece& name,
-            const StringPiece& field) {
+            State state, const StringMap<Json>& object, const StringSlice& name,
+            const StringSlice& field) {
         if (object.find(field) == object.end()) {
             throw Exception(format("{0} must have {1} field", name, quote(field)));
         }

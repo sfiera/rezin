@@ -32,7 +32,7 @@ namespace rezin {
 // @param [in] in       The content of a 'snd ' resource.
 // @returns             A JSON object representing the content of `in`.
 // @throws Exception    If the 'snd ' data could not be read.
-rgos::Json read_snd(const sfz::BytesPiece& in);
+rgos::Json read_snd(const sfz::BytesSlice& in);
 
 // Converts JSON sound data into AIFF data.
 //

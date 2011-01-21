@@ -6,7 +6,7 @@
             'sources': [
                 'src/rezin/AppleSingle.cpp',
                 'src/rezin/BasicTypes.cpp',
-                'src/rezin/BitsPiece.cpp',
+                'src/rezin/BitsSlice.cpp',
                 'src/rezin/ColorIcon.cpp',
                 'src/rezin/ColorTable.cpp',
                 'src/rezin/ColorTableInternal.cpp',

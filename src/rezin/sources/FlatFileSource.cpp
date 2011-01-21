@@ -7,16 +7,16 @@
 
 #include <sfz/sfz.hpp>
 
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::MappedFile;
-using sfz::StringPiece;
+using sfz::StringSlice;
 
 namespace rezin {
 
-FlatFileSource::FlatFileSource(const StringPiece& arg)
+FlatFileSource::FlatFileSource(const StringSlice& arg)
     : _path(arg) { }
 
-BytesPiece FlatFileSource::load() {
+BytesSlice FlatFileSource::load() {
     _file.reset(new MappedFile(_path));
     return _file->data();
 }

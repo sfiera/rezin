@@ -8,7 +8,7 @@
 #include <rezin/ResourceEntry.hpp>
 #include <sfz/sfz.hpp>
 
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::Exception;
 using sfz::format;
 using sfz::linked_ptr;
@@ -41,18 +41,18 @@ ResourceType::const_iterator ResourceType::end() const {
 }
 
 ResourceType::ResourceType(
-        const BytesPiece& type_data, int index, const BytesPiece& name_data,
-        const BytesPiece& data_data, const Options& options) {
-    _code.assign(macroman::decode(type_data.substr(2 + index * 8, 4)));
-    BytesPiece type(type_data.substr(6 + index * 8, 4));
+        const BytesSlice& type_data, int index, const BytesSlice& name_data,
+        const BytesSlice& data_data, const Options& options) {
+    _code.assign(macroman::decode(type_data.slice(2 + index * 8, 4)));
+    BytesSlice type(type_data.slice(6 + index * 8, 4));
     uint16_t count;
     uint16_t offset;
     read(&type, &count);
     read(&type, &offset);
     ++count;
 
-    BytesPiece entry_data = type_data.substr(offset);
-    foreach (i, range(count)) {
+    BytesSlice entry_data = type_data.slice(offset);
+    foreach (uint16_t i, range(count)) {
         linked_ptr<ResourceEntry> entry(
                 new ResourceEntry(entry_data, i, name_data, data_data, options));
         _entries[entry->id()] = entry;

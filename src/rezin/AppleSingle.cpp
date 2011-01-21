@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 #include <sfz/sfz.hpp>
 
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::Exception;
 using sfz::format;
 using sfz::hex;
@@ -42,9 +42,9 @@ enum AppleSingleVersion {
 
 }  // namespace
 
-AppleSingle::AppleSingle(const BytesPiece& data) {
+AppleSingle::AppleSingle(const BytesSlice& data) {
     bool little_endian = false;
-    BytesPiece remainder(data);
+    BytesSlice remainder(data);
     uint32_t magic;
     read(&remainder, &magic);
     switch (magic) {
@@ -78,7 +78,7 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
                 entry_count = htons(entry_count);
             }
 
-            foreach (i, range(entry_count)) {
+            foreach (uint16_t i, range(entry_count)) {
                 uint32_t id;
                 uint32_t offset;
                 uint32_t length;
@@ -92,7 +92,7 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
                     length = htonl(length);
                 }
 
-                _entries.insert(std::make_pair(id, data.substr(offset, length)));
+                _entries.insert(std::make_pair(id, data.slice(offset, length)));
             }
         }
         break;
@@ -102,8 +102,8 @@ AppleSingle::AppleSingle(const BytesPiece& data) {
     }
 }
 
-const BytesPiece& AppleSingle::at(uint32_t id) {
-    std::map<uint32_t, BytesPiece>::const_iterator it = _entries.find(id);
+const BytesSlice& AppleSingle::at(uint32_t id) {
+    std::map<uint32_t, BytesSlice>::const_iterator it = _entries.find(id);
     if (it == _entries.end()) {
         throw Exception(format("no such id '{0}'", id));
     }

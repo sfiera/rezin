@@ -10,15 +10,15 @@
 #include <sfz/sfz.hpp>
 
 using rgos::Json;
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::Exception;
 using sfz::format;
 using sfz::read;
 
 namespace rezin {
 
-Json read_clut(const BytesPiece& in) {
-    BytesPiece remainder(in);
+Json read_clut(const BytesSlice& in) {
+    BytesSlice remainder(in);
     ColorTable clut;
     read(&remainder, &clut);
     if (!remainder.empty()) {

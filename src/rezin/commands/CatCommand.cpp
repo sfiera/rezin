@@ -10,16 +10,16 @@
 #include <rezin/ResourceFork.hpp>
 #include <rezin/ResourceType.hpp>
 
-using sfz::BytesPiece;
+using sfz::BytesSlice;
 using sfz::Exception;
-using sfz::StringPiece;
+using sfz::StringSlice;
 using sfz::format;
 using sfz::string_to_int;
 using std::vector;
 
 namespace rezin {
 
-CatCommand::CatCommand(const vector<StringPiece>& args) {
+CatCommand::CatCommand(const vector<StringSlice>& args) {
     if (args.size() != 3) {
         throw Exception(format("wrong number of arguments to command \"cat\"."));
     }
@@ -31,7 +31,7 @@ CatCommand::CatCommand(const vector<StringPiece>& args) {
 
 void CatCommand::run(const ResourceFork& rsrc) {
     const ResourceEntry& entry = rsrc.at(_code).at(_id);
-    BytesPiece data = entry.data();
+    BytesSlice data = entry.data();
     write(1, data.data(), data.size());
 }
 
