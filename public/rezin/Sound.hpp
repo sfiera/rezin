@@ -6,7 +6,6 @@
 #ifndef REZIN_SOUND_HPP_
 #define REZIN_SOUND_HPP_
 
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
@@ -32,7 +31,7 @@ namespace rezin {
 // @param [in] in       The content of a 'snd ' resource.
 // @returns             A JSON object representing the content of `in`.
 // @throws Exception    If the 'snd ' data could not be read.
-rgos::Json read_snd(const sfz::BytesSlice& in);
+sfz::Json read_snd(const sfz::BytesSlice& in);
 
 // Converts JSON sound data into AIFF data.
 //
@@ -43,7 +42,7 @@ rgos::Json read_snd(const sfz::BytesSlice& in);
 // @param [in] sound    Sound data as returned by read_snd().
 // @param [out] out     AIFF data is appended to this target.
 // @throws Exception    If the JSON data could not be interpreted.
-void write_aiff(sfz::WriteTarget out, const rgos::Json& sound);
+void write_aiff(sfz::WriteTarget out, const sfz::Json& sound);
 
 }  // namespace rezin
 

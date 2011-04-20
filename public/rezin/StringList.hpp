@@ -6,7 +6,6 @@
 #ifndef REZIN_STRING_LIST_HPP_
 #define REZIN_STRING_LIST_HPP_
 
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
@@ -20,7 +19,7 @@ class Options;
 // @param [in] data     The content of a 'STR#' resource.
 // @param [in] options  Miscellaneous options.
 // @returns             A JSON object representing the content of `in`.
-rgos::Json read_string_list(const sfz::BytesSlice& data, const Options& options);
+sfz::Json read_string_list(const sfz::BytesSlice& data, const Options& options);
 
 }  // namespace rezin
 

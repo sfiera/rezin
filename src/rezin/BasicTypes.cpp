@@ -7,15 +7,14 @@
 
 #include <vector>
 #include <rezin/BitsSlice.hpp>
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
-using rgos::Json;
-using rgos::StringMap;
 using sfz::Bytes;
 using sfz::BytesSlice;
 using sfz::Exception;
+using sfz::Json;
 using sfz::ReadSource;
+using sfz::StringMap;
 using sfz::format;
 using sfz::read;
 using std::vector;

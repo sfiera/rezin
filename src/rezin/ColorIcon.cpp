@@ -12,16 +12,15 @@
 #include <rezin/BasicTypes.hpp>
 #include <rezin/BitsSlice.hpp>
 #include <rezin/ColorTableInternal.hpp>
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
-using rgos::Json;
-using rgos::JsonDefaultVisitor;
-using rgos::StringMap;
 using sfz::Bytes;
 using sfz::BytesSlice;
 using sfz::Exception;
+using sfz::Json;
+using sfz::JsonDefaultVisitor;
 using sfz::ReadSource;
+using sfz::StringMap;
 using sfz::StringSlice;
 using sfz::WriteTarget;
 using sfz::format;
@@ -29,8 +28,8 @@ using sfz::range;
 using sfz::read;
 using std::make_pair;
 using std::map;
-using std::vector;
 using std::swap;
+using std::vector;
 
 namespace rezin {
 
@@ -46,7 +45,7 @@ struct ColorIcon {
     ColorTable color_table;
     std::vector<uint8_t> icon_pixmap_pixels;
 
-    rgos::Json to_json() const;
+    Json to_json() const;
 };
 
 Json ColorIcon::to_json() const {
@@ -60,9 +59,9 @@ Json ColorIcon::to_json() const {
     vector<uint8_t>::const_iterator icon_it = icon_pixmap_pixels.begin();
 
     vector<Json> pixels;
-    foreach (int i, range(height)) {
+    SFZ_FOREACH(int i, range(height), {
         vector<Json> row;
-        foreach (int j, range(width)) {
+        SFZ_FOREACH(int j, range(width), {
             if (*mask_it) {
                 row.push_back(Json::number(*icon_it));
             } else {
@@ -70,9 +69,9 @@ Json ColorIcon::to_json() const {
             }
             ++mask_it;
             ++icon_it;
-        }
+        });
         pixels.push_back(Json::array(row));
-    }
+    });
     result["pixels"] = Json::array(pixels);
     return Json::object(result);
 }
@@ -91,7 +90,7 @@ void read_from(ReadSource in, ColorIcon* cicn) {
 
 }  // namespace
 
-rgos::Json read_cicn(const BytesSlice& in) {
+Json read_cicn(const BytesSlice& in) {
     BytesSlice remainder(in);
     ColorIcon cicn;
     read(&remainder, &cicn);
@@ -177,9 +176,9 @@ class JsonToPngVisitor : public JsonDefaultVisitor {
     virtual void visit_array(const vector<Json>& value) {
         switch (_state) {
           case COLOR_TABLE:
-            foreach (const Json& item, value) {
+            SFZ_FOREACH(const Json& item, value, {
                 descend(COLOR, item);
-            }
+            });
             break;
 
           case GET_HEIGHT:
@@ -198,9 +197,9 @@ class JsonToPngVisitor : public JsonDefaultVisitor {
             break;
 
           case PIXELS:
-            foreach (const Json& item, value) {
+            SFZ_FOREACH(const Json& item, value, {
                 descend(PIXEL_ROW, item);
-            }
+            });
             break;
 
           case PIXEL_ROW:
@@ -208,9 +207,9 @@ class JsonToPngVisitor : public JsonDefaultVisitor {
                 throw Exception("Image must be rectangular");
             }
             _row_data.clear();
-            foreach (const Json& item, value) {
+            SFZ_FOREACH(const Json& item, value, {
                 descend(PIXEL, item);
-            }
+            });
             png_write_row(_png, _row_data.data());
             break;
 
@@ -346,7 +345,7 @@ class JsonToPngVisitor : public JsonDefaultVisitor {
 
 }  // namespace
 
-void write_png(WriteTarget out, const rgos::Json& image) {
+void write_png(WriteTarget out, const Json& image) {
     JsonToPngVisitor visitor(out);
     image.accept(&visitor);
 }

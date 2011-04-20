@@ -7,12 +7,11 @@
 
 #include <fcntl.h>
 #include <rezin/rezin.hpp>
-#include <rgos/rgos.hpp>
 
-using rgos::Json;
 using sfz::Bytes;
 using sfz::BytesSlice;
 using sfz::Exception;
+using sfz::Json;
 using sfz::String;
 using sfz::StringSlice;
 using sfz::format;

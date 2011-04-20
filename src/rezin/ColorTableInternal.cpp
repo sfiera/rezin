@@ -5,13 +5,12 @@
 
 #include <rezin/ColorTableInternal.hpp>
 
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
-using rgos::Json;
-using rgos::StringMap;
 using sfz::Exception;
+using sfz::Json;
 using sfz::ReadSource;
+using sfz::StringMap;
 using sfz::format;
 using sfz::range;
 using sfz::read;
@@ -49,9 +48,9 @@ void read_from(ReadSource in, ColorSpec* out) {
 
 Json ColorTable::to_json() const {
     vector<Json> result;
-    foreach (uint32_t i, range(uint32_t(ct_size) + 1)) {
+    SFZ_FOREACH(uint32_t i, range(uint32_t(ct_size) + 1), {
         result.push_back(ct_table[i].to_json());
-    }
+    });
     return Json::array(result);
 }
 
@@ -60,9 +59,9 @@ void read_from(ReadSource in, ColorTable* out) {
     read(in, &out->ct_flags);
     read(in, &out->ct_size);
     out->ct_table.resize(out->ct_size + 1);
-    foreach (uint32_t i, range(uint32_t(out->ct_size) + 1)) {
+    SFZ_FOREACH(uint32_t i, range(uint32_t(out->ct_size) + 1), {
         read(in, &out->ct_table[i]);
-    }
+    });
 }
 
 }  // namespace rezin

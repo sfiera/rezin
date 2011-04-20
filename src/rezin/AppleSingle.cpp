@@ -78,7 +78,7 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
                 entry_count = htons(entry_count);
             }
 
-            foreach (uint16_t i, range(entry_count)) {
+            SFZ_FOREACH(uint16_t i, range(entry_count), {
                 uint32_t id;
                 uint32_t offset;
                 uint32_t length;
@@ -93,7 +93,7 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
                 }
 
                 _entries.insert(std::make_pair(id, data.slice(offset, length)));
-            }
+            });
         }
         break;
 

@@ -52,11 +52,11 @@ ResourceType::ResourceType(
     ++count;
 
     BytesSlice entry_data = type_data.slice(offset);
-    foreach (uint16_t i, range(count)) {
+    SFZ_FOREACH(uint16_t i, range(count), {
         linked_ptr<ResourceEntry> entry(
                 new ResourceEntry(entry_data, i, name_data, data_data, options));
         _entries[entry->id()] = entry;
-    }
+    });
 }
 
 }  // namespace rezin

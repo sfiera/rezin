@@ -8,7 +8,6 @@
 
 #include <stdint.h>
 #include <vector>
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
@@ -18,7 +17,7 @@ struct RgbColor {
     uint16_t green;
     uint16_t blue;
 
-    rgos::Json to_json() const;
+    sfz::Json to_json() const;
 };
 void read_from(sfz::ReadSource in, RgbColor* out);
 
@@ -26,7 +25,7 @@ struct ColorSpec {
     uint16_t value;
     RgbColor rgb;
 
-    rgos::Json to_json() const;
+    sfz::Json to_json() const;
 };
 void read_from(sfz::ReadSource in, ColorSpec* out);
 
@@ -36,7 +35,7 @@ struct ColorTable {
     uint16_t ct_size;
     std::vector<ColorSpec> ct_table;
 
-    rgos::Json to_json() const;
+    sfz::Json to_json() const;
 };
 void read_from(sfz::ReadSource in, ColorTable* out);
 

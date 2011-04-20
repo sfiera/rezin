@@ -6,7 +6,6 @@
 #ifndef REZIN_COLOR_ICON_HPP_
 #define REZIN_COLOR_ICON_HPP_
 
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
@@ -33,7 +32,7 @@ namespace rezin {
 // @param [in] in       The content of a 'cicn' resource.
 // @returns             A JSON object representing the content of `in`.
 // @throws Exception    If the 'cicn' data could not be read.
-rgos::Json read_cicn(const sfz::BytesSlice& in);
+sfz::Json read_cicn(const sfz::BytesSlice& in);
 
 // Converts a JSON image into a PNG image.
 //
@@ -44,7 +43,7 @@ rgos::Json read_cicn(const sfz::BytesSlice& in);
 // @param [out] out     PNG data is appended to this target.
 // @param [in] image    Image data as returned by read_cicn().
 // @throw Exception     If the JSON data could not be interpreted.
-void write_png(sfz::WriteTarget out, const rgos::Json& image);
+void write_png(sfz::WriteTarget out, const sfz::Json& image);
 
 }  // namespace rezin
 

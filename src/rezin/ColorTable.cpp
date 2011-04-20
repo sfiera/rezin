@@ -6,12 +6,11 @@
 #include <rezin/ColorTable.hpp>
 
 #include <rezin/ColorTableInternal.hpp>
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
-using rgos::Json;
 using sfz::BytesSlice;
 using sfz::Exception;
+using sfz::Json;
 using sfz::format;
 using sfz::read;
 

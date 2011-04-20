@@ -7,7 +7,6 @@
 #define REZIN_BASIC_TYPES_HPP_
 
 #include <stdint.h>
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
@@ -21,7 +20,7 @@ struct Rect {
     int16_t width() const;
     int16_t height() const;
 
-    rgos::Json to_json() const;
+    sfz::Json to_json() const;
 };
 void read_from(sfz::ReadSource in, Rect* out);
 
@@ -29,7 +28,7 @@ struct fixed32_t {
     int32_t int_value;
 
     double to_double() const;
-    rgos::Json to_json() const;
+    sfz::Json to_json() const;
 };
 void read_from(sfz::ReadSource in, fixed32_t* out);
 
@@ -50,7 +49,7 @@ struct PixMap {
     uint32_t pm_table;
     int32_t pm_reserved;
 
-    rgos::Json to_json() const;
+    sfz::Json to_json() const;
     void read_pixels(sfz::ReadSource in, std::vector<uint8_t>* out) const;
 };
 void read_from(sfz::ReadSource in, PixMap* out);
@@ -60,7 +59,7 @@ struct BitMap {
     uint16_t row_bytes;
     Rect bounds;
 
-    rgos::Json to_json() const;
+    sfz::Json to_json() const;
     void read_pixels(sfz::ReadSource in, std::vector<uint8_t>* out) const;
 };
 void read_from(sfz::ReadSource in, BitMap* out);

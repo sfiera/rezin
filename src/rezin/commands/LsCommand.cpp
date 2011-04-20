@@ -37,14 +37,14 @@ LsCommand::LsCommand(const vector<StringSlice>& args)
 
 void LsCommand::run(const ResourceFork& rsrc) {
     if (_argc == 1) {
-        foreach (const ResourceType& type, rsrc) {
+        SFZ_FOREACH(const ResourceType& type, rsrc, {
             print(io::out, format("{0}\n", type.code()));
-        }
+        });
     } else if (_argc == 2) {
         const ResourceType& type = rsrc.at(_code);
-        foreach (const ResourceEntry& entry, type) {
+        SFZ_FOREACH(const ResourceEntry& entry, type, {
             print(io::out, format("{0}\t{1}\n", entry.id(), entry.name()));
-        }
+        });
     } else if (_argc == 3) {
         const ResourceEntry& entry = rsrc.at(_code).at(_id);
         print(io::out, format("{0}\t{1}\n", entry.id(), entry.name()));

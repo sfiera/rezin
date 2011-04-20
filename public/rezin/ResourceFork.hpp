@@ -6,7 +6,6 @@
 #ifndef REZIN_RESOURCE_FORK_HPP_
 #define REZIN_RESOURCE_FORK_HPP_
 
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
@@ -56,8 +55,8 @@ class ResourceFork {
 
       private:
         friend class ResourceFork;
-        const_iterator(rgos::StringMap<sfz::linked_ptr<ResourceType> >::const_iterator it) : _it(it) { }
-        rgos::StringMap<sfz::linked_ptr<ResourceType> >::const_iterator _it;
+        const_iterator(sfz::StringMap<sfz::linked_ptr<ResourceType> >::const_iterator it) : _it(it) { }
+        sfz::StringMap<sfz::linked_ptr<ResourceType> >::const_iterator _it;
     };
     typedef const_iterator iterator;
 
@@ -67,7 +66,7 @@ class ResourceFork {
 
   private:
     // The map represented by this object.
-    rgos::StringMap<sfz::linked_ptr<ResourceType> > _types;
+    sfz::StringMap<sfz::linked_ptr<ResourceType> > _types;
 
     DISALLOW_COPY_AND_ASSIGN(ResourceFork);
 };

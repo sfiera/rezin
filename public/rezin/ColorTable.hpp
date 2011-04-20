@@ -8,7 +8,6 @@
 
 #include <stdint.h>
 #include <vector>
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
@@ -40,7 +39,7 @@ namespace rezin {
 // @param [in] in       The content of a 'clut' resource.
 // @returns             A JSON object representing the content of `in`.
 // @throws Exception    If the 'clut' data could not be read.
-rgos::Json read_clut(const sfz::BytesSlice& in);
+sfz::Json read_clut(const sfz::BytesSlice& in);
 
 }  // namespace rezin
 

@@ -8,15 +8,15 @@
 #include <rezin/ResourceType.hpp>
 #include <sfz/sfz.hpp>
 
-using rgos::StringMap;
 using sfz::BytesSlice;
 using sfz::Exception;
+using sfz::StringMap;
 using sfz::StringSlice;
 using sfz::format;
+using sfz::linked_ptr;
 using sfz::quote;
 using sfz::range;
 using sfz::read;
-using sfz::linked_ptr;
 
 namespace rezin {
 
@@ -49,11 +49,11 @@ ResourceFork::ResourceFork(const BytesSlice& data, const Options& options) {
     BytesSlice type_data = map_data.slice(type_offset);
     BytesSlice name_data = map_data.slice(name_offset);
 
-    foreach (uint16_t i, range(type_count)) {
+    SFZ_FOREACH(uint16_t i, range(type_count), {
         linked_ptr<ResourceType> type(
                 new ResourceType(type_data, i, name_data, data_data, options));
         _types[StringSlice(type->code())] = type;
-    }
+    });
 }
 
 ResourceFork::~ResourceFork() { }

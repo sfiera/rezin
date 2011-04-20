@@ -7,12 +7,11 @@
 
 #include <vector>
 #include <rezin/Options.hpp>
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
-using rgos::Json;
 using sfz::Bytes;
 using sfz::BytesSlice;
+using sfz::Json;
 using sfz::String;
 using sfz::range;
 using sfz::read;
@@ -26,7 +25,7 @@ Json read_string_list(const BytesSlice& data, const Options& options) {
     read(&in, &array_size);
 
     vector<Json> result;
-    foreach (uint16_t i, range(array_size)) {
+    SFZ_FOREACH(uint16_t i, range(array_size), {
         uint8_t data[255];
         uint8_t size;
         read(&in, &size);
@@ -34,7 +33,7 @@ Json read_string_list(const BytesSlice& data, const Options& options) {
         Bytes utf8;
         String string(options.decode(BytesSlice(data, size)));
         result.push_back(Json::string(string));
-    }
+    });
     return Json::array(result);
 }
 

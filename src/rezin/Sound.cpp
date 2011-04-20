@@ -5,16 +5,15 @@
 
 #include <rezin/Sound.hpp>
 
-#include <rgos/rgos.hpp>
 #include <sfz/sfz.hpp>
 
-using rgos::Json;
-using rgos::JsonDefaultVisitor;
-using rgos::StringMap;
 using sfz::Bytes;
 using sfz::BytesSlice;
 using sfz::Exception;
+using sfz::Json;
+using sfz::JsonDefaultVisitor;
 using sfz::ReadSource;
+using sfz::StringMap;
 using sfz::StringSlice;
 using sfz::WriteTarget;
 using sfz::format;
@@ -104,11 +103,11 @@ void read_snd_data_table(ReadSource in, uint32_t* pointer, uint32_t* size, doubl
 // @param [in] sample_count The number of samples to read.
 // @param [out] samples The array to read the samples into.
 void read_snd_samples(ReadSource in, uint32_t sample_count, vector<Json>* samples) {
-    foreach (uint32_t i, range(sample_count)) {
+    SFZ_FOREACH(uint32_t i, range(sample_count), {
         uint8_t sample;
         read(in, &sample);
         samples->push_back(Json::number(sample));
-    }
+    });
 }
 
 }  // namespace
@@ -190,11 +189,11 @@ class GetSamplesVisitor : public JsonDefaultVisitor {
             : _out(out) { }
 
     virtual void visit_array(const vector<Json>& value) {
-        foreach (const Json& item, value) {
+        SFZ_FOREACH(const Json& item, value, {
             _out->push_back(0);
             GetNumberVisitor<uint8_t> visitor(&_out->back());
             item.accept(&visitor);
-        }
+        });
     }
 
   public:
@@ -312,9 +311,9 @@ void write_ssnd(WriteTarget out, const SoundInfo& info) {
     Bytes ssnd;
     write<uint32_t>(&ssnd, 0);
     write<uint32_t>(&ssnd, 0);
-    foreach (uint8_t sample, info.samples) {
+    SFZ_FOREACH(uint8_t sample, info.samples, {
         write<int8_t>(&ssnd, sample - 0x80);
-    }
+    });
 
     write_chunk(out, "SSND", ssnd);
 }

@@ -19,7 +19,6 @@
             ],
             'dependencies': [
                 '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
-                '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
                 '<(DEPTH)/ext/libpng/libpng.gyp:libpng',
             ],
             'include_dirs': [
@@ -33,7 +32,6 @@
             },
             'export_dependent_settings': [
                 '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
-                '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
                 '<(DEPTH)/ext/libpng/libpng.gyp:libpng',
             ],
         },
@@ -52,7 +50,6 @@
             'dependencies': [
                 ':librezin',
                 '<(DEPTH)/ext/libsfz/libsfz.gyp:libsfz',
-                '<(DEPTH)/ext/librgos/librgos.gyp:librgos',
                 '<(DEPTH)/ext/libzipxx/libzipxx.gyp:libzipxx',
             ],
             'include_dirs': [
