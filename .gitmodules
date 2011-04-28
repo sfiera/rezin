@@ -10,12 +10,9 @@
 [submodule "ext/libzipxx"]
 	path = ext/libzipxx
 	url = git://github.com/sfiera/libzipxx.git
-[submodule "ext/gyputil"]
-	path = ext/gyputil
-	url = git://github.com/sfiera/gyputil.git
 [submodule "ext/libpng"]
 	path = ext/libpng
 	url = git://github.com/sfiera/libpng.git
-[submodule "ext/gyp"]
-	path = ext/gyp
-	url = git://github.com/sfiera/gyp.git
+[submodule "ext/waf-sfiera"]
+	path = ext/waf-sfiera
+	url = git://github.com/sfiera/waf-sfiera.git
