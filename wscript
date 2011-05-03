@@ -36,7 +36,6 @@ def build(bld):
             "src/rezin/StringList.cpp",
         ],
         cxxflags="-Wall -Werror",
-        arch="x86_64 i386 ppc",
         includes="./public ./private",
         export_includes="./public",
         use=[
@@ -44,6 +43,12 @@ def build(bld):
             "libsfz/libsfz",
             "libzipxx/libzipxx",
         ],
+    )
+
+    bld.platform(
+        target="rezin/librezin",
+        platform="darwin",
+        arch="x86_64 i386 ppc",
     )
 
     bld.program(
@@ -58,7 +63,12 @@ def build(bld):
             "src/rezin/sources/ZipSource.cpp",
         ],
         cxxflags="-Wall -Werror",
-        arch="x86_64 i386 ppc",
         includes="./private",
         use="rezin/librezin",
+    )
+
+    bld.platform(
+        target="rezin/rezin",
+        platform="darwin",
+        arch="x86_64 i386 ppc",
     )
