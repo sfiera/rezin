@@ -2,13 +2,8 @@
 
 def common(ctx):
     ctx.load("compiler_cxx")
-    ctx.load("externals", "ext/waf-sfiera")
-    ctx.load("platforms", "ext/waf-sfiera")
-    ctx.external([
-        "libpng",
-        "libsfz",
-        "libzipxx",
-    ])
+    ctx.load("core externals", "ext/waf-sfiera")
+    ctx.external("libpng libsfz libzipxx")
 
 def options(opt):
     common(opt)
