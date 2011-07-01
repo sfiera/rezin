@@ -6,20 +6,20 @@
 #ifndef REZIN_STRING_LIST_HPP_
 #define REZIN_STRING_LIST_HPP_
 
+#include <vector>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
 
 class Options;
 
-// Converts 'STR#' resource data into a caller-owned JSON object.
-//
-// The returned data is an array of strings.
-//
-// @param [in] data     The content of a 'STR#' resource.
-// @param [in] options  Miscellaneous options.
-// @returns             A JSON object representing the content of `in`.
-sfz::Json read_string_list(const sfz::BytesSlice& data, const Options& options);
+struct StringList {
+    StringList(sfz::BytesSlice in, const Options& options);
+
+    std::vector<sfz::linked_ptr<const sfz::String> > strings;
+};
+
+sfz::Json json(const StringList& strings);
 
 }  // namespace rezin
 

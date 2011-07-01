@@ -46,9 +46,9 @@ void ConvertCommand::run(const ResourceFork& rsrc) {
         String string(_options.decode(data));
         converted.assign(utf8::encode(string));
     } else if (_code == "STR#") {
-        Json list = read_string_list(data, _options);
-        String decoded_string;
-        print_to(&decoded_string, pretty_print(list));
+        StringList string_list(data, _options);
+        Json list = json(string_list);
+        String decoded_string(pretty_print(list));
         converted.assign(utf8::encode(decoded_string));
     } else if (_code == "cicn") {
         Json cicn = read_cicn(data);
