@@ -22,7 +22,6 @@ def build(bld):
             "src/rezin/BitsSlice.cpp",
             "src/rezin/ColorIcon.cpp",
             "src/rezin/ColorTable.cpp",
-            "src/rezin/ColorTableInternal.cpp",
             "src/rezin/Options.cpp",
             "src/rezin/ResourceEntry.cpp",
             "src/rezin/ResourceFork.cpp",

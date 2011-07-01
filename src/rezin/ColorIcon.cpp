@@ -11,7 +11,7 @@
 #include <png.h>
 #include <rezin/BasicTypes.hpp>
 #include <rezin/BitsSlice.hpp>
-#include <rezin/ColorTableInternal.hpp>
+#include <rezin/ColorTable.hpp>
 #include <sfz/sfz.hpp>
 
 using sfz::Bytes;
@@ -50,7 +50,7 @@ struct ColorIcon {
 
 Json ColorIcon::to_json() const {
     StringMap<Json> result;
-    result["color-table"] = color_table.to_json();
+    result["color-table"] = json(color_table);
 
     const int width = mask_bitmap.bounds.width();
     const int height = mask_bitmap.bounds.height();

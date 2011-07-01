@@ -54,9 +54,9 @@ void ConvertCommand::run(const ResourceFork& rsrc) {
         Json cicn = read_cicn(data);
         write_png(&converted, cicn);
     } else if (_code == "clut") {
-        Json list = read_clut(data);
-        String decoded_string;
-        print_to(&decoded_string, pretty_print(list));
+        ColorTable clut(data);
+        Json list = json(clut);
+        String decoded_string(pretty_print(list));
         converted.assign(utf8::encode(decoded_string));
     } else {
         print(io::err, format("warning: printing unknown resource type {0} as raw data.\n",
