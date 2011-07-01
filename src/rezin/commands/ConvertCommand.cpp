@@ -40,8 +40,8 @@ void ConvertCommand::run(const ResourceFork& rsrc) {
     Bytes converted;
 
     if (_code == "snd ") {
-        Json snd = read_snd(data);
-        write_aiff(&converted, snd);
+        Sound snd(data);
+        write(&converted, aiff(snd));
     } else if (_code == "TEXT") {
         String string(_options.decode(data));
         converted.assign(utf8::encode(string));
