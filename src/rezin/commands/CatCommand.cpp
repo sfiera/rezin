@@ -24,7 +24,7 @@ CatCommand::CatCommand(const vector<StringSlice>& args) {
         throw Exception(format("wrong number of arguments to command \"cat\"."));
     }
     _code.assign(args[1]);
-    if (!string_to_int(args[2], &_id)) {
+    if (!string_to_int(args[2], _id)) {
         throw Exception(format("invalid resource ID {0}.", quote(args[2])));
     }
 }

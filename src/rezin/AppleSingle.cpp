@@ -46,7 +46,7 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
     bool little_endian = false;
     BytesSlice remainder(data);
     uint32_t magic;
-    read(&remainder, &magic);
+    read(remainder, magic);
     switch (magic) {
       case APPLE_SINGLE_MAGIC:
       case APPLE_DOUBLE_MAGIC:
@@ -62,7 +62,7 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
     }
 
     uint32_t version;
-    read(&remainder, &version);
+    read(remainder, version);
     if (little_endian) {
         version = htonl(version);
     }
@@ -73,7 +73,7 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
             remainder.shift(16);
 
             uint16_t entry_count;
-            read(&remainder, &entry_count);
+            read(remainder, entry_count);
             if (little_endian) {
                 entry_count = htons(entry_count);
             }
@@ -82,9 +82,9 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
                 uint32_t id;
                 uint32_t offset;
                 uint32_t length;
-                read(&remainder, &id);
-                read(&remainder, &offset);
-                read(&remainder, &length);
+                read(remainder, id);
+                read(remainder, offset);
+                read(remainder, length);
 
                 if (little_endian) {
                     id = htonl(id);

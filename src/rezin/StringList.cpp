@@ -25,13 +25,13 @@ namespace rezin {
 
 StringList::StringList(BytesSlice in, const Options& options) {
     uint16_t array_size;
-    read(&in, &array_size);
+    read(in, array_size);
 
     SFZ_FOREACH(uint16_t i, range(array_size), {
         uint8_t data[255];
         uint8_t size;
-        read(&in, &size);
-        read(&in, data, size);
+        read(in, size);
+        read(in, data, size);
         Bytes utf8;
         linked_ptr<const String> string(new String(options.decode(BytesSlice(data, size))));
         strings.push_back(string);

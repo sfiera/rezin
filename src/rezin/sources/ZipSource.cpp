@@ -36,7 +36,7 @@ ZipSource::~ZipSource() { }
 
 BytesSlice ZipSource::load() {
     _archive.reset(new ZipArchive(_archive_path, 0));
-    _file.reset(new ZipFileReader(_archive.get(), _file_path));
+    _file.reset(new ZipFileReader(*_archive, _file_path));
     _apple_single.reset(new AppleDouble(_file->data()));
     return _apple_single->at(AppleDouble::RESOURCE_FORK);
 }

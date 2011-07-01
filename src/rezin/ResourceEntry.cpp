@@ -30,11 +30,11 @@ ResourceEntry::ResourceEntry(
         const BytesSlice& entry_data, int index, const BytesSlice& name_data,
         const BytesSlice& data_data, const Options& options) {
     BytesSlice entry_remainder(entry_data.slice(index * 12, 12));
-    read(&entry_remainder, &_id);
+    read(entry_remainder, _id);
     uint16_t name_offset;
-    read(&entry_remainder, &name_offset);
+    read(entry_remainder, name_offset);
     uint32_t data_offset;
-    read(&entry_remainder, &data_offset);
+    read(entry_remainder, data_offset);
     data_offset &= 0x00FFFFFF;
     entry_remainder.shift(4);
 
@@ -45,7 +45,7 @@ ResourceEntry::ResourceEntry(
 
     BytesSlice data_remainder(data_data.slice(data_offset, 4));
     uint32_t data_size;
-    read(&data_remainder, &data_size);
+    read(data_remainder, data_size);
     _data = data_data.slice(data_offset + 4, data_size);
 }
 
