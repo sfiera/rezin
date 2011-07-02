@@ -12,7 +12,7 @@
 
 namespace rezin {
 
-struct ColorSpec;
+struct Color;
 
 struct ColorTable {
     ColorTable();
@@ -21,19 +21,18 @@ struct ColorTable {
     uint32_t seed;
     uint16_t flags;
     uint16_t size;
-    std::vector<ColorSpec> table;
+    std::map<uint16_t, Color> table;
 };
 void read_from(sfz::ReadSource in, ColorTable* out);
 sfz::Json json(const ColorTable& color_table);
 
-struct ColorSpec {
-    uint16_t id;
+struct Color {
     uint16_t red;
     uint16_t green;
     uint16_t blue;
 };
-void read_from(sfz::ReadSource in, ColorSpec* out);
-sfz::Json json(const ColorSpec& spec);
+void read_from(sfz::ReadSource in, Color* out);
+sfz::Json json(const Color& spec);
 
 }  // namespace rezin
 

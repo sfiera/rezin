@@ -51,8 +51,8 @@ void ConvertCommand::run(const ResourceFork& rsrc) {
         String decoded_string(pretty_print(list));
         converted.assign(utf8::encode(decoded_string));
     } else if (_code == "cicn") {
-        Json cicn = read_cicn(data);
-        write_png(&converted, cicn);
+        ColorIcon cicn(data);
+        write(&converted, png(cicn));
     } else if (_code == "clut") {
         ColorTable clut(data);
         Json list = json(clut);

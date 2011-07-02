@@ -11,6 +11,7 @@ using sfz::BytesSlice;
 using sfz::Exception;
 using sfz::Json;
 using sfz::ReadSource;
+using sfz::String;
 using sfz::StringMap;
 using sfz::format;
 using sfz::range;
@@ -33,30 +34,30 @@ void read_from(ReadSource in, ColorTable* out) {
     read(&in, &out->seed);
     read(&in, &out->flags);
     read(&in, &out->size);
-    out->table.resize(out->size + 1);
     SFZ_FOREACH(uint32_t i, range(uint32_t(out->size) + 1), {
-        read(&in, &out->table[i]);
+        const uint16_t id = read<uint16_t>(&in);
+        read(&in, &out->table[id]);
     });
 }
 
 Json json(const ColorTable& color_table) {
-    vector<Json> specs;
-    SFZ_FOREACH(const ColorSpec& spec, color_table.table, {
-        specs.push_back(json(spec));
+    StringMap<Json> specs;
+    typedef std::pair<uint16_t, Color> pair;
+    SFZ_FOREACH(const pair& p, color_table.table, {
+        String key(p.first);
+        specs[key] = json(p.second);
     });
-    return Json::array(specs);
+    return Json::object(specs);
 }
 
-void read_from(ReadSource in, ColorSpec* out) {
-    read(in, &out->id);
+void read_from(ReadSource in, Color* out) {
     read(in, &out->red);
     read(in, &out->green);
     read(in, &out->blue);
 }
 
-sfz::Json json(const ColorSpec& spec) {
+sfz::Json json(const Color& spec) {
     StringMap<Json> attributes;
-    attributes.insert(make_pair("id", Json::number(spec.id)));
     attributes.insert(make_pair("red", Json::number(spec.red)));
     attributes.insert(make_pair("green", Json::number(spec.green)));
     attributes.insert(make_pair("blue", Json::number(spec.blue)));
