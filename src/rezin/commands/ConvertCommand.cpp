@@ -40,23 +40,23 @@ void ConvertCommand::run(const ResourceFork& rsrc) {
     Bytes converted;
 
     if (_code == "snd ") {
-        Json snd = read_snd(data);
-        write_aiff(&converted, snd);
+        Sound snd(data);
+        write(&converted, aiff(snd));
     } else if (_code == "TEXT") {
         String string(_options.decode(data));
         converted.assign(utf8::encode(string));
     } else if (_code == "STR#") {
-        Json list = read_string_list(data, _options);
-        String decoded_string;
-        print_to(&decoded_string, pretty_print(list));
+        StringList string_list(data, _options);
+        Json list = json(string_list);
+        String decoded_string(pretty_print(list));
         converted.assign(utf8::encode(decoded_string));
     } else if (_code == "cicn") {
-        Json cicn = read_cicn(data);
-        write_png(&converted, cicn);
+        ColorIcon cicn(data);
+        write(&converted, png(cicn));
     } else if (_code == "clut") {
-        Json list = read_clut(data);
-        String decoded_string;
-        print_to(&decoded_string, pretty_print(list));
+        ColorTable clut(data);
+        Json list = json(clut);
+        String decoded_string(pretty_print(list));
         converted.assign(utf8::encode(decoded_string));
     } else {
         print(io::err, format("warning: printing unknown resource type {0} as raw data.\n",

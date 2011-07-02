@@ -12,34 +12,27 @@
 
 namespace rezin {
 
-// Converts 'clut' resource data into a JSON object.
-//
-// The returned data is in the following format:
-//
-// [
-//   {
-//     "id": 0,
-//     "red": 65535,
-//     "green": 65535,
-//     "blue": 65535
-//   },
-//   {
-//     "id": 1,
-//     "red": 65535,
-//     "green": 39321,
-//     "blue": 0
-//   }
-//   ...
-// ]
-//
-// All "red", "green", and "blue" components are integers in the range 0..65535.  The "id"
-// attribute is a integer in the range 0..65535.  In the common case, the "id" attribute will equal
-// the index of the color within the table, but this will not always hold.
-//
-// @param [in] in       The content of a 'clut' resource.
-// @returns             A JSON object representing the content of `in`.
-// @throws Exception    If the 'clut' data could not be read.
-sfz::Json read_clut(const sfz::BytesSlice& in);
+struct Color;
+
+struct ColorTable {
+    ColorTable();
+    ColorTable(sfz::BytesSlice in);
+
+    uint32_t seed;
+    uint16_t flags;
+    uint16_t size;
+    std::map<uint16_t, Color> table;
+};
+void read_from(sfz::ReadSource in, ColorTable* out);
+sfz::Json json(const ColorTable& color_table);
+
+struct Color {
+    uint16_t red;
+    uint16_t green;
+    uint16_t blue;
+};
+void read_from(sfz::ReadSource in, Color* out);
+sfz::Json json(const Color& spec);
 
 }  // namespace rezin
 

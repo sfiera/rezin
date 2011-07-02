@@ -102,32 +102,29 @@ void read_snd_data_table(ReadSource in, uint32_t* pointer, uint32_t* size, doubl
 // @param [in] in       The ReadSource to read from.
 // @param [in] sample_count The number of samples to read.
 // @param [out] samples The array to read the samples into.
-void read_snd_samples(ReadSource in, uint32_t sample_count, vector<Json>* samples) {
+void read_snd_samples(ReadSource in, uint32_t sample_count, vector<uint8_t>* samples) {
     SFZ_FOREACH(uint32_t i, range(sample_count), {
         uint8_t sample;
         read(in, &sample);
-        samples->push_back(Json::number(sample));
+        samples->push_back(sample);
     });
 }
 
 }  // namespace
 
-Json read_snd(const BytesSlice& in) {
-    StringMap<Json> result;
-    BytesSlice remainder(in);
-    uint16_t fmt;
-    read(&remainder, &fmt);
+Sound::Sound(BytesSlice in) {
+    BytesSlice header(in);
+    read(&header, &fmt);
     if (fmt == 1) {
-        read_snd_format_1_header(&remainder);
+        read_snd_format_1_header(&header);
     } else if (fmt == 2) {
-        read_snd_format_2_header(&remainder);
+        read_snd_format_2_header(&header);
     } else {
         throw Exception(format("unknown 'snd ' format '{0}'", fmt));
     }
-    result.insert(make_pair("format", Json::number(fmt)));
 
     uint16_t command_count;
-    read(&remainder, &command_count);
+    read(&header, &command_count);
     if (command_count != 1) {
         throw Exception(format("can only handle 1 command; {0} found", command_count));
     }
@@ -135,7 +132,7 @@ Json read_snd(const BytesSlice& in) {
     uint16_t command;
     uint16_t zero;
     uint32_t offset;
-    read_snd_command(&remainder, &command, &zero, &offset);
+    read_snd_command(&header, &command, &zero, &offset);
     if (command != 0x8051) {
         throw Exception(format("can only handle bufferCmd; 0x{0} found", hex(command, 4)));
     }
@@ -146,106 +143,15 @@ Json read_snd(const BytesSlice& in) {
     BytesSlice sound(in.slice(offset));
     uint32_t pointer;
     uint32_t sample_count;
-    double sample_rate;
     read_snd_data_table(&sound, &pointer, &sample_count, &sample_rate);
-    result.insert(make_pair("channels", Json::number(1)));
-    result.insert(make_pair("sample_bits", Json::number(8)));
-    result.insert(make_pair("sample_rate", Json::number(sample_rate)));
+    channels = 1;
+    sample_bits = 8;
 
-    vector<Json> samples;
     BytesSlice sample(in.slice(offset + 22 + pointer, sample_count));
     read_snd_samples(&sample, sample_count, &samples);
-    result.insert(make_pair("samples", Json::array(samples)));
-    return Json::object(result);
 }
 
 namespace {
-
-// A JsonVisitor which gets the numeric value of a visited value.
-//
-// If it visits a numeric value, sets the provided value accordingly; otherwise, throws.
-template <typename T>
-class GetNumberVisitor : public JsonDefaultVisitor {
-  public:
-    GetNumberVisitor(T* out)
-            : _out(out) { }
-
-    void visit_number(double value) { *_out = value; }
-
-  private:
-    virtual void visit_default(const char* type) {
-        throw Exception(format("need number, found {0}", type));
-    }
-
-    T* _out;
-};
-
-// A JsonVisitor which gets an array of uint8_t objects.
-//
-// If it visits an array of numbers, sets the provided value accordingly; otherwise, throws.
-class GetSamplesVisitor : public JsonDefaultVisitor {
-  public:
-    GetSamplesVisitor(vector<uint8_t>* out)
-            : _out(out) { }
-
-    virtual void visit_array(const vector<Json>& value) {
-        SFZ_FOREACH(const Json& item, value, {
-            _out->push_back(0);
-            GetNumberVisitor<uint8_t> visitor(&_out->back());
-            item.accept(&visitor);
-        });
-    }
-
-  public:
-    virtual void visit_default(const char* type) {
-        throw Exception(format("need array, found {0}", type));
-    }
-
-    vector<uint8_t>* _out;
-};
-
-// Sound data extracted from a JSON sound object.
-struct SoundInfo {
-    int channels;
-    int sample_bits;
-    double sample_rate;
-    vector<uint8_t> samples;
-};
-
-// A JsonVisitor which converts a JSON sound object into a SoundInfo object.
-//
-// If it visits an object it can interpret, sets the provided value accordingly; otherwise, throws.
-class SoundInfoVisitor : public JsonDefaultVisitor {
-  public:
-    SoundInfoVisitor(SoundInfo* out)
-            : _out(out) { }
-
-    void visit_object(const StringMap<Json>& value) {
-        GetNumberVisitor<int> get_channels(&_out->channels);
-        GetNumberVisitor<int> get_sample_bits(&_out->sample_bits);
-        GetNumberVisitor<double> get_sample_rate(&_out->sample_rate);
-        GetSamplesVisitor get_samples(&_out->samples);
-        checked_get(value, "channels").accept(&get_channels);
-        checked_get(value, "sample_bits").accept(&get_sample_bits);
-        checked_get(value, "sample_rate").accept(&get_sample_rate);
-        checked_get(value, "samples").accept(&get_samples);
-    }
-
-  private:
-    const Json& checked_get(const StringMap<Json>& value, const char* key) {
-        StringMap<Json>::const_iterator it = value.find(key);
-        if (it == value.end()) {
-            throw Exception(format("missing key '{0}'", key));
-        }
-        return it->second;
-    }
-
-    virtual void visit_default(const char* type) {
-        throw Exception(format("need object, found {0}", type));
-    }
-
-    SoundInfo* _out;
-};
 
 // Write `d` as an IEEE 754 80-bit floating point (extended precision) number.
 //
@@ -291,12 +197,12 @@ void write_chunk(WriteTarget out, const char* name, const BytesSlice& data) {
 //
 // @param [out] out     The WriteTarget to write the chunk to.
 // @param [in] info     Contains the information to write.
-void write_comm(WriteTarget out, const SoundInfo& info) {
+void write_comm(WriteTarget out, const Sound& sound) {
     Bytes comm;
-    write<int16_t>(&comm, info.channels);
-    write<uint32_t>(&comm, info.samples.size());
-    write<int16_t>(&comm, info.sample_bits);
-    write_float80(&comm, info.sample_rate);
+    write<int16_t>(&comm, sound.channels);
+    write<uint32_t>(&comm, sound.samples.size());
+    write<int16_t>(&comm, sound.sample_bits);
+    write_float80(&comm, sound.sample_rate);
 
     write_chunk(out, "COMM", comm);
 }
@@ -306,12 +212,12 @@ void write_comm(WriteTarget out, const SoundInfo& info) {
 // The "SSND" (sampled sound) chunk is an array of samples from the sound.
 //
 // @param [out] out     The WriteTarget to write the chunk to.
-// @param [in] info     Contains the samples to write.
-void write_ssnd(WriteTarget out, const SoundInfo& info) {
+// @param [in] sound    Contains the samples to write.
+void write_ssnd(WriteTarget out, const Sound& sound) {
     Bytes ssnd;
     write<uint32_t>(&ssnd, 0);
     write<uint32_t>(&ssnd, 0);
-    SFZ_FOREACH(uint8_t sample, info.samples, {
+    SFZ_FOREACH(uint8_t sample, sound.samples, {
         write<int8_t>(&ssnd, sample - 0x80);
     });
 
@@ -320,30 +226,31 @@ void write_ssnd(WriteTarget out, const SoundInfo& info) {
 
 // Write an AIFF file.
 //
-// IFF files (including AIFF files) are structured as a hierarchy of chunks.  Given `info`, which
+// IFF files (including AIFF files) are structured as a hierarchy of chunks.  Given `sound`, which
 // contains sound data, this function writes the "FORM" chunk which is at the top level of every
 // IFF file, which consists of the identifier "AIFF", followed by the two chunks, "COMM" and
 // "SSND", which define the content of the sound.
 //
 // @param [out] out     The WriteTarget to write the sound data to.
-// @param [in] info     Contains the sound to write.
-void write_form(WriteTarget out, const SoundInfo& info) {
+// @param [in] sound    Contains the sound to write.
+void write_form(WriteTarget out, const Sound& sound) {
     Bytes form;
     write(&form, "AIFF", 4);
-    write_comm(&form, info);
-    write_ssnd(&form, info);
+    write_comm(&form, sound);
+    write_ssnd(&form, sound);
 
     write_chunk(out, "FORM", form);
 }
 
 }  // namespace
 
-void write_aiff(WriteTarget out, const Json& sound) {
-    SoundInfo info;
-    SoundInfoVisitor visitor(&info);
-    sound.accept(&visitor);
+AiffSound aiff(const Sound& sound) {
+    AiffSound aiff = {sound};
+    return aiff;
+}
 
-    write_form(out, info);
+void write_to(WriteTarget out, AiffSound aiff) {
+    write_form(out, aiff.sound);
 }
 
 }  // namespace rezin
