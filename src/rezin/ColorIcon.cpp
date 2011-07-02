@@ -34,15 +34,15 @@ using std::vector;
 namespace rezin {
 
 ColorIcon::ColorIcon(BytesSlice in) {
-    read(&in, &icon_pixmap);
-    read(&in, &mask_bitmap);
-    read(&in, &icon_bitmap);
-    read(&in, &icon_data);
+    read(in, icon_pixmap);
+    read(in, mask_bitmap);
+    read(in, icon_bitmap);
+    read(in, icon_data);
 
-    mask_bitmap.read_pixels(&in, &mask_bitmap_pixels);
-    icon_bitmap.read_pixels(&in, &icon_bitmap_pixels);
-    read(&in, &color_table);
-    icon_pixmap.read_pixels(&in, &icon_pixmap_pixels);
+    mask_bitmap.read_pixels(in, mask_bitmap_pixels);
+    icon_bitmap.read_pixels(in, icon_bitmap_pixels);
+    read(in, color_table);
+    icon_pixmap.read_pixels(in, icon_pixmap_pixels);
 
     if (!in.empty()) {
         throw Exception("extra bytes at end of 'cicn' resource.");

@@ -47,8 +47,8 @@ ResourceType::ResourceType(
     BytesSlice type(type_data.slice(6 + index * 8, 4));
     uint16_t count;
     uint16_t offset;
-    read(&type, &count);
-    read(&type, &offset);
+    read(type, count);
+    read(type, offset);
     ++count;
 
     BytesSlice entry_data = type_data.slice(offset);

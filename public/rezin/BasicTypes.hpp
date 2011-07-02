@@ -22,7 +22,7 @@ struct Rect {
 
     sfz::Json to_json() const;
 };
-void read_from(sfz::ReadSource in, Rect* out);
+void read_from(sfz::ReadSource in, Rect& out);
 
 struct fixed32_t {
     int32_t int_value;
@@ -30,7 +30,7 @@ struct fixed32_t {
     double to_double() const;
     sfz::Json to_json() const;
 };
-void read_from(sfz::ReadSource in, fixed32_t* out);
+void read_from(sfz::ReadSource in, fixed32_t& out);
 
 struct PixMap {
     uint32_t base_addr;
@@ -50,9 +50,9 @@ struct PixMap {
     int32_t pm_reserved;
 
     sfz::Json to_json() const;
-    void read_pixels(sfz::ReadSource in, std::vector<uint8_t>* out) const;
+    void read_pixels(sfz::ReadSource in, std::vector<uint8_t>& out) const;
 };
-void read_from(sfz::ReadSource in, PixMap* out);
+void read_from(sfz::ReadSource in, PixMap& out);
 
 struct BitMap {
     uint32_t base_addr;
@@ -60,9 +60,9 @@ struct BitMap {
     Rect bounds;
 
     sfz::Json to_json() const;
-    void read_pixels(sfz::ReadSource in, std::vector<uint8_t>* out) const;
+    void read_pixels(sfz::ReadSource in, std::vector<uint8_t>& out) const;
 };
-void read_from(sfz::ReadSource in, BitMap* out);
+void read_from(sfz::ReadSource in, BitMap& out);
 
 }  // namespace rezin
 

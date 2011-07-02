@@ -24,19 +24,19 @@ namespace rezin {
 ColorTable::ColorTable() { }
 
 ColorTable::ColorTable(BytesSlice in) {
-    read(&in, this);
+    read(in, *this);
     if (!in.empty()) {
         throw Exception(format("{0} extra bytes at end of 'clut' resource.", in.size()));
     }
 }
 
-void read_from(ReadSource in, ColorTable* out) {
-    read(&in, &out->seed);
-    read(&in, &out->flags);
-    read(&in, &out->size);
-    SFZ_FOREACH(uint32_t i, range(uint32_t(out->size) + 1), {
-        const uint16_t id = read<uint16_t>(&in);
-        read(&in, &out->table[id]);
+void read_from(ReadSource in, ColorTable& out) {
+    read(in, out.seed);
+    read(in, out.flags);
+    read(in, out.size);
+    SFZ_FOREACH(uint32_t i, range(uint32_t(out.size) + 1), {
+        const uint16_t id = read<uint16_t>(in);
+        read(in, out.table[id]);
     });
 }
 
@@ -50,10 +50,10 @@ Json json(const ColorTable& color_table) {
     return Json::object(specs);
 }
 
-void read_from(ReadSource in, Color* out) {
-    read(in, &out->red);
-    read(in, &out->green);
-    read(in, &out->blue);
+void read_from(ReadSource in, Color& out) {
+    read(in, out.red);
+    read(in, out.green);
+    read(in, out.blue);
 }
 
 sfz::Json json(const Color& spec) {

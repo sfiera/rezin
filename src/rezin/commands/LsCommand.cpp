@@ -26,7 +26,7 @@ LsCommand::LsCommand(const vector<StringSlice>& args)
         throw Exception(format("too many arguments to command \"ls\"."));
     }
     if (args.size() > 2) {
-        if (!string_to_int(args[2], &_id)) {
+        if (!string_to_int(args[2], _id)) {
             throw Exception(format("invalid resource ID {0}.", quote(args[2])));
         }
     }

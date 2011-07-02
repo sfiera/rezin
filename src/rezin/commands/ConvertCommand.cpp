@@ -29,7 +29,7 @@ ConvertCommand::ConvertCommand(const vector<StringSlice>& args, const Options& o
         throw Exception(format("wrong number of arguments to command \"convert\"."));
     }
     _code.assign(args[1]);
-    if (!string_to_int(args[2], &_id)) {
+    if (!string_to_int(args[2], _id)) {
         throw Exception(format("invalid resource ID {0}.", quote(args[2])));
     }
 }
@@ -41,7 +41,7 @@ void ConvertCommand::run(const ResourceFork& rsrc) {
 
     if (_code == "snd ") {
         Sound snd(data);
-        write(&converted, aiff(snd));
+        write(converted, aiff(snd));
     } else if (_code == "TEXT") {
         String string(_options.decode(data));
         converted.assign(utf8::encode(string));
@@ -52,7 +52,7 @@ void ConvertCommand::run(const ResourceFork& rsrc) {
         converted.assign(utf8::encode(decoded_string));
     } else if (_code == "cicn") {
         ColorIcon cicn(data);
-        write(&converted, png(cicn));
+        write(converted, png(cicn));
     } else if (_code == "clut") {
         ColorTable clut(data);
         Json list = json(clut);

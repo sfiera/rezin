@@ -27,10 +27,10 @@ ResourceFork::ResourceFork(const BytesSlice& data, const Options& options) {
     uint32_t map_offset;
     uint32_t data_length;
     uint32_t map_length;
-    read(&header, &data_offset);
-    read(&header, &map_offset);
-    read(&header, &data_length);
-    read(&header, &map_length);
+    read(header, data_offset);
+    read(header, map_offset);
+    read(header, data_length);
+    read(header, map_length);
 
     BytesSlice map_data = data.slice(map_offset, map_length);
     BytesSlice data_data = data.slice(data_offset, data_length);
@@ -41,9 +41,9 @@ ResourceFork::ResourceFork(const BytesSlice& data, const Options& options) {
     uint16_t name_offset;
     uint16_t type_count;
     map.shift(8);
-    read(&map, &type_offset);
-    read(&map, &name_offset);
-    read(&map, &type_count);
+    read(map, type_offset);
+    read(map, name_offset);
+    read(map, type_count);
     ++type_count;
 
     BytesSlice type_data = map_data.slice(type_offset);
