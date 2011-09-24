@@ -7,31 +7,29 @@
 #define REZIN_SOURCES_ZIP_SOURCE_HPP_
 
 #include <sfz/sfz.hpp>
-#include <rezin/Source.hpp>
-
-namespace zipxx { class ZipArchive; }
-namespace zipxx { class ZipFileReader; }
+#include <zipxx/zipxx.hpp>
 
 namespace rezin {
 
-class AppleSingle;
-
-class ZipSource : public Source {
+class ZipSource {
   public:
-    ZipSource(const sfz::StringSlice& arg);
+    ZipSource();
     ~ZipSource();
 
-    virtual sfz::BytesSlice load();
+    void load(sfz::StringSlice zip_file, sfz::StringSlice file_path);
+    sfz::BytesSlice data() const;
 
   private:
-    sfz::String _archive_path;
-    sfz::String _file_path;
-    sfz::scoped_ptr<zipxx::ZipArchive> _archive;
-    sfz::scoped_ptr<zipxx::ZipFileReader> _file;
-    sfz::scoped_ptr<AppleSingle> _apple_single;
+    friend void swap(ZipSource& x, ZipSource& y);
+
+    struct Contents;
+    sfz::scoped_ptr<Contents> _contents;
 
     DISALLOW_COPY_AND_ASSIGN(ZipSource);
 };
+
+void swap(ZipSource& x, ZipSource& y);
+bool store_argument(ZipSource& to, sfz::StringSlice value, sfz::PrintTarget error);
 
 }  // namespace rezin
 

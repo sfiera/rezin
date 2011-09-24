@@ -6,10 +6,8 @@
 #include <getopt.h>
 #include <exception>
 #include <vector>
-#include <rezin/Command.hpp>
 #include <rezin/Options.hpp>
 #include <rezin/ResourceFork.hpp>
-#include <rezin/Source.hpp>
 #include <rezin/commands/CatCommand.hpp>
 #include <rezin/commands/ConvertCommand.hpp>
 #include <rezin/commands/LsCommand.hpp>
@@ -18,148 +16,88 @@
 #include <rezin/sources/ZipSource.hpp>
 
 using sfz::Exception;
+using sfz::Optional;
 using sfz::String;
 using sfz::StringSlice;
+using sfz::args::store;
 using sfz::format;
 using sfz::path::basename;
+using sfz::print;
 using sfz::scoped_ptr;
 using std::vector;
 
+namespace args = sfz::args;
 namespace utf8 = sfz::utf8;
 namespace io = sfz::io;
 
 namespace rezin {
 namespace {
 
-int main(int argc, char** argv) {
-    const String binary_name(utf8::decode(argv[0]));
-    scoped_ptr<Command> command;
-    scoped_ptr<Source> source;
+template <typename Source>
+void RunCommand(const Source& source, const Options& options, const Command& command) {
+    ResourceFork rsrc(source.data(), options);
+    command.run(rsrc, options);
+}
+
+void main(int argc, char** argv) {
+    args::Parser parser(argv[0],
+            "rezin is a tool for extracting data from the resource fork of legacy files");
+
+    Optional<AppleSingleSource> apple_single;
+    parser.add_argument("-a", "--apple-single", store(apple_single))
+        .metavar("FILE")
+        .help("read from an AppleSingle- or AppleDouble-formatted file");
+
+    Optional<FlatFileSource> flat_file;
+    parser.add_argument("-f", "--flat-file", store(flat_file))
+        .metavar("FILE")
+        .help("read from a flat file");
+
+    Optional<ZipSource> zip_file;
+    parser.add_argument("-z", "--zip-file", store(zip_file))
+        .metavar("ZIP,FILE")
+        .help("read from a file enclosed in a zip archive");
+
     Options options;
+    parser.add_argument("-l", "--line-ending", store(options.line_ending))
+        .metavar("cr|nl|crnl")
+        .help("convert carriage returns to this");
+
+    Command* command = NULL;
+    LsCommand ls_command(parser, command);
+    CatCommand cat_command(parser, command);
+    ConvertCommand convert_command(parser, command);
 
     try {
-        opterr = 0;
-        const option longopts[] = {
-            { "apple-single",   required_argument,  NULL,   'a' },
-            { "flat-file",      required_argument,  NULL,   'f' },
-            { "zip-file",       required_argument,  NULL,   'z' },
-            { "line-ending",    required_argument,  NULL,   'l' },
-            { NULL,             0,                  NULL,   0 }
-        };
-
-        while (true) {
-            const char ch = getopt_long(argc, argv, "a:f:z:l:", longopts, NULL);
-            if (ch == -1) {
-                break;
-            }
-
-            String arg;
-            if (optarg) {
-                arg.assign(utf8::decode(optarg));
-            }
-            switch (ch) {
-              case 'a':
-                if (source.get() != NULL) {
-                    throw Exception(format("more than one source specified."));
-                }
-                source.reset(new AppleSingleSource(arg));
-                break;
-
-              case 'f':
-                if (source.get() != NULL) {
-                    throw Exception(format("more than one source specified."));
-                }
-                source.reset(new FlatFileSource(arg));
-                break;
-
-              case 'z':
-                if (source.get() != NULL) {
-                    throw Exception(format("more than one source specified."));
-                }
-                source.reset(new ZipSource(arg));
-                break;
-
-              case 'l':
-                if (arg == "cr") {
-                    options.set_line_ending(Options::CR);
-                } else if (arg == "nl") {
-                    options.set_line_ending(Options::NL);
-                } else if (arg == "crnl") {
-                    options.set_line_ending(Options::CRNL);
-                } else {
-                    throw Exception(format("unrecognized line ending {0}.", quote(arg)));
-                }
-                break;
-
-              default:
-                {
-                    String opt;
-                    if (optopt == '\0') {
-                        opt.assign(utf8::decode(argv[optind - 1]));
-                    } else {
-                        opt.assign(format("-{0}", char(optopt)));
-                    }
-                    throw Exception(format("unrecognized option {0}.", quote(opt)));
-                }
-                break;
-            }
+        String error;
+        if (!parser.parse_args(argc - 1, argv + 1, error)) {
+            print(io::err, format("{0}: {1}\n", parser.name(), error));
+            exit(1);
         }
-
-        argc -= optind;
-        argv += optind;
-        if (argc < 1) {
-            throw Exception(format("missing command."));
+        if (command == NULL) {
+            print(io::err, parser.help());
+            exit(1);
         }
-        if (source.get() == NULL) {
-            throw Exception(format("must provide a source."));
-        }
-
-        String storage;
-        vector<StringSlice> args;
-        for (int i = 0; i < argc; ++i) {
-            String arg(utf8::decode(argv[i]));
-            storage.append(arg);
-            args.push_back(StringSlice(storage).slice(storage.size() - arg.size()));
-        }
-
-        if (args[0] == "ls") {
-            command.reset(new LsCommand(args));
-        } else if (args[0] == "cat") {
-            command.reset(new CatCommand(args));
-        } else if (args[0] == "convert") {
-            command.reset(new ConvertCommand(args, options));
+        if (apple_single.has()) {
+            RunCommand(*apple_single, options, *command);
+        } else if (flat_file.has()) {
+            RunCommand(*flat_file, options, *command);
+        } else if (zip_file.has()) {
+            RunCommand(*zip_file, options, *command);
         } else {
-            throw Exception(format("unknown command '{0}'.", args[0]));
+            print(io::err, format("{0}: no source specified\n", parser.name()));
+            exit(1);
         }
     } catch (Exception& e) {
-        print(io::err, format(
-                    "{0}: {1}\n"
-                    "usage: {0} [OPTIONS] ls [TYPE [ID]]\n"
-                    "       {0} [OPTIONS] cat TYPE ID\n"
-                    "       {0} [OPTIONS] convert TYPE ID\n"
-                    "options:\n"
-                    "    -a|--apple-single=FILE\n"
-                    "    -f|--flat-file=FILE\n"
-                    "    -z|--zip-file=ZIP,FILE\n"
-                    "    -l|--line-ending=cr|nl|crnl\n",
-                    basename(binary_name), e.message()));
-        return 1;
+        print(io::err, format("{0}: {1}\n", parser.name(), e.message()));
+        exit(1);
     }
-
-    try {
-        ResourceFork rsrc(source->load(), options);
-        command->run(rsrc);
-    } catch (Exception& e) {
-        print(io::err, format("{0}: {1}\n", binary_name, e.message()));
-        return 1;
-    }
-
-    return 0;
 }
 
 }  // namespace
 }  // namespace rezin
 
 int main(int argc, char** argv) {
-    return rezin::main(argc, argv);
+    rezin::main(argc, argv);
+    return 0;
 }

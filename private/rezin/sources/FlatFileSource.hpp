@@ -7,22 +7,26 @@
 #define REZIN_SOURCES_FLAT_FILE_SOURCE_HPP_
 
 #include <sfz/sfz.hpp>
-#include <rezin/Source.hpp>
 
 namespace rezin {
 
-class FlatFileSource : public Source {
+class FlatFileSource {
   public:
-    FlatFileSource(const sfz::StringSlice& arg);
+    FlatFileSource();
 
-    virtual sfz::BytesSlice load();
+    void load(sfz::StringSlice path);
+    sfz::BytesSlice data() const;
 
   private:
-    const sfz::String _path;
+    friend void swap(FlatFileSource& x, FlatFileSource& y);
+
     sfz::scoped_ptr<sfz::MappedFile> _file;
 
     DISALLOW_COPY_AND_ASSIGN(FlatFileSource);
 };
+
+void swap(FlatFileSource& x, FlatFileSource& y);
+bool store_argument(FlatFileSource& to, sfz::StringSlice value, sfz::PrintTarget error);
 
 }  // namespace rezin
 
