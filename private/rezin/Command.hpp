@@ -8,12 +8,13 @@
 
 namespace rezin {
 
+class Options;
 class ResourceFork;
 
 class Command {
   public:
     virtual ~Command() { }
-    virtual void run(const ResourceFork& rsrc) = 0;
+    virtual void run(const ResourceFork& rsrc, const Options& options) const = 0;
 };
 
 }  // namespace rezin

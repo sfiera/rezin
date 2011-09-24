@@ -31,18 +31,10 @@ void convert_cr(String* string, const StringSlice& replacement) {
 }  // namespace
 
 Options::Options()
-        : _line_ending(NL) { }
-
-Options::LineEnding Options::line_ending() const {
-    return _line_ending;
-}
-
-void Options::set_line_ending(LineEnding line_ending) {
-    _line_ending = line_ending;
-}
+        : line_ending(NL) { }
 
 Options::EncodedString Options::decode(const sfz::BytesSlice& bytes) const {
-    EncodedString result = { bytes, _line_ending };
+    EncodedString result = { bytes, line_ending };
     return result;
 }
 
@@ -62,6 +54,21 @@ void print_to(PrintTarget out, const Options::EncodedString& encoded) {
         break;
     }
     out.push(result);
+}
+
+bool store_argument(Options::LineEnding& to, StringSlice value, PrintTarget error) {
+    if (value == "cr") {
+        to = Options::CR;
+    } else if (value == "nl") {
+        to = Options::NL;
+    } else if (value == "crnl") {
+        to = Options::CRNL;
+    } else {
+        print(error, format(
+                    "invalid line ending {0}: must be one of cr, nl, or crnl", quote(value)));
+        return false;
+    }
+    return true;
 }
 
 }  // namespace rezin

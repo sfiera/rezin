@@ -11,18 +11,31 @@
 using sfz::BytesSlice;
 using sfz::MappedFile;
 using sfz::StringSlice;
+using sfz::PrintTarget;
 
 namespace rezin {
 
-AppleSingleSource::AppleSingleSource(const StringSlice& arg)
-        : _path(arg) { }
+AppleSingleSource::AppleSingleSource() { }
 
 AppleSingleSource::~AppleSingleSource() { }
 
-BytesSlice AppleSingleSource::load() {
-    _file.reset(new MappedFile(_path));
+void AppleSingleSource::load(sfz::StringSlice path) {
+    _file.reset(new MappedFile(path));
     _apple_single.reset(new AppleSingle(_file->data()));
+}
+
+BytesSlice AppleSingleSource::data() const {
     return _apple_single->at(AppleSingle::RESOURCE_FORK);
+}
+
+void swap(AppleSingleSource& x, AppleSingleSource& y) {
+    swap(x._file, y._file);
+    swap(x._apple_single, y._apple_single);
+}
+
+bool store_argument(AppleSingleSource& to, sfz::StringSlice value, PrintTarget error) {
+    to.load(value);
+    return true;
 }
 
 }  // namespace rezin

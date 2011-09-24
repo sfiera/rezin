@@ -14,23 +14,26 @@ using sfz::BytesSlice;
 using sfz::Exception;
 using sfz::StringSlice;
 using sfz::format;
+using sfz::args::store;
+using sfz::args::store_const;
 using sfz::string_to_int;
 using std::vector;
 
+namespace args = sfz::args;
+
 namespace rezin {
 
-CatCommand::CatCommand(const vector<StringSlice>& args) {
-    if (args.size() != 3) {
-        throw Exception(format("wrong number of arguments to command \"cat\"."));
-    }
-    _code.assign(args[1]);
-    if (!string_to_int(args[2], _id)) {
-        throw Exception(format("invalid resource ID {0}.", quote(args[2])));
-    }
+CatCommand::CatCommand(args::Parser& parser, Command*& command) {
+    args::Parser& cat = parser.add_subparser(
+            "cat", "print binary resource data", store_const(command, this));
+    cat.add_argument("type", store(_type))
+        .required();
+    cat.add_argument("id", store(_id))
+        .required();
 }
 
-void CatCommand::run(const ResourceFork& rsrc) {
-    const ResourceEntry& entry = rsrc.at(_code).at(_id);
+void CatCommand::run(const ResourceFork& rsrc, const Options& options) const {
+    const ResourceEntry& entry = rsrc.at(_type).at(_id);
     BytesSlice data = entry.data();
     write(1, data.data(), data.size());
 }

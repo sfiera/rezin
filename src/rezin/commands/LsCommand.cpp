@@ -12,43 +12,43 @@
 
 using sfz::Exception;
 using sfz::StringSlice;
+using sfz::args::store;
+using sfz::args::store_const;
 using sfz::format;
 using sfz::print;
 using std::vector;
+
+namespace args = sfz::args;
 
 namespace io = sfz::io;
 
 namespace rezin {
 
-LsCommand::LsCommand(const vector<StringSlice>& args)
-        : _argc(args.size()) {
-    if (args.size() > 3) {
-        throw Exception(format("too many arguments to command \"ls\"."));
-    }
-    if (args.size() > 2) {
-        if (!string_to_int(args[2], _id)) {
-            throw Exception(format("invalid resource ID {0}.", quote(args[2])));
-        }
-    }
-    if (args.size() > 1) {
-        _code.assign(args[1]);
-    }
+LsCommand::LsCommand(args::Parser& parser, Command*& command) {
+    args::Parser& ls = parser.add_subparser(
+            "ls", "list resources", store_const(command, this));
+    ls.add_argument("type", store(_type));
+    ls.add_argument("id", store(_id));
 }
 
-void LsCommand::run(const ResourceFork& rsrc) {
-    if (_argc == 1) {
+void LsCommand::run(const ResourceFork& rsrc, const Options& options) const {
+    if (!_type.has()) {
         SFZ_FOREACH(const ResourceType& type, rsrc, {
             print(io::out, format("{0}\n", type.code()));
         });
-    } else if (_argc == 2) {
-        const ResourceType& type = rsrc.at(_code);
+        return;
+    }
+
+    const ResourceType& type = rsrc.at(*_type);
+    if (!_id.has()) {
         SFZ_FOREACH(const ResourceEntry& entry, type, {
             print(io::out, format("{0}\t{1}\n", entry.id(), entry.name()));
         });
-    } else if (_argc == 3) {
-        const ResourceEntry& entry = rsrc.at(_code).at(_id);
-        print(io::out, format("{0}\t{1}\n", entry.id(), entry.name()));
+        return;
     }
+
+    const ResourceEntry& entry = type.at(*_id);
+    print(io::out, format("{0}\t{1}\n", entry.id(), entry.name()));
 }
 
 }  // namespace

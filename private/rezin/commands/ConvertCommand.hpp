@@ -8,24 +8,21 @@
 
 #include <vector>
 #include <rezin/Command.hpp>
-#include <rezin/Options.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
 
-class Options;
 class ResourceFork;
 
 class ConvertCommand : public Command {
   public:
-    ConvertCommand(const std::vector<sfz::StringSlice>& args, const Options& options);
+    ConvertCommand(sfz::args::Parser& parser, Command*& command);
 
-    virtual void run(const ResourceFork& rsrc);
+    virtual void run(const ResourceFork& rsrc, const Options& options) const;
 
   private:
-    sfz::String _code;
+    sfz::String _type;
     int16_t _id;
-    Options _options;
 
     DISALLOW_COPY_AND_ASSIGN(ConvertCommand);
 };

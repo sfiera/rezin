@@ -10,19 +10,14 @@
 
 namespace rezin {
 
-class Options {
-  public:
+struct Options {
     Options();
 
     enum LineEnding { CR, NL, CRNL };
-    LineEnding line_ending() const;
-    void set_line_ending(LineEnding line_ending);
+    LineEnding line_ending;
 
     struct EncodedString;
     EncodedString decode(const sfz::BytesSlice& bytes) const;
-
-  private:
-    LineEnding _line_ending;
 };
 
 struct Options::EncodedString {
@@ -30,6 +25,8 @@ struct Options::EncodedString {
     LineEnding line_ending;
 };
 void print_to(sfz::PrintTarget out, const Options::EncodedString& encoded);
+
+bool store_argument(Options::LineEnding& to, sfz::StringSlice value, sfz::PrintTarget error);
 
 }  // namespace rezin
 

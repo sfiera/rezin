@@ -7,26 +7,30 @@
 #define REZIN_SOURCES_APPLE_SINGLE_SOURCE_HPP_
 
 #include <sfz/sfz.hpp>
-#include <rezin/Source.hpp>
 
 namespace rezin {
 
 class AppleSingle;
 
-class AppleSingleSource : public Source {
+class AppleSingleSource {
   public:
-    AppleSingleSource(const sfz::StringSlice& arg);
+    AppleSingleSource();
     ~AppleSingleSource();
 
-    virtual sfz::BytesSlice load();
+    void load(sfz::StringSlice path);
+    sfz::BytesSlice data() const;
 
   private:
-    const sfz::String _path;
+    friend void swap(AppleSingleSource& x, AppleSingleSource& y);
+
     sfz::scoped_ptr<sfz::MappedFile> _file;
     sfz::scoped_ptr<AppleSingle> _apple_single;
 
     DISALLOW_COPY_AND_ASSIGN(AppleSingleSource);
 };
+
+void swap(AppleSingleSource& x, AppleSingleSource& y);
+bool store_argument(AppleSingleSource& to, sfz::StringSlice value, sfz::PrintTarget error);
 
 }  // namespace rezin
 

@@ -6,10 +6,10 @@
 #include <rezin/sources/ZipSource.hpp>
 
 #include <rezin/AppleSingle.hpp>
-#include <zipxx/zipxx.hpp>
 
 using sfz::BytesSlice;
 using sfz::Exception;
+using sfz::PrintTarget;
 using sfz::String;
 using sfz::StringSlice;
 using sfz::format;
@@ -18,27 +18,48 @@ using zipxx::ZipFileReader;
 
 namespace rezin {
 
-ZipSource::ZipSource(const StringSlice& arg) {
-    String arg_string(arg);
-    size_t comma = arg_string.find(',');
-    if (comma == String::npos) {
-        throw Exception(format("invalid format to --zip-file {0}.", quote(arg_string)));
-    }
-    _archive_path.assign(arg_string.slice(0, comma));
-
-    _file_path.append("__MACOSX/");
-    _file_path.append(arg_string.slice(comma + 1));
-    size_t loc = _file_path.rfind('/');
-    _file_path.replace(loc, 1, "/._");
-}
+ZipSource::ZipSource() { }
 
 ZipSource::~ZipSource() { }
 
-BytesSlice ZipSource::load() {
-    _archive.reset(new ZipArchive(_archive_path, 0));
-    _file.reset(new ZipFileReader(*_archive, _file_path));
-    _apple_single.reset(new AppleDouble(_file->data()));
-    return _apple_single->at(AppleDouble::RESOURCE_FORK);
+struct ZipSource::Contents {
+    Contents(sfz::StringSlice zip_file, sfz::StringSlice file_path);
+
+    zipxx::ZipArchive archive;
+    zipxx::ZipFileReader file;
+    AppleSingle apple_single;
+};
+
+ZipSource::Contents::Contents(sfz::StringSlice zip_file, sfz::StringSlice file_path):
+        archive(zip_file, 0),
+        file(archive, file_path),
+        apple_single(file.data()) { }
+
+void ZipSource::load(sfz::StringSlice zip_file, sfz::StringSlice file_path) {
+    _contents.reset(new Contents(zip_file, file_path));
+}
+
+BytesSlice ZipSource::data() const {
+    return _contents->apple_single.at(AppleDouble::RESOURCE_FORK);
+}
+
+void swap(ZipSource& x, ZipSource& y) {
+    swap(x._contents, y._contents);
+}
+
+bool store_argument(ZipSource& to, sfz::StringSlice value, PrintTarget error) {
+    StringSlice zip_file;
+    if (!partition(zip_file, ",", value)) {
+        print(error, format("invalid format {0}.", quote(value)));
+    }
+
+    String file_path("__MACOSX/");
+    file_path.append(value);
+    size_t loc = file_path.rfind('/');
+    file_path.replace(loc, 1, "/._");
+
+    to.load(zip_file, file_path);
+    return true;
 }
 
 }  // namespace rezin

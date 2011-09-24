@@ -16,12 +16,12 @@ class ResourceFork;
 
 class CatCommand : public Command {
   public:
-    CatCommand(const std::vector<sfz::StringSlice>& args);
+    CatCommand(sfz::args::Parser& parser, Command*& command);
 
-    virtual void run(const ResourceFork& rsrc);
+    virtual void run(const ResourceFork& rsrc, const Options& options) const;
 
   private:
-    sfz::String _code;
+    sfz::String _type;
     int16_t _id;
 
     DISALLOW_COPY_AND_ASSIGN(CatCommand);

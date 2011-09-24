@@ -9,16 +9,28 @@
 
 using sfz::BytesSlice;
 using sfz::MappedFile;
+using sfz::PrintTarget;
 using sfz::StringSlice;
 
 namespace rezin {
 
-FlatFileSource::FlatFileSource(const StringSlice& arg)
-    : _path(arg) { }
+FlatFileSource::FlatFileSource() { }
 
-BytesSlice FlatFileSource::load() {
-    _file.reset(new MappedFile(_path));
+void FlatFileSource::load(StringSlice path) {
+    _file.reset(new MappedFile(path));
+}
+
+BytesSlice FlatFileSource::data() const {
     return _file->data();
+}
+
+void swap(FlatFileSource& x, FlatFileSource& y) {
+    swap(x._file, y._file);
+}
+
+bool store_argument(FlatFileSource& to, sfz::StringSlice value, PrintTarget error) {
+    to.load(value);
+    return true;
 }
 
 }  // namespace rezin
