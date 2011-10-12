@@ -30,8 +30,8 @@ def build(bld):
             "src/rezin/StringList.cpp",
         ],
         cxxflags="-Wall -Werror",
-        includes="./public ./private",
-        export_includes="./public",
+        includes="./include ./src",
+        export_includes="./include",
         use=[
             "libpng/libpng",
             "libsfz/libsfz",
@@ -57,7 +57,7 @@ def build(bld):
             "src/rezin/sources/ZipSource.cpp",
         ],
         cxxflags="-Wall -Werror",
-        includes="./private",
+        includes="./src",
         use="rezin/librezin",
     )
 
