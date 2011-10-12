@@ -3,12 +3,12 @@
 // This file is part of librezin, a free software project.  You can redistribute it and/or modify
 // it under the terms of the MIT License.
 
-#ifndef REZIN_COLOR_ICON_HPP_
-#define REZIN_COLOR_ICON_HPP_
+#ifndef REZIN_CICN_HPP_
+#define REZIN_CICN_HPP_
 
 #include <sfz/sfz.hpp>
-#include <rezin/BasicTypes.hpp>
-#include <rezin/ColorTable.hpp>
+#include <rezin/clut.hpp>
+#include <rezin/primitives.hpp>
 
 namespace rezin {
 
@@ -34,4 +34,4 @@ void write_to(sfz::WriteTarget out, PngColorIcon png);
 
 }  // namespace rezin
 
-#endif // REZIN_COLOR_ICON_HPP_
+#endif // REZIN_CICN_HPP_

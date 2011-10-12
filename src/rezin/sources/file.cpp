@@ -3,7 +3,7 @@
 // This file is part of rezin, a free software project.  You can redistribute it and/or modify it
 // under the terms of the MIT License.
 
-#include <rezin/sources/FlatFileSource.hpp>
+#include <rezin/sources/file.hpp>
 
 #include <sfz/sfz.hpp>
 

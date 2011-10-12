@@ -6,15 +6,13 @@
 #ifndef REZIN_REZIN_HPP_
 #define REZIN_REZIN_HPP_
 
-#include <rezin/AppleSingle.hpp>
-#include <rezin/ColorIcon.hpp>
-#include <rezin/ColorTable.hpp>
-#include <rezin/Options.hpp>
-#include <rezin/ResourceEntry.hpp>
-#include <rezin/ResourceFork.hpp>
-#include <rezin/ResourceType.hpp>
-#include <rezin/Sound.hpp>
-#include <rezin/StringList.hpp>
-#include <rezin/rezin.hpp>
+#include <rezin/apple-single.hpp>
+#include <rezin/cicn.hpp>
+#include <rezin/clut.hpp>
+#include <rezin/options.hpp>
+#include <rezin/primitives.hpp>
+#include <rezin/resource.hpp>
+#include <rezin/snd.hpp>
+#include <rezin/strl.hpp>
 
 #endif // REZIN_REZIN_HPP_

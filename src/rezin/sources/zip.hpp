@@ -3,8 +3,8 @@
 // This file is part of rezin, a free software project.  You can redistribute it and/or modify it
 // under the terms of the MIT License.
 
-#ifndef REZIN_SOURCES_ZIP_SOURCE_HPP_
-#define REZIN_SOURCES_ZIP_SOURCE_HPP_
+#ifndef REZIN_SOURCES_ZIP_HPP_
+#define REZIN_SOURCES_ZIP_HPP_
 
 #include <sfz/sfz.hpp>
 #include <zipxx/zipxx.hpp>
@@ -33,4 +33,4 @@ bool store_argument(ZipSource& to, sfz::StringSlice value, sfz::PrintTarget erro
 
 }  // namespace rezin
 
-#endif  // REZIN_SOURCES_ZIP_SOURCE_HPP_
+#endif  // REZIN_SOURCES_ZIP_HPP_

@@ -3,9 +3,9 @@
 // This file is part of rezin, a free software project.  You can redistribute it and/or modify it
 // under the terms of the MIT License.
 
-#include <rezin/sources/AppleSingleSource.hpp>
+#include <rezin/sources/apple-single.hpp>
 
-#include <rezin/AppleSingle.hpp>
+#include <rezin/apple-single.hpp>
 #include <sfz/sfz.hpp>
 
 using sfz::BytesSlice;

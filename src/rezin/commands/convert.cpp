@@ -3,7 +3,7 @@
 // This file is part of rezin, a free software project.  You can redistribute it and/or modify it
 // under the terms of the MIT License.
 
-#include <rezin/commands/ConvertCommand.hpp>
+#include <rezin/commands/convert.hpp>
 
 #include <fcntl.h>
 #include <rezin/rezin.hpp>

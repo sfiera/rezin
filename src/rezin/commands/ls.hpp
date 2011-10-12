@@ -3,11 +3,11 @@
 // This file is part of rezin, a free software project.  You can redistribute it and/or modify it
 // under the terms of the MIT License.
 
-#ifndef REZIN_COMMANDS_LS_COMMAND_HPP_
-#define REZIN_COMMANDS_LS_COMMAND_HPP_
+#ifndef REZIN_COMMANDS_LS_HPP_
+#define REZIN_COMMANDS_LS_HPP_
 
 #include <vector>
-#include <rezin/Command.hpp>
+#include <rezin/command.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
@@ -29,4 +29,4 @@ class LsCommand : public Command {
 
 }  // namespace
 
-#endif  // REZIN_COMMANDS_LS_COMMAND_HPP_
+#endif  // REZIN_COMMANDS_LS_HPP_

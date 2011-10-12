@@ -3,8 +3,8 @@
 // This file is part of librezin, a free software project.  You can redistribute it and/or modify
 // it under the terms of the MIT License.
 
-#ifndef REZIN_BASIC_TYPES_HPP_
-#define REZIN_BASIC_TYPES_HPP_
+#ifndef REZIN_PRIMITIVES_HPP_
+#define REZIN_PRIMITIVES_HPP_
 
 #include <stdint.h>
 #include <sfz/sfz.hpp>
@@ -66,4 +66,4 @@ void read_from(sfz::ReadSource in, BitMap& out);
 
 }  // namespace rezin
 
-#endif // REZIN_BASIC_TYPES_HPP_
+#endif // REZIN_PRIMITIVES_HPP_

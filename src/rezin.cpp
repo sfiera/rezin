@@ -6,14 +6,14 @@
 #include <getopt.h>
 #include <exception>
 #include <vector>
-#include <rezin/Options.hpp>
-#include <rezin/ResourceFork.hpp>
-#include <rezin/commands/CatCommand.hpp>
-#include <rezin/commands/ConvertCommand.hpp>
-#include <rezin/commands/LsCommand.hpp>
-#include <rezin/sources/AppleSingleSource.hpp>
-#include <rezin/sources/FlatFileSource.hpp>
-#include <rezin/sources/ZipSource.hpp>
+#include <rezin/options.hpp>
+#include <rezin/resource.hpp>
+#include <rezin/commands/cat.hpp>
+#include <rezin/commands/convert.hpp>
+#include <rezin/commands/ls.hpp>
+#include <rezin/sources/apple-single.hpp>
+#include <rezin/sources/file.hpp>
+#include <rezin/sources/zip.hpp>
 
 using sfz::Exception;
 using sfz::Optional;

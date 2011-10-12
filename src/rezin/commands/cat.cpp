@@ -3,12 +3,10 @@
 // This file is part of rezin, a free software project.  You can redistribute it and/or modify it
 // under the terms of the MIT License.
 
-#include <rezin/commands/CatCommand.hpp>
+#include <rezin/commands/cat.hpp>
 
 #include <fcntl.h>
-#include <rezin/ResourceEntry.hpp>
-#include <rezin/ResourceFork.hpp>
-#include <rezin/ResourceType.hpp>
+#include <rezin/resource.hpp>
 
 using sfz::BytesSlice;
 using sfz::Exception;

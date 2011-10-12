@@ -3,7 +3,7 @@
 // This file is part of librezin, a free software project.  You can redistribute it and/or modify
 // it under the terms of the MIT License.
 
-#include <rezin/BitsSlice.hpp>
+#include <rezin/bits-slice.hpp>
 
 #include <sfz/sfz.hpp>
 

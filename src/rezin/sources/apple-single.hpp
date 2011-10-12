@@ -3,8 +3,8 @@
 // This file is part of rezin, a free software project.  You can redistribute it and/or modify it
 // under the terms of the MIT License.
 
-#ifndef REZIN_SOURCES_APPLE_SINGLE_SOURCE_HPP_
-#define REZIN_SOURCES_APPLE_SINGLE_SOURCE_HPP_
+#ifndef REZIN_SOURCES_APPLE_SINGLE_HPP_
+#define REZIN_SOURCES_APPLE_SINGLE_HPP_
 
 #include <sfz/sfz.hpp>
 
@@ -34,4 +34,4 @@ bool store_argument(AppleSingleSource& to, sfz::StringSlice value, sfz::PrintTar
 
 }  // namespace rezin
 
-#endif  // REZIN_SOURCES_APPLE_SINGLE_SOURCE_HPP_
+#endif  // REZIN_SOURCES_APPLE_SINGLE_HPP_

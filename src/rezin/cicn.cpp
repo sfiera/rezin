@@ -3,15 +3,15 @@
 // This file is part of librezin, a free software project.  You can redistribute it and/or modify
 // it under the terms of the MIT License.
 
-#include <rezin/ColorIcon.hpp>
+#include <rezin/cicn.hpp>
 
 #include <algorithm>
 #include <map>
 #include <vector>
 #include <png.h>
-#include <rezin/BasicTypes.hpp>
-#include <rezin/BitsSlice.hpp>
-#include <rezin/ColorTable.hpp>
+#include <rezin/bits-slice.hpp>
+#include <rezin/clut.hpp>
+#include <rezin/primitives.hpp>
 #include <sfz/sfz.hpp>
 
 using sfz::Bytes;

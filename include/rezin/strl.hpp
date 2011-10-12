@@ -3,8 +3,8 @@
 // This file is part of librezin, a free software project.  You can redistribute it and/or modify
 // it under the terms of the MIT License.
 
-#ifndef REZIN_STRING_LIST_HPP_
-#define REZIN_STRING_LIST_HPP_
+#ifndef REZIN_STRL_HPP_
+#define REZIN_STRL_HPP_
 
 #include <vector>
 #include <sfz/sfz.hpp>
@@ -23,4 +23,4 @@ sfz::Json json(const StringList& strings);
 
 }  // namespace rezin
 
-#endif // REZIN_STRING_LIST_HPP_
+#endif // REZIN_STRL_HPP_
