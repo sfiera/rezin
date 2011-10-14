@@ -57,7 +57,7 @@ void read_from(ReadSource in, ColorIcon::Rep& rep) {
     rep.mask_bitmap.read_image(in, black, clear, rep.mask_bitmap_image);
     rep.icon_bitmap.read_image(in, black, white, rep.icon_bitmap_image);
     read(in, rep.color_table);
-    rep.icon_pixmap.read_indexed_image(in, rep.color_table, rep.icon_pixmap_image);
+    rep.icon_pixmap.read_image(in, rep.color_table, rep.icon_pixmap_image);
 }
 
 ColorIcon::ColorIcon(BytesSlice in):

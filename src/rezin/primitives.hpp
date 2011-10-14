@@ -26,6 +26,9 @@ struct Rect {
 
     sfz::Json to_json() const;
 };
+
+bool operator==(const Rect& x, const Rect& y);
+bool operator!=(const Rect& x, const Rect& y);
 void read_from(sfz::ReadSource in, Rect& out);
 
 struct fixed32_t {
@@ -52,8 +55,11 @@ struct PixMap {
     uint32_t pm_table;
     int32_t pm_reserved;
 
-    void read_indexed_image(
+    void read_image(
             sfz::ReadSource in, const ColorTable& clut, sfz::scoped_ptr<RasterImage>& image) const;
+    void read_packed_image(
+            sfz::ReadSource in, const ColorTable& clut, sfz::scoped_ptr<RasterImage>& image) const;
+    void read_direct_image(sfz::ReadSource in, sfz::scoped_ptr<RasterImage>& image) const;
 };
 void read_from(sfz::ReadSource in, PixMap& out);
 

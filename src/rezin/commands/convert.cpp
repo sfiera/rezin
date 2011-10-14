@@ -59,6 +59,9 @@ void ConvertCommand::run(const ResourceFork& rsrc, const Options& options) const
         Json list = json(clut);
         String decoded_string(pretty_print(list));
         converted.assign(utf8::encode(decoded_string));
+    } else if (_type == "PICT") {
+        Picture pict(data);
+        write(converted, png(pict));
     } else {
         print(io::err, format("warning: printing unknown resource type {0} as raw data.\n",
                     quote(_type)));
