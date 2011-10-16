@@ -33,7 +33,6 @@ struct fixed32_t {
 void read_from(sfz::ReadSource in, fixed32_t& out);
 
 struct PixMap {
-    uint32_t base_addr;
     int16_t row_bytes;
     Rect bounds;
     int16_t pm_version;
@@ -49,10 +48,14 @@ struct PixMap {
     uint32_t pm_table;
     int32_t pm_reserved;
 
-    sfz::Json to_json() const;
     void read_pixels(sfz::ReadSource in, std::vector<uint8_t>& out) const;
 };
 void read_from(sfz::ReadSource in, PixMap& out);
+
+struct AddressedPixMap : PixMap {
+    uint32_t base_addr;
+};
+void read_from(sfz::ReadSource in, AddressedPixMap& out);
 
 struct BitMap {
     uint32_t base_addr;

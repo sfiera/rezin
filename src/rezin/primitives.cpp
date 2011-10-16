@@ -57,12 +57,6 @@ void read_from(ReadSource in, fixed32_t& out) {
     read(in, out.int_value);
 }
 
-Json PixMap::to_json() const {
-    StringMap<Json> result;
-    result["bounds"] = bounds.to_json();
-    return Json::object(result);
-}
-
 void PixMap::read_pixels(ReadSource in, vector<uint8_t>& out) const {
     if (row_bytes == 0) {
         return;
@@ -84,8 +78,7 @@ void PixMap::read_pixels(ReadSource in, vector<uint8_t>& out) const {
     }
 }
 
-void read_from(ReadSource in, PixMap& out) {
-    read(in, out.base_addr);
+void read_from(sfz::ReadSource in, PixMap& out) {
     read(in, out.row_bytes);
     out.row_bytes &= 0x3fff;
     read(in, out.bounds);
@@ -119,15 +112,22 @@ void read_from(ReadSource in, PixMap& out) {
     if (out.plane_bytes != 0) {
         throw Exception("PixMap::plane_bytes must be 0");
     }
-    if (out.base_addr != 0) {
-        throw Exception("PixMap::base_addr must be 0");
-    }
     if (out.pm_table != 0) {
         throw Exception("PixMap::pm_table must be 0");
     }
     if (out.pm_reserved != 0) {
         throw Exception("PixMap::pm_reserved must be 0");
     }
+}
+
+void read_from(ReadSource in, AddressedPixMap& out) {
+    read(in, out.base_addr);
+    if (out.base_addr != 0) {
+        throw Exception("PixMap::base_addr must be 0");
+    }
+
+    PixMap& parent = out;
+    read(in, parent);
 }
 
 Json BitMap::to_json() const {

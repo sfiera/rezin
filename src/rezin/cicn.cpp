@@ -34,7 +34,7 @@ using std::vector;
 namespace rezin {
 
 struct ColorIcon::Rep {
-    PixMap icon_pixmap;
+    AddressedPixMap icon_pixmap;
     BitMap mask_bitmap;
     BitMap icon_bitmap;
     uint32_t icon_data;
