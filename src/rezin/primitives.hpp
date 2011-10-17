@@ -11,6 +11,10 @@
 
 namespace rezin {
 
+class AlphaColor;
+class RasterImage;
+class ColorTable;
+
 struct Rect {
     int16_t top;
     int16_t left;
@@ -48,7 +52,8 @@ struct PixMap {
     uint32_t pm_table;
     int32_t pm_reserved;
 
-    void read_pixels(sfz::ReadSource in, std::vector<uint8_t>& out) const;
+    void read_indexed_image(
+            sfz::ReadSource in, const ColorTable& clut, sfz::scoped_ptr<RasterImage>& image) const;
 };
 void read_from(sfz::ReadSource in, PixMap& out);
 
@@ -63,7 +68,9 @@ struct BitMap {
     Rect bounds;
 
     sfz::Json to_json() const;
-    void read_pixels(sfz::ReadSource in, std::vector<uint8_t>& out) const;
+    void read_image(
+            sfz::ReadSource in, AlphaColor on, AlphaColor off,
+            sfz::scoped_ptr<RasterImage>& image) const;
 };
 void read_from(sfz::ReadSource in, BitMap& out);
 

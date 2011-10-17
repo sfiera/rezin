@@ -7,6 +7,8 @@
 
 #include <vector>
 #include <rezin/bits-slice.hpp>
+#include <rezin/clut.hpp>
+#include <rezin/image.hpp>
 #include <sfz/sfz.hpp>
 
 using sfz::Bytes;
@@ -17,6 +19,7 @@ using sfz::ReadSource;
 using sfz::StringMap;
 using sfz::format;
 using sfz::read;
+using sfz::scoped_ptr;
 using std::vector;
 
 namespace rezin {
@@ -57,24 +60,22 @@ void read_from(ReadSource in, fixed32_t& out) {
     read(in, out.int_value);
 }
 
-void PixMap::read_pixels(ReadSource in, vector<uint8_t>& out) const {
+void PixMap::read_indexed_image(
+        sfz::ReadSource in, const ColorTable& clut, sfz::scoped_ptr<RasterImage>& image) const {
+    image.reset(new RasterImage(bounds));
     if (row_bytes == 0) {
         return;
     }
-
-    size_t size = row_bytes * bounds.height();
-    Bytes bytes(size, '\0');
-    in.shift(bytes.data(), size);
-
-    BytesSlice remainder = bytes;
-    for (int i = 0; i < bounds.height(); ++i) {
-        BitsSlice bits(remainder.slice(0, row_bytes));
-        for (int j = 0; j < bounds.width(); ++j) {
+    Bytes bytes(row_bytes, '\0');
+    for (int y = 0; y < bounds.height(); ++y) {
+        in.shift(bytes.data(), bytes.size());
+        BitsSlice bits(bytes);
+        for (int x = 0; x < bounds.width(); ++x) {
             uint8_t value;
             bits.shift(&value, pixel_size);
-            out.push_back(value);
+            const Color& color = clut.table.find(value)->second;
+            image->set(x, y, AlphaColor(color.red >> 8, color.green >> 8, color.blue >> 8));
         }
-        remainder.shift(row_bytes);
     }
 }
 
@@ -136,24 +137,21 @@ Json BitMap::to_json() const {
     return Json::object(result);
 }
 
-void BitMap::read_pixels(ReadSource in, vector<uint8_t>& out) const {
+void BitMap::read_image(
+        ReadSource in, AlphaColor on, AlphaColor off, scoped_ptr<RasterImage>& image) const {
+    image.reset(new RasterImage(bounds));
     if (row_bytes == 0) {
         return;
     }
-
-    size_t size = row_bytes * bounds.height();
-    Bytes bytes(size, '\0');
-    in.shift(bytes.data(), size);
-
-    BytesSlice remainder = bytes;
-    for (int i = 0; i < bounds.height(); ++i) {
-        BitsSlice bits(remainder.slice(0, row_bytes));
-        for (int j = 0; j < bounds.width(); ++j) {
+    Bytes bytes(row_bytes, '\0');
+    for (int y = 0; y < bounds.height(); ++y) {
+        in.shift(bytes.data(), bytes.size());
+        BitsSlice bits(bytes);
+        for (int x = 0; x < bounds.width(); ++x) {
             uint8_t value;
             bits.shift(&value, 1);
-            out.push_back(value);
+            image->set(x, y, value ? on : off);
         }
-        remainder.shift(row_bytes);
     }
 }
 

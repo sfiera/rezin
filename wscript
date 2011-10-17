@@ -21,6 +21,7 @@ def build(bld):
             "src/rezin/bits-slice.cpp",
             "src/rezin/cicn.cpp",
             "src/rezin/clut.cpp",
+            "src/rezin/image.cpp",
             "src/rezin/options.cpp",
             "src/rezin/png.cpp",
             "src/rezin/primitives.cpp",

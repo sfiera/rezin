@@ -10,7 +10,7 @@
 #include <vector>
 #include <rezin/bits-slice.hpp>
 #include <rezin/clut.hpp>
-#include <rezin/png.hpp>
+#include <rezin/image.hpp>
 #include <rezin/primitives.hpp>
 #include <sfz/sfz.hpp>
 
@@ -26,6 +26,7 @@ using sfz::WriteTarget;
 using sfz::format;
 using sfz::range;
 using sfz::read;
+using sfz::scoped_ptr;
 using std::make_pair;
 using std::map;
 using std::swap;
@@ -38,10 +39,10 @@ struct ColorIcon::Rep {
     BitMap mask_bitmap;
     BitMap icon_bitmap;
     uint32_t icon_data;
-    std::vector<uint8_t> mask_bitmap_pixels;
-    std::vector<uint8_t> icon_bitmap_pixels;
+    scoped_ptr<RasterImage> mask_bitmap_image;
+    scoped_ptr<RasterImage> icon_bitmap_image;
     ColorTable color_table;
-    std::vector<uint8_t> icon_pixmap_pixels;
+    scoped_ptr<RasterImage> icon_pixmap_image;
 };
 
 void read_from(ReadSource in, ColorIcon::Rep& rep) {
@@ -50,10 +51,13 @@ void read_from(ReadSource in, ColorIcon::Rep& rep) {
     read(in, rep.icon_bitmap);
     read(in, rep.icon_data);
 
-    rep.mask_bitmap.read_pixels(in, rep.mask_bitmap_pixels);
-    rep.icon_bitmap.read_pixels(in, rep.icon_bitmap_pixels);
+    const AlphaColor black(0, 0, 0);
+    const AlphaColor white(255, 255, 255);
+    const AlphaColor clear(0, 0, 0, 0);
+    rep.mask_bitmap.read_image(in, black, clear, rep.mask_bitmap_image);
+    rep.icon_bitmap.read_image(in, black, white, rep.icon_bitmap_image);
     read(in, rep.color_table);
-    rep.icon_pixmap.read_pixels(in, rep.icon_pixmap_pixels);
+    rep.icon_pixmap.read_indexed_image(in, rep.color_table, rep.icon_pixmap_image);
 }
 
 ColorIcon::ColorIcon(BytesSlice in):
@@ -70,28 +74,11 @@ PngColorIcon png(const ColorIcon& cicn) {
     return png;
 }
 
-void write_to(WriteTarget out, PngColorIcon png) {
-    const ColorIcon::Rep& rep = *png.cicn.rep;
-    int16_t width = rep.icon_pixmap.bounds.width();
-    int16_t height = rep.icon_pixmap.bounds.height();
-
-    PngWriter p(out, width, height);
-
-    SFZ_FOREACH(int16_t row, range(height), {
-        SFZ_FOREACH(int16_t col, range(width), {
-            uint8_t index = rep.icon_pixmap_pixels[(row * height) + col];
-            uint8_t mask = rep.mask_bitmap_pixels[(row * height) + col];
-            if (mask == 0) {
-                p.append_pixel(0, 0, 0, 0);
-            } else {
-                if (rep.color_table.table.find(index) == rep.color_table.table.end()) {
-                    throw Exception(format("No color with id {0}", index));
-                }
-                const Color& color = rep.color_table.table.find(index)->second;
-                p.append_pixel(color.red, color.green, color.blue, 255);
-            }
-        });
-    });
+void write_to(WriteTarget out, PngColorIcon png_cicn) {
+    const ColorIcon::Rep& rep = *png_cicn.cicn.rep;
+    RasterImage composite(rep.mask_bitmap.bounds);
+    composite.src(*rep.icon_pixmap_image, *rep.mask_bitmap_image);
+    write(out, png(composite));
 }
 
 }  // namespace rezin
