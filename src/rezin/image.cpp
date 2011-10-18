@@ -14,22 +14,34 @@ using std::min;
 
 namespace rezin {
 
-Image::Image() {
-}
+Image::Image(Rect bounds):
+        _bounds(bounds) { }
 
-RasterImage::RasterImage(const Rect& bounds):
-        _bounds(bounds),
-        _pixels(bounds.width() * bounds.height(), AlphaColor()) {
-}
+Image::~Image() { }
 
-const Rect& RasterImage::bounds() const {
+const Rect& Image::bounds() const {
     return _bounds;
 }
 
-bool RasterImage::contains(int16_t x, int16_t y) const {
+bool Image::contains(int16_t x, int16_t y) const {
     return (x >= _bounds.left) && (x < _bounds.right)
         && (y >= _bounds.top) && (y < _bounds.bottom);
 }
+
+RectImage::RectImage(Rect bounds, AlphaColor color):
+        Image(bounds),
+        _color(color) { }
+
+AlphaColor RectImage::get(int16_t x, int16_t y) const {
+    if (contains(x, y)) {
+        return _color;
+    }
+    return AlphaColor();
+}
+
+RasterImage::RasterImage(Rect bounds):
+        Image(bounds),
+        _pixels(bounds.width() * bounds.height(), AlphaColor()) { }
 
 void RasterImage::set(int16_t x, int16_t y, const AlphaColor& color) {
     if (contains(x, y)) {
@@ -45,7 +57,7 @@ AlphaColor RasterImage::get(int16_t x, int16_t y) const {
     }
 }
 
-void RasterImage::src(const RasterImage& src, const RasterImage& mask) {
+void RasterImage::src(const Image& src, const Image& mask) {
     Rect area = {
         max(max(src.bounds().top, mask.bounds().top), bounds().top),
         max(max(src.bounds().left, mask.bounds().left), bounds().left),
@@ -62,9 +74,9 @@ void RasterImage::src(const RasterImage& src, const RasterImage& mask) {
 }
 
 size_t RasterImage::index(int16_t x, int16_t y) const {
-    x -= _bounds.left;
-    y -= _bounds.top;
-    return x + (y * _bounds.width());
+    x -= bounds().left;
+    y -= bounds().top;
+    return x + (y * bounds().width());
 }
 
 PngRasterImage png(const RasterImage& image) {
@@ -80,6 +92,30 @@ void write_to(WriteTarget out, const PngRasterImage& png) {
             writer.append_pixel(color.red, color.green, color.blue, color.alpha);
         }
     }
+}
+
+namespace {
+
+Rect translate_rect(Rect r, int16_t dx, int16_t dy) {
+    Rect result = {
+        r.top + dy,
+        r.left + dx,
+        r.bottom + dy,
+        r.right + dx,
+    };
+    return result;
+}
+
+}  // namespace
+
+TranslatedImage::TranslatedImage(const Image& image, int16_t dx, int16_t dy):
+        Image(translate_rect(image.bounds(), dx, dy)),
+        _image(image) { }
+
+AlphaColor TranslatedImage::get(int16_t x, int16_t y) const {
+    return _image.get(
+            x + _image.bounds().left - bounds().left,
+            y + _image.bounds().top - bounds().top);
 }
 
 }  // namespace rezin

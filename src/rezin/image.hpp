@@ -35,33 +35,56 @@ struct AlphaColor {
 
 class Image {
   public:
-    Image();
+    Image(Rect bounds);
+    virtual ~Image();
+
+    const Rect& bounds() const;
+    bool contains(int16_t x, int16_t y) const;
+    virtual AlphaColor get(int16_t x, int16_t y) const = 0;
 
   private:
+    const Rect _bounds;
+
     DISALLOW_COPY_AND_ASSIGN(Image);
+};
+
+class RectImage : public Image {
+  public:
+    RectImage(Rect bounds, AlphaColor color);
+
+    virtual AlphaColor get(int16_t x, int16_t y) const;
+
+  private:
+    AlphaColor _color;
 };
 
 class RasterImage : public Image {
   public:
-    explicit RasterImage(const Rect& bounds);
+    explicit RasterImage(Rect bounds);
 
-    const Rect& bounds() const;
-    bool contains(int16_t x, int16_t y) const;
+    virtual AlphaColor get(int16_t x, int16_t y) const;
+
     void set(int16_t x, int16_t y, const AlphaColor& color);
-    AlphaColor get(int16_t x, int16_t y) const;
 
-    void src(const RasterImage& src, const RasterImage& mask);
+    void src(const Image& src, const Image& mask);
 
   private:
     size_t index(int16_t x, int16_t y) const;
 
-    const Rect _bounds;
     std::vector<AlphaColor> _pixels;
-
-    DISALLOW_COPY_AND_ASSIGN(RasterImage);
 };
 
 PngRasterImage png(const RasterImage& image);
+
+class TranslatedImage : public Image {
+  public:
+    TranslatedImage(const Image& image, int16_t dx, int16_t dy);
+
+    virtual AlphaColor get(int16_t x, int16_t y) const;
+
+  private:
+    const Image& _image;
+};
 
 struct PngRasterImage {
     const RasterImage& image;
