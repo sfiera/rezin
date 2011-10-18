@@ -122,6 +122,7 @@ enum {
     DEFAULT_HILITE_V2 = 0x001e,
     PACK_BITS_RECT_V2 = 0x0098,
     DIRECT_BITS_RECT_V2 = 0x009a,
+    SHORT_COMMENT_V2 = 0x00a0,
     LONG_COMMENT_V2 = 0x00a1,
     HEADER_OP_V2 = 0x0c00,
     END_V2 = 0x00ff,
@@ -166,6 +167,11 @@ void read_version_2_pict(ReadSource in, Picture& pict) {
                 DirectBitsRectOp op;
                 read(in, op);
                 op.draw(*pict.rep);
+                break;
+            }
+
+            case SHORT_COMMENT_V2: {
+                in.shift(2);
                 break;
             }
 
