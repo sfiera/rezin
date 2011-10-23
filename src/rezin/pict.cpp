@@ -27,6 +27,7 @@ namespace rezin {
 struct Picture::Rep {
     Rect bounds;
     bool is_raster;
+    uint8_t version;
     scoped_ptr<RasterImage> image;
 };
 
@@ -294,13 +295,19 @@ void read_version_1_pict(ReadSource in, Picture& pict) {
             }
 
             case PIC_VERSION_V1: {
-                if (read<uint8_t>(in) != 0x02) {
-                    throw Exception("only version 2 'PICT' resources are supported");
+                const uint8_t version = read<uint8_t>(in);
+                if (version == 0x01) {
+                    pict.rep->version = 1;
+                    return;
+                } else if (version == 0x02) {
+                    pict.rep->version = 2;
+                    if (read<uint8_t>(in) != 0xff) {
+                        throw Exception("expected end of version 1 'PICT' resource");
+                    }
+                    read_version_2_pict(in, pict);
+                } else {
+                    throw Exception("only version 1 and 2 'PICT' resources are supported");
                 }
-                if (read<uint8_t>(in) != 0xff) {
-                    throw Exception("expected end of version 1 'PICT' resource");
-                }
-                read_version_2_pict(in, pict);
                 break;
             }
 
@@ -315,9 +322,10 @@ void read_version_1_pict(ReadSource in, Picture& pict) {
 
 Picture::Picture(BytesSlice in):
         rep(new Rep) {
+    rep->version = 0;
+    rep->is_raster = true;
     in.shift(2);  // Ignore size of 'PICT' resource.
     read(in, rep->bounds);
-    rep->is_raster = true;
     rep->image.reset(new RasterImage(rep->bounds));
 
     read_version_1_pict(in, *this);
@@ -327,11 +335,18 @@ bool Picture::is_raster() const {
     return rep->is_raster;
 }
 
+uint8_t Picture::version() const {
+    return rep->version;
+}
+
 Picture::~Picture() { }
 
 PngPicture png(const Picture& pict) {
+    if (pict.version() != 2) {
+        throw Exception("can only create png of version 2 'PICT' resource");
+    }
     if (!pict.is_raster()) {
-        throw Exception("png() can only be used with raster images");
+        throw Exception("cannot create png of vector 'PICT' resource");
     }
     PngPicture result = {pict};
     return result;

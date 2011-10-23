@@ -19,6 +19,7 @@ struct Picture {
     ~Picture();
 
     bool is_raster() const;
+    uint8_t version() const;
 
     sfz::linked_ptr<Rep> rep;
 };
