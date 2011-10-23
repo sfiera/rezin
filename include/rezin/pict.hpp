@@ -18,6 +18,8 @@ struct Picture {
     Picture(sfz::BytesSlice in);
     ~Picture();
 
+    bool is_raster() const;
+
     sfz::linked_ptr<Rep> rep;
 };
 

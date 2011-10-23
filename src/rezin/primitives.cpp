@@ -158,9 +158,9 @@ void PixMap::read_direct_image(ReadSource in, sfz::scoped_ptr<RasterImage>& imag
             }
         }
         const int16_t w = bounds.width();
-        const BytesSlice red = components.slice(w, w);
-        const BytesSlice green = components.slice(2 * w, w);
-        const BytesSlice blue = components.slice(3 * w);
+        const BytesSlice red = components.slice((cmp_count - 3) * w, w);
+        const BytesSlice green = components.slice((cmp_count - 2) * w, w);
+        const BytesSlice blue = components.slice((cmp_count - 1) * w);
         for (int x = 0; x < w; ++x) {
             image->set(x, y, AlphaColor(red.at(x), green.at(x), blue.at(x)));
         }
@@ -285,8 +285,8 @@ void read_from(ReadSource in, PixMap& out) {
                     throw Exception(format("direct pixels may not have size {0}", out.pixel_size));
                 }
             }
-            if (out.cmp_count != 4) {
-                throw Exception("direct pixels must have four components");
+            if ((out.cmp_count != 3) && (out.cmp_count != 4)) {
+                throw Exception("direct pixels must have three or four components");
             }
             break;
         }

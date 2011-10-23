@@ -26,10 +26,19 @@ namespace rezin {
 
 struct Picture::Rep {
     Rect bounds;
+    bool is_raster;
     scoped_ptr<RasterImage> image;
 };
 
 namespace {
+
+template <typename T>
+T round_up_even(T t) {
+    if ((t % 2) == 1) {
+        return t + 1;
+    }
+    return t;
+}
 
 struct PackBitsRectOp {
     PixMap pix_map;
@@ -77,7 +86,9 @@ void read_from(ReadSource in, DirectBitsRectOp& op) {
     read(in, op.src_rect);
     read(in, op.dst_rect);
     read(in, op.mode);
+    op.mode &= ~0x0040;  // Ignore dithering.
     if (op.mode != 0) {
+        sfz::print(sfz::io::err, sfz::format("{0}\n", op.mode));
         throw Exception("only source compositing is supported");
     }
     op.pix_map.read_direct_image(in, op.image);
@@ -119,7 +130,26 @@ void read_from(ReadSource in, Header& header) {
 enum {
     NOOP_V2 = 0x0000,
     CLIP_V2 = 0x0001,
+    PEN_SIZE_V2 = 0x0007,
+    FOREGROUND_COLOR_V2 = 0x001a,
+    BACKGROUND_COLOR_V2 = 0x001b,
     DEFAULT_HILITE_V2 = 0x001e,
+    OP_COLOR_V2 = 0x001f,
+    SHORT_LINE_V2 = 0x0022,
+    FRAME_RECT_V2 = 0x0030,
+    PAINT_RECT_V2 = 0x0031,
+    FRAME_SAME_RECT_V2 = 0x0038,
+    PAINT_SAME_RECT_V2 = 0x0039,
+    FRAME_OVAL_V2 = 0x0050,
+    PAINT_OVAL_V2 = 0x0051,
+    FRAME_SAME_OVAL_V2 = 0x0058,
+    PAINT_SAME_OVAL_V2 = 0x0059,
+    FRAME_ARC_V2 = 0x0060,
+    PAINT_ARC_V2 = 0x0061,
+    FRAME_SAME_ARC_V2 = 0x0068,
+    PAINT_SAME_ARC_V2 = 0x0069,
+    FRAME_POLY_V2 = 0x0070,
+    PAINT_POLY_V2 = 0x0071,
     PACK_BITS_RECT_V2 = 0x0098,
     DIRECT_BITS_RECT_V2 = 0x009a,
     SHORT_COMMENT_V2 = 0x00a0,
@@ -143,6 +173,62 @@ void read_version_2_pict(ReadSource in, Picture& pict) {
         switch (op) {
             case NOOP_V2:
             case DEFAULT_HILITE_V2: {
+                break;
+            }
+
+            case PEN_SIZE_V2: {
+                in.shift(4);
+                break;
+            }
+
+            case FOREGROUND_COLOR_V2:
+            case BACKGROUND_COLOR_V2:
+            case OP_COLOR_V2: {
+                in.shift(6);
+                break;
+            }
+
+            case SHORT_LINE_V2: {
+                pict.rep->is_raster = false;
+                in.shift(6);
+                break;
+            }
+
+            case FRAME_RECT_V2:
+            case PAINT_RECT_V2:
+            case FRAME_OVAL_V2:
+            case PAINT_OVAL_V2: {
+                pict.rep->is_raster = false;
+                in.shift(8);
+                break;
+            }
+
+            case FRAME_SAME_RECT_V2:
+            case PAINT_SAME_RECT_V2:
+            case FRAME_SAME_OVAL_V2:
+            case PAINT_SAME_OVAL_V2: {
+                pict.rep->is_raster = false;
+                break;
+            }
+
+            case FRAME_ARC_V2:
+            case PAINT_ARC_V2: {
+                pict.rep->is_raster = false;
+                in.shift(12);
+                break;
+            }
+
+            case FRAME_SAME_ARC_V2:
+            case PAINT_SAME_ARC_V2: {
+                pict.rep->is_raster = false;
+                in.shift(4);
+                break;
+            }
+
+            case FRAME_POLY_V2:
+            case PAINT_POLY_V2: {
+                pict.rep->is_raster = false;
+                in.shift(round_up_even(read<uint16_t>(in) - 2));
                 break;
             }
 
@@ -177,7 +263,7 @@ void read_version_2_pict(ReadSource in, Picture& pict) {
 
             case LONG_COMMENT_V2: {
                 in.shift(2);
-                in.shift(read<uint16_t>(in));
+                in.shift(round_up_even(read<uint16_t>(in)));
                 break;
             }
 
@@ -231,14 +317,22 @@ Picture::Picture(BytesSlice in):
         rep(new Rep) {
     in.shift(2);  // Ignore size of 'PICT' resource.
     read(in, rep->bounds);
+    rep->is_raster = true;
     rep->image.reset(new RasterImage(rep->bounds));
 
     read_version_1_pict(in, *this);
 }
 
+bool Picture::is_raster() const {
+    return rep->is_raster;
+}
+
 Picture::~Picture() { }
 
 PngPicture png(const Picture& pict) {
+    if (!pict.is_raster()) {
+        throw Exception("png() can only be used with raster images");
+    }
     PngPicture result = {pict};
     return result;
 }
