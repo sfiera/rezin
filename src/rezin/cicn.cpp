@@ -33,21 +33,38 @@ using std::vector;
 
 namespace rezin {
 
-ColorIcon::ColorIcon(BytesSlice in) {
-    read(in, icon_pixmap);
-    read(in, mask_bitmap);
-    read(in, icon_bitmap);
-    read(in, icon_data);
+struct ColorIcon::Rep {
+    PixMap icon_pixmap;
+    BitMap mask_bitmap;
+    BitMap icon_bitmap;
+    uint32_t icon_data;
+    std::vector<uint8_t> mask_bitmap_pixels;
+    std::vector<uint8_t> icon_bitmap_pixels;
+    ColorTable color_table;
+    std::vector<uint8_t> icon_pixmap_pixels;
+};
 
-    mask_bitmap.read_pixels(in, mask_bitmap_pixels);
-    icon_bitmap.read_pixels(in, icon_bitmap_pixels);
-    read(in, color_table);
-    icon_pixmap.read_pixels(in, icon_pixmap_pixels);
+void read_from(ReadSource in, ColorIcon::Rep& rep) {
+    read(in, rep.icon_pixmap);
+    read(in, rep.mask_bitmap);
+    read(in, rep.icon_bitmap);
+    read(in, rep.icon_data);
 
+    rep.mask_bitmap.read_pixels(in, rep.mask_bitmap_pixels);
+    rep.icon_bitmap.read_pixels(in, rep.icon_bitmap_pixels);
+    read(in, rep.color_table);
+    rep.icon_pixmap.read_pixels(in, rep.icon_pixmap_pixels);
+}
+
+ColorIcon::ColorIcon(BytesSlice in):
+        rep(new Rep) {
+    read(in, *rep);
     if (!in.empty()) {
         throw Exception("extra bytes at end of 'cicn' resource.");
     }
 }
+
+ColorIcon::~ColorIcon() { }
 
 namespace {
 
@@ -109,8 +126,9 @@ PngColorIcon png(const ColorIcon& cicn) {
 }
 
 void write_to(WriteTarget out, PngColorIcon png) {
-    int16_t width = png.cicn.icon_pixmap.bounds.width();
-    int16_t height = png.cicn.icon_pixmap.bounds.height();
+    const ColorIcon::Rep& rep = *png.cicn.rep;
+    int16_t width = rep.icon_pixmap.bounds.width();
+    int16_t height = rep.icon_pixmap.bounds.height();
 
     PngWriter p(out);
     png_set_IHDR(p.png, p.info, width, height, 8, PNG_COLOR_TYPE_RGBA, NULL, NULL, NULL);
@@ -120,15 +138,15 @@ void write_to(WriteTarget out, PngColorIcon png) {
     SFZ_FOREACH(int16_t row, range(height), {
         Bytes row_data;
         SFZ_FOREACH(int16_t col, range(width), {
-            uint8_t index = png.cicn.icon_pixmap_pixels[(row * height) + col];
-            uint8_t mask = png.cicn.mask_bitmap_pixels[(row * height) + col];
+            uint8_t index = rep.icon_pixmap_pixels[(row * height) + col];
+            uint8_t mask = rep.mask_bitmap_pixels[(row * height) + col];
             if (mask == 0) {
                 append_pixel(row_data, 0, 0, 0, 0);
             } else {
-                if (png.cicn.color_table.table.find(index) == png.cicn.color_table.table.end()) {
+                if (rep.color_table.table.find(index) == rep.color_table.table.end()) {
                     throw Exception(format("No color with id {0}", index));
                 }
-                const Color& color = png.cicn.color_table.table.find(index)->second;
+                const Color& color = rep.color_table.table.find(index)->second;
                 append_pixel(row_data, color.red, color.green, color.blue, 255);
             }
         });

@@ -10,7 +10,6 @@
 #include <rezin/cicn.hpp>
 #include <rezin/clut.hpp>
 #include <rezin/options.hpp>
-#include <rezin/primitives.hpp>
 #include <rezin/resource.hpp>
 #include <rezin/snd.hpp>
 #include <rezin/strl.hpp>

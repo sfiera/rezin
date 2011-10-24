@@ -7,24 +7,18 @@
 #define REZIN_CICN_HPP_
 
 #include <sfz/sfz.hpp>
-#include <rezin/clut.hpp>
-#include <rezin/primitives.hpp>
 
 namespace rezin {
 
 struct PngColorIcon;
 
 struct ColorIcon {
-    ColorIcon(sfz::BytesSlice in);
+    struct Rep;
 
-    PixMap icon_pixmap;
-    BitMap mask_bitmap;
-    BitMap icon_bitmap;
-    uint32_t icon_data;
-    std::vector<uint8_t> mask_bitmap_pixels;
-    std::vector<uint8_t> icon_bitmap_pixels;
-    ColorTable color_table;
-    std::vector<uint8_t> icon_pixmap_pixels;
+    ColorIcon(sfz::BytesSlice in);
+    ~ColorIcon();
+
+    sfz::linked_ptr<Rep> rep;
 };
 
 PngColorIcon png(const ColorIcon& cicn);
