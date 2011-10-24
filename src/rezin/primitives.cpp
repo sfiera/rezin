@@ -201,7 +201,7 @@ void PixMap::read_packed_image(
                 uint8_t size = 0x101 - header;
                 for (int j = 0; j < size; ++j) {
                     if (x < bounds.width()) {
-                        image->set(x, y, lookup(clut, value));
+                        image->set(x + bounds.left, y + bounds.top, lookup(clut, value));
                     }
                     ++x;
                 }
@@ -210,7 +210,7 @@ void PixMap::read_packed_image(
                 for (int j = 0; j < size; ++j) {
                     if (x < bounds.width()) {
                         uint8_t value = read<uint8_t>(remainder);
-                        image->set(x, y, lookup(clut, value));
+                        image->set(x + bounds.left, y + bounds.top, lookup(clut, value));
                     }
                     ++x;
                 }
@@ -322,7 +322,7 @@ void BitMap::read_image(
         for (int x = 0; x < bounds.width(); ++x) {
             uint8_t value;
             bits.shift(&value, 1);
-            image->set(x, y, value ? on : off);
+            image->set(x + bounds.left, y + bounds.top, value ? on : off);
         }
     }
 }
