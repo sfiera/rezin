@@ -11,6 +11,10 @@
 
 namespace rezin {
 
+class AlphaColor;
+class RasterImage;
+class ColorTable;
+
 struct Rect {
     int16_t top;
     int16_t left;
@@ -22,6 +26,9 @@ struct Rect {
 
     sfz::Json to_json() const;
 };
+
+bool operator==(const Rect& x, const Rect& y);
+bool operator!=(const Rect& x, const Rect& y);
 void read_from(sfz::ReadSource in, Rect& out);
 
 struct fixed32_t {
@@ -33,7 +40,6 @@ struct fixed32_t {
 void read_from(sfz::ReadSource in, fixed32_t& out);
 
 struct PixMap {
-    uint32_t base_addr;
     int16_t row_bytes;
     Rect bounds;
     int16_t pm_version;
@@ -49,10 +55,18 @@ struct PixMap {
     uint32_t pm_table;
     int32_t pm_reserved;
 
-    sfz::Json to_json() const;
-    void read_pixels(sfz::ReadSource in, std::vector<uint8_t>& out) const;
+    void read_image(
+            sfz::ReadSource in, const ColorTable& clut, sfz::scoped_ptr<RasterImage>& image) const;
+    void read_packed_image(
+            sfz::ReadSource in, const ColorTable& clut, sfz::scoped_ptr<RasterImage>& image) const;
+    void read_direct_image(sfz::ReadSource in, sfz::scoped_ptr<RasterImage>& image) const;
 };
 void read_from(sfz::ReadSource in, PixMap& out);
+
+struct AddressedPixMap : PixMap {
+    uint32_t base_addr;
+};
+void read_from(sfz::ReadSource in, AddressedPixMap& out);
 
 struct BitMap {
     uint32_t base_addr;
@@ -60,7 +74,9 @@ struct BitMap {
     Rect bounds;
 
     sfz::Json to_json() const;
-    void read_pixels(sfz::ReadSource in, std::vector<uint8_t>& out) const;
+    void read_image(
+            sfz::ReadSource in, AlphaColor on, AlphaColor off,
+            sfz::scoped_ptr<RasterImage>& image) const;
 };
 void read_from(sfz::ReadSource in, BitMap& out);
 

@@ -35,8 +35,8 @@ void read_from(ReadSource in, ColorTable& out) {
     read(in, out.flags);
     read(in, out.size);
     SFZ_FOREACH(uint32_t i, range(uint32_t(out.size) + 1), {
-        const uint16_t id = read<uint16_t>(in);
-        read(in, out.table[id]);
+        in.shift(2);
+        read(in, out.table[i]);
     });
 }
 
