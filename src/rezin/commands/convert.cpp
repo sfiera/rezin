@@ -67,7 +67,9 @@ void ConvertCommand::run(const ResourceFork& rsrc, const Options& options) const
                     quote(_type)));
         converted.assign(data.data(), data.size());
     }
-    write(1, converted.data(), converted.size());
+    if (write(1, converted.data(), converted.size()) < 0) {
+        // TODO(sfiera): handle result properly.
+    }
 }
 
 }  // namespace rezin
