@@ -16,6 +16,7 @@ def build(bld):
 
     bld.stlib(
         target="rezin/librezin",
+        features="universal",
         source=[
             "src/rezin/apple-single.cpp",
             "src/rezin/bits-slice.cpp",
@@ -40,14 +41,9 @@ def build(bld):
         ],
     )
 
-    bld.platform(
-        target="rezin/librezin",
-        platform="darwin",
-        arch="x86_64 i386 ppc",
-    )
-
     bld.program(
         target="rezin/rezin",
+        features="universal",
         source=[
             "src/rezin.cpp",
             "src/rezin/commands/cat.cpp",
@@ -60,10 +56,4 @@ def build(bld):
         cxxflags="-Wall -Werror",
         includes="./src",
         use="rezin/librezin",
-    )
-
-    bld.platform(
-        target="rezin/rezin",
-        platform="darwin",
-        arch="x86_64 i386 ppc",
     )
