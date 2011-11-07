@@ -5,6 +5,7 @@
 
 #include <rezin/snd.hpp>
 
+#include <string.h>
 #include <sfz/sfz.hpp>
 
 using sfz::Bytes;
@@ -162,7 +163,8 @@ namespace {
 // @param [in] d        A double-precision floating point value.
 void write_float80(WriteTarget out, double d) {
     // Reinterpret `d` as uint64_t, since we will be manupulating bits.
-    uint64_t sample_rate_bits = *reinterpret_cast<uint64_t*>(&d);
+    uint64_t sample_rate_bits;
+    memcpy(&sample_rate_bits, &d, sizeof(uint64_t));
 
     // Deconstruct the double:
     //   * the sign, 1 bit.
