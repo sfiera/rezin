@@ -33,7 +33,9 @@ CatCommand::CatCommand(args::Parser& parser, Command*& command) {
 void CatCommand::run(const ResourceFork& rsrc, const Options& options) const {
     const ResourceEntry& entry = rsrc.at(_type).at(_id);
     BytesSlice data = entry.data();
-    write(1, data.data(), data.size());
+    if (write(1, data.data(), data.size()) < 0) {
+        // TODO(sfiera): handle result properly.
+    }
 }
 
 }  // namespace rezin
