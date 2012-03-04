@@ -2,6 +2,4 @@
 
 set -e
 
-git submodule init
-git submodule update
-./ext/gyp/gyp --depth=. -Dlibrary=static_library -Iext/gyputil/util.gypi
+python ext/waf-sfiera/waf configure "$@"
