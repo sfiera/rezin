@@ -8,6 +8,13 @@ def common(ctx):
     ctx.load("core externals", "ext/waf-sfiera")
     ctx.external("libpng libsfz libzipxx")
 
+def dist(dst):
+    dst.algo = "zip"
+    dst.excl = (
+        " **/.* **/*.zip **/*.pyc **/build ext/*/ext"
+        " ext/libsfz/waf ext/libzipxx/waf"
+    )
+
 def options(opt):
     common(opt)
 
