@@ -1,5 +1,8 @@
 # -*- mode: python -*-
 
+APPNAME = "rezin"
+VERSION = "1.4.1"
+
 def common(ctx):
     ctx.load("compiler_cxx")
     ctx.load("core externals", "ext/waf-sfiera")
