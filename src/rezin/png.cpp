@@ -52,7 +52,7 @@ PngWriter::PngWriter(WriteTarget& out, int32_t width, int32_t height):
 
     png_set_write_fn(_png, &_out, png_write_data, png_flush_data);
 
-    png_set_IHDR(_png, _info, width, height, 8, PNG_COLOR_TYPE_RGBA, NULL, NULL, NULL);
+    png_set_IHDR(_png, _info, width, height, 8, PNG_COLOR_TYPE_RGBA, 0, 0, 0);
     png_set_swap_alpha(_png);
     png_write_info(_png, _info);
 }
