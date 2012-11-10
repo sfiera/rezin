@@ -11,9 +11,9 @@
 
 namespace rezin {
 
-class AlphaColor;
+struct AlphaColor;
 class RasterImage;
-class ColorTable;
+struct ColorTable;
 
 struct Rect {
     int16_t top;
