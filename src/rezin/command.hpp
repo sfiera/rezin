@@ -8,7 +8,7 @@
 
 namespace rezin {
 
-class Options;
+struct Options;
 class ResourceFork;
 
 class Command {

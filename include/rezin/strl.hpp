@@ -11,7 +11,7 @@
 
 namespace rezin {
 
-class Options;
+struct Options;
 
 struct StringList {
     StringList(sfz::BytesSlice in, const Options& options);

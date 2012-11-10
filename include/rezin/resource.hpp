@@ -10,7 +10,7 @@
 
 namespace rezin {
 
-class Options;
+struct Options;
 class ResourceEntry;
 class ResourceType;
 
