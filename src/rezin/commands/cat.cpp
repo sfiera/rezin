@@ -6,6 +6,7 @@
 #include <rezin/commands/cat.hpp>
 
 #include <fcntl.h>
+#include <unistd.h>
 #include <rezin/resource.hpp>
 
 using sfz::BytesSlice;

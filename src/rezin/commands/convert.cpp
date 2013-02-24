@@ -6,6 +6,7 @@
 #include <rezin/commands/convert.hpp>
 
 #include <fcntl.h>
+#include <unistd.h>
 #include <rezin/rezin.hpp>
 
 using sfz::Bytes;
