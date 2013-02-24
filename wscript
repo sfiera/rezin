@@ -4,11 +4,11 @@ APPNAME = "rezin"
 VERSION = "1.4.1"
 
 def common(ctx):
-    ctx.default_sdk = "10.4"
+    ctx.default_sdk = "10.6"
     ctx.default_compiler = "gcc"
     ctx.load("compiler_cxx")
     ctx.load("core externals", "ext/waf-sfiera")
-    ctx.external("libpng libsfz libzipxx")
+    ctx.external("libpng-waf libsfz libzipxx")
 
 def dist(dst):
     dst.algo = "zip"
