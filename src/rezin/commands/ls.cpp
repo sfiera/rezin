@@ -31,17 +31,17 @@ LsCommand::LsCommand(args::Parser& parser, Command*& command) {
 
 void LsCommand::run(const ResourceFork& rsrc, const Options& options) const {
     if (!_type.has()) {
-        SFZ_FOREACH(const ResourceType& type, rsrc, {
+        for (const ResourceType& type: rsrc) {
             print(io::out, format("{0}\n", type.code()));
-        });
+        }
         return;
     }
 
     const ResourceType& type = rsrc.at(*_type);
     if (!_id.has()) {
-        SFZ_FOREACH(const ResourceEntry& entry, type, {
+        for (const ResourceEntry& entry: type) {
             print(io::out, format("{0}\t{1}\n", entry.id(), entry.name()));
-        });
+        }
         return;
     }
 

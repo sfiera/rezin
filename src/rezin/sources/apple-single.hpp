@@ -23,8 +23,8 @@ class AppleSingleSource {
   private:
     friend void swap(AppleSingleSource& x, AppleSingleSource& y);
 
-    sfz::scoped_ptr<sfz::MappedFile> _file;
-    sfz::scoped_ptr<AppleSingle> _apple_single;
+    std::unique_ptr<sfz::MappedFile> _file;
+    std::unique_ptr<AppleSingle> _apple_single;
 
     DISALLOW_COPY_AND_ASSIGN(AppleSingleSource);
 };

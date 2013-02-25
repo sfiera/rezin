@@ -15,10 +15,9 @@ using sfz::Exception;
 using sfz::Json;
 using sfz::String;
 using sfz::format;
-using sfz::linked_ptr;
-using sfz::make_linked_ptr;
 using sfz::range;
 using sfz::read;
+using std::shared_ptr;
 using std::vector;
 
 namespace rezin {
@@ -27,15 +26,16 @@ StringList::StringList(BytesSlice in, const Options& options) {
     uint16_t array_size;
     read(in, array_size);
 
-    SFZ_FOREACH(uint16_t i, range(array_size), {
+    for (uint16_t i: range(array_size)) {
+        static_cast<void>(i);
         uint8_t data[255];
         uint8_t size;
         read(in, size);
         read(in, data, size);
         Bytes utf8;
-        linked_ptr<const String> string(new String(options.decode(BytesSlice(data, size))));
+        shared_ptr<const String> string(new String(options.decode(BytesSlice(data, size))));
         strings.push_back(string);
-    });
+    }
 
     if (!in.empty()) {
         throw Exception(format("{0} extra bytes at end of 'STR#' resource.", in.size()));
@@ -44,9 +44,9 @@ StringList::StringList(BytesSlice in, const Options& options) {
 
 Json json(const StringList& strings) {
     vector<Json> array;
-    SFZ_FOREACH(const linked_ptr<const String>& string, strings.strings, {
+    for (const shared_ptr<const String>& string: strings.strings) {
         array.push_back(Json::string(*string));
-    });
+    }
     return Json::array(array);
 }
 
