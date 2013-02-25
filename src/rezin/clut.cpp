@@ -34,19 +34,19 @@ void read_from(ReadSource in, ColorTable& out) {
     read(in, out.seed);
     read(in, out.flags);
     read(in, out.size);
-    SFZ_FOREACH(uint32_t i, range(uint32_t(out.size) + 1), {
+    for (uint32_t i: range(uint32_t(out.size) + 1)) {
         in.shift(2);
         read(in, out.table[i]);
-    });
+    }
 }
 
 Json json(const ColorTable& color_table) {
     StringMap<Json> specs;
     typedef std::pair<uint16_t, Color> pair;
-    SFZ_FOREACH(const pair& p, color_table.table, {
+    for (const pair& p: color_table.table) {
         String key(p.first);
         specs[key] = json(p.second);
-    });
+    }
     return Json::object(specs);
 }
 

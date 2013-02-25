@@ -18,13 +18,13 @@ namespace {
 
 void convert_cr(String* string, const StringSlice& replacement) {
     String result;
-    SFZ_FOREACH(Rune r, *string, {
+    for (Rune r: *string) {
         if (r == '\r') {
             result.append(replacement);
         } else {
             result.append(1, r);
         }
-    });
+    }
     swap(result, *string);
 }
 

@@ -20,7 +20,7 @@ class FlatFileSource {
   private:
     friend void swap(FlatFileSource& x, FlatFileSource& y);
 
-    sfz::scoped_ptr<sfz::MappedFile> _file;
+    std::unique_ptr<sfz::MappedFile> _file;
 
     DISALLOW_COPY_AND_ASSIGN(FlatFileSource);
 };

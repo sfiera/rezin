@@ -19,7 +19,7 @@ using sfz::format;
 using sfz::hex;
 using sfz::range;
 using sfz::read;
-using sfz::scoped_ptr;
+using std::unique_ptr;
 using std::vector;
 
 namespace rezin {
@@ -28,7 +28,7 @@ struct Picture::Rep {
     Rect bounds;
     bool is_raster;
     uint8_t version;
-    scoped_ptr<RasterImage> image;
+    unique_ptr<RasterImage> image;
 };
 
 namespace {
@@ -47,7 +47,7 @@ struct PackBitsRectOp {
     Rect src_rect;
     Rect dst_rect;
     int16_t mode;
-    scoped_ptr<RasterImage> image;
+    unique_ptr<RasterImage> image;
 
     void draw(Picture::Rep& rep) {
         RectImage mask(dst_rect, AlphaColor(0, 0, 0));
@@ -73,7 +73,7 @@ struct DirectBitsRectOp {
     Rect src_rect;
     Rect dst_rect;
     int16_t mode;
-    scoped_ptr<RasterImage> image;
+    unique_ptr<RasterImage> image;
 
     void draw(Picture::Rep& rep) {
         RectImage mask(dst_rect, AlphaColor(0, 0, 0));

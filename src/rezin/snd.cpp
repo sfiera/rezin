@@ -104,11 +104,12 @@ void read_snd_data_table(ReadSource in, uint32_t& pointer, uint32_t& size, doubl
 // @param [in] sample_count The number of samples to read.
 // @param [out] samples The array to read the samples into.
 void read_snd_samples(ReadSource in, uint32_t sample_count, vector<uint8_t>* samples) {
-    SFZ_FOREACH(uint32_t i, range(sample_count), {
+    for (uint32_t i: range(sample_count)) {
+        static_cast<void>(i);
         uint8_t sample;
         read(in, sample);
         samples->push_back(sample);
-    });
+    }
 }
 
 }  // namespace
@@ -219,9 +220,9 @@ void write_ssnd(WriteTarget out, const Sound& sound) {
     Bytes ssnd;
     write<uint32_t>(ssnd, 0);
     write<uint32_t>(ssnd, 0);
-    SFZ_FOREACH(uint8_t sample, sound.samples, {
+    for (uint8_t sample: sound.samples) {
         write<int8_t>(ssnd, sample - 0x80);
-    });
+    }
 
     write_chunk(out, "SSND", ssnd);
 }

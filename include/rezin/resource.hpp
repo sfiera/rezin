@@ -56,8 +56,8 @@ class ResourceFork {
 
       private:
         friend class ResourceFork;
-        const_iterator(sfz::StringMap<sfz::linked_ptr<ResourceType> >::const_iterator it) : _it(it) { }
-        sfz::StringMap<sfz::linked_ptr<ResourceType> >::const_iterator _it;
+        const_iterator(sfz::StringMap<std::shared_ptr<ResourceType> >::const_iterator it) : _it(it) { }
+        sfz::StringMap<std::shared_ptr<ResourceType> >::const_iterator _it;
     };
     typedef const_iterator iterator;
 
@@ -67,7 +67,7 @@ class ResourceFork {
 
   private:
     // The map represented by this object.
-    sfz::StringMap<sfz::linked_ptr<ResourceType> > _types;
+    sfz::StringMap<std::shared_ptr<ResourceType> > _types;
 
     DISALLOW_COPY_AND_ASSIGN(ResourceFork);
 };
@@ -110,8 +110,8 @@ class ResourceType {
 
       private:
         friend class ResourceType;
-        const_iterator(std::map<int16_t, sfz::linked_ptr<ResourceEntry> >::const_iterator it) : _it(it) { }
-        std::map<int16_t, sfz::linked_ptr<ResourceEntry> >::const_iterator _it;
+        const_iterator(std::map<int16_t, std::shared_ptr<ResourceEntry> >::const_iterator it) : _it(it) { }
+        std::map<int16_t, std::shared_ptr<ResourceEntry> >::const_iterator _it;
     };
     typedef const_iterator iterator;
 
@@ -137,7 +137,7 @@ class ResourceType {
     sfz::String _code;
 
     // The map represented by this object.
-    std::map<int16_t, sfz::linked_ptr<ResourceEntry> > _entries;
+    std::map<int16_t, std::shared_ptr<ResourceEntry> > _entries;
 
     DISALLOW_COPY_AND_ASSIGN(ResourceType);
 };

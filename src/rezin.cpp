@@ -23,7 +23,6 @@ using sfz::args::store;
 using sfz::format;
 using sfz::path::basename;
 using sfz::print;
-using sfz::scoped_ptr;
 using std::vector;
 
 namespace args = sfz::args;

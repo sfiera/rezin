@@ -19,7 +19,7 @@ using sfz::ReadSource;
 using sfz::StringMap;
 using sfz::format;
 using sfz::read;
-using sfz::scoped_ptr;
+using std::unique_ptr;
 using std::vector;
 
 namespace rezin {
@@ -95,7 +95,7 @@ AlphaColor lookup(const ColorTable& clut, uint16_t index) {
 }  // namespace
 
 void PixMap::read_image(
-        sfz::ReadSource in, const ColorTable& clut, sfz::scoped_ptr<RasterImage>& image) const {
+        sfz::ReadSource in, const ColorTable& clut, unique_ptr<RasterImage>& image) const {
     if (pixel_type == RGB_DIRECT) {
         return read_direct_image(in, image);
     }
@@ -120,7 +120,7 @@ void PixMap::read_image(
     }
 }
 
-void PixMap::read_direct_image(ReadSource in, sfz::scoped_ptr<RasterImage>& image) const {
+void PixMap::read_direct_image(ReadSource in, unique_ptr<RasterImage>& image) const {
     if (pixel_type != RGB_DIRECT) {
         throw Exception("image is not direct");
     }
@@ -171,7 +171,7 @@ void PixMap::read_direct_image(ReadSource in, sfz::scoped_ptr<RasterImage>& imag
 }
 
 void PixMap::read_packed_image(
-        sfz::ReadSource in, const ColorTable& clut, sfz::scoped_ptr<RasterImage>& image) const {
+        sfz::ReadSource in, const ColorTable& clut, unique_ptr<RasterImage>& image) const {
     if (pixel_type != INDEXED) {
         throw Exception("image is not indexed");
     }
@@ -310,7 +310,7 @@ Json BitMap::to_json() const {
 }
 
 void BitMap::read_image(
-        ReadSource in, AlphaColor on, AlphaColor off, scoped_ptr<RasterImage>& image) const {
+        ReadSource in, AlphaColor on, AlphaColor off, unique_ptr<RasterImage>& image) const {
     image.reset(new RasterImage(bounds));
     if (row_bytes == 0) {
         return;
