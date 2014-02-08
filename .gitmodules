@@ -4,12 +4,9 @@
 [submodule "ext/libzipxx"]
 	path = ext/libzipxx
 	url = git://github.com/sfiera/libzipxx.git
-[submodule "ext/waf-sfiera"]
-	path = ext/waf-sfiera
-	url = git://github.com/sfiera/waf-sfiera.git
-[submodule "ext/libpng-waf"]
-	path = ext/libpng-waf
-	url = https://github.com/sfiera/libpng-waf.git
-[submodule "ext/gmock-waf"]
-	path = ext/gmock-waf
-	url = https://github.com/sfiera/gmock-waf.git
+[submodule "ext/libpng-gyp"]
+	path = ext/libpng-gyp
+	url = https://github.com/sfiera/libpng-gyp.git
+[submodule "ext/gmock-gyp"]
+	path = ext/gmock-gyp
+	url = https://github.com/sfiera/gmock-gyp.git
