@@ -12,4 +12,10 @@ dist:
 distclean:
 	rm -Rf out/
 
+man/rezin.1: man/rezin.1.ronn
+	ronn -r --pipe $< >$@
+
+README: man/rezin.1
+	man $< |col -b >$@
+
 .PHONY: all clean dist distclean
