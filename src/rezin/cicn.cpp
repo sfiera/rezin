@@ -26,10 +26,10 @@ using sfz::WriteTarget;
 using sfz::format;
 using sfz::range;
 using sfz::read;
-using sfz::scoped_ptr;
 using std::make_pair;
 using std::map;
 using std::swap;
+using std::unique_ptr;
 using std::vector;
 
 namespace rezin {
@@ -39,10 +39,10 @@ struct ColorIcon::Rep {
     BitMap mask_bitmap;
     BitMap icon_bitmap;
     uint32_t icon_data;
-    scoped_ptr<RasterImage> mask_bitmap_image;
-    scoped_ptr<RasterImage> icon_bitmap_image;
+    unique_ptr<RasterImage> mask_bitmap_image;
+    unique_ptr<RasterImage> icon_bitmap_image;
     ColorTable color_table;
-    scoped_ptr<RasterImage> icon_pixmap_image;
+    unique_ptr<RasterImage> icon_pixmap_image;
 };
 
 void read_from(ReadSource in, ColorIcon::Rep& rep) {

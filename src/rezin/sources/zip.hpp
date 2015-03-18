@@ -23,7 +23,7 @@ class ZipSource {
     friend void swap(ZipSource& x, ZipSource& y);
 
     struct Contents;
-    sfz::scoped_ptr<Contents> _contents;
+    std::unique_ptr<Contents> _contents;
 
     DISALLOW_COPY_AND_ASSIGN(ZipSource);
 };

@@ -1,18 +1,12 @@
 [submodule "ext/libsfz"]
 	path = ext/libsfz
 	url = git://github.com/sfiera/libsfz.git
-[submodule "ext/googletest"]
-	path = ext/googletest
-	url = git://github.com/sfiera/googletest.git
-[submodule "ext/googlemock"]
-	path = ext/googlemock
-	url = git://github.com/sfiera/googlemock.git
 [submodule "ext/libzipxx"]
 	path = ext/libzipxx
 	url = git://github.com/sfiera/libzipxx.git
-[submodule "ext/libpng"]
-	path = ext/libpng
-	url = git://github.com/sfiera/libpng.git
-[submodule "ext/waf-sfiera"]
-	path = ext/waf-sfiera
-	url = git://github.com/sfiera/waf-sfiera.git
+[submodule "ext/libpng-gyp"]
+	path = ext/libpng-gyp
+	url = https://github.com/sfiera/libpng-gyp.git
+[submodule "ext/gmock-gyp"]
+	path = ext/gmock-gyp
+	url = https://github.com/sfiera/gmock-gyp.git

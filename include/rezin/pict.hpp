@@ -21,7 +21,7 @@ struct Picture {
     bool is_raster() const;
     uint8_t version() const;
 
-    sfz::linked_ptr<Rep> rep;
+    std::shared_ptr<Rep> rep;
 };
 
 PngPicture png(const Picture& pict);

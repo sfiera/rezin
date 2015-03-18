@@ -18,7 +18,7 @@ struct ColorIcon {
     ColorIcon(sfz::BytesSlice in);
     ~ColorIcon();
 
-    sfz::linked_ptr<Rep> rep;
+    std::shared_ptr<Rep> rep;
 };
 
 PngColorIcon png(const ColorIcon& cicn);

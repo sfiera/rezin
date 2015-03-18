@@ -14,11 +14,11 @@ using sfz::String;
 using sfz::StringMap;
 using sfz::StringSlice;
 using sfz::format;
-using sfz::linked_ptr;
 using sfz::quote;
 using sfz::range;
 using sfz::read;
 using std::map;
+using std::shared_ptr;
 
 namespace macroman = sfz::macroman;
 
@@ -53,17 +53,17 @@ ResourceFork::ResourceFork(const BytesSlice& data, const Options& options) {
     BytesSlice type_data = map_data.slice(type_offset);
     BytesSlice name_data = map_data.slice(name_offset);
 
-    SFZ_FOREACH(uint16_t i, range(type_count), {
-        linked_ptr<ResourceType> type(
+    for (uint16_t i: range(type_count)) {
+        shared_ptr<ResourceType> type(
                 new ResourceType(type_data, i, name_data, data_data, options));
         _types[StringSlice(type->code())] = type;
-    });
+    }
 }
 
 ResourceFork::~ResourceFork() { }
 
 const ResourceType& ResourceFork::at(const StringSlice& code) const {
-    StringMap<linked_ptr<ResourceType> >::const_iterator it = _types.find(code);
+    StringMap<shared_ptr<ResourceType> >::const_iterator it = _types.find(code);
     if (it == _types.end()) {
         throw Exception(format("no such resource type '{0}'", code));
     }
@@ -90,11 +90,11 @@ ResourceType::ResourceType(
     ++count;
 
     BytesSlice entry_data = type_data.slice(offset);
-    SFZ_FOREACH(uint16_t i, range(count), {
-        linked_ptr<ResourceEntry> entry(
+    for (uint16_t i: range(count)) {
+        shared_ptr<ResourceEntry> entry(
                 new ResourceEntry(entry_data, i, name_data, data_data, options));
         _entries[entry->id()] = entry;
-    });
+    }
 }
 
 ResourceType::~ResourceType() { }
@@ -102,7 +102,7 @@ ResourceType::~ResourceType() { }
 const sfz::String& ResourceType::code() const { return _code; }
 
 const ResourceEntry& ResourceType::at(int16_t i) const {
-    map<int16_t, linked_ptr<ResourceEntry> >::const_iterator it = _entries.find(i);
+    map<int16_t, shared_ptr<ResourceEntry> >::const_iterator it = _entries.find(i);
     if (it == _entries.end()) {
         throw Exception(format("no such resource entry '{0}' {1}", _code, i));
     }

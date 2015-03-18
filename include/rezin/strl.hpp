@@ -11,12 +11,12 @@
 
 namespace rezin {
 
-class Options;
+struct Options;
 
 struct StringList {
     StringList(sfz::BytesSlice in, const Options& options);
 
-    std::vector<sfz::linked_ptr<const sfz::String> > strings;
+    std::vector<std::shared_ptr<const sfz::String> > strings;
 };
 
 sfz::Json json(const StringList& strings);

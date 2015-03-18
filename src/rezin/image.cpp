@@ -98,10 +98,10 @@ namespace {
 
 Rect translate_rect(Rect r, int16_t dx, int16_t dy) {
     Rect result = {
-        r.top + dy,
-        r.left + dx,
-        r.bottom + dy,
-        r.right + dx,
+        int16_t(r.top + dy),
+        int16_t(r.left + dx),
+        int16_t(r.bottom + dy),
+        int16_t(r.right + dx),
     };
     return result;
 }
