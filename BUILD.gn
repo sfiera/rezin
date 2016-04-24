@@ -1,0 +1,55 @@
+config("librezin_private") {
+  include_dirs = [ "src" ]
+}
+
+config("librezin_public") {
+  include_dirs = [ "include" ]
+}
+
+static_library("librezin") {
+  sources = [
+    "src/rezin/apple-single.cpp",
+    "src/rezin/bits-slice.cpp",
+    "src/rezin/cicn.cpp",
+    "src/rezin/clut.cpp",
+    "src/rezin/image.cpp",
+    "src/rezin/options.cpp",
+    "src/rezin/pict.cpp",
+    "src/rezin/png.cpp",
+    "src/rezin/primitives.cpp",
+    "src/rezin/resource.cpp",
+    "src/rezin/snd.cpp",
+    "src/rezin/strl.cpp",
+  ]
+  include_dirs = [ "include" ]
+  public_deps = [
+    "//ext/libpng-gyp:libpng",
+    "//ext/libsfz",
+    "//ext/libzipxx",
+  ]
+  configs += [ ":librezin_private" ]
+  public_configs = [ ":librezin_public" ]
+}
+
+executable("rezin") {
+  sources = [
+    "src/rezin.cpp",
+    "src/rezin/commands/cat.cpp",
+    "src/rezin/commands/convert.cpp",
+    "src/rezin/commands/ls.cpp",
+    "src/rezin/sources/apple-single.cpp",
+    "src/rezin/sources/file.cpp",
+    "src/rezin/sources/zip.cpp",
+  ]
+  deps = [
+    ":librezin",
+  ]
+  configs += [ ":librezin_private" ]
+}
+
+group("local") {
+  deps = [
+    ":librezin",
+    ":rezin",
+  ]
+}
