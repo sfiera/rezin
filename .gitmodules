@@ -1,9 +1,9 @@
 [submodule "ext/libsfz"]
 	path = ext/libsfz
-	url = git://github.com/sfiera/libsfz.git
+	url = https://github.com/sfiera/libsfz.git
 [submodule "ext/libzipxx"]
 	path = ext/libzipxx
-	url = git://github.com/sfiera/libzipxx.git
+	url = https://github.com/sfiera/libzipxx.git
 [submodule "ext/libpng-gyp"]
 	path = ext/libpng
 	url = https://github.com/sfiera/libpng-gyp.git
