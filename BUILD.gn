@@ -23,7 +23,7 @@ static_library("librezin") {
   ]
   include_dirs = [ "include" ]
   public_deps = [
-    "//ext/libpng-gyp:libpng",
+    "//ext/libpng",
     "//ext/libsfz",
     "//ext/libzipxx",
   ]
