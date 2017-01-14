@@ -5,7 +5,7 @@
 	path = ext/libzipxx
 	url = git://github.com/sfiera/libzipxx.git
 [submodule "ext/libpng-gyp"]
-	path = ext/libpng-gyp
+	path = ext/libpng
 	url = https://github.com/sfiera/libpng-gyp.git
 [submodule "ext/gmock-gyp"]
 	path = ext/gmock

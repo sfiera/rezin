@@ -55,7 +55,7 @@ def check_submodules():
     REQUIRED_SUBMODULES = [
         "build/lib",
         "ext/gmock",
-        "ext/libpng-gyp",
+        "ext/libpng",
         "ext/libsfz",
         "ext/libzipxx",
     ]
