@@ -227,9 +227,6 @@ void read_from(ReadSource in, PixMap& out) {
     read(in, out.pm_table);
     read(in, out.pm_reserved);
 
-    if (out.plane_bytes != 0) {
-        throw Exception("PixMap::plane_bytes must be 0");
-    }
     if (out.pm_reserved != 0) {
         throw Exception("PixMap::pm_reserved must be 0");
     }
