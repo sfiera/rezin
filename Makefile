@@ -1,13 +1,18 @@
 NINJA=ninja -C out/cur
 
+.PHONY: all
 all:
 	@$(NINJA)
 
+.PHONY: test
+test: all
+	python3 -m pytest test
+
+.PHONY: clean
 clean:
 	@$(NINJA) -t clean
 
+.PHONY: distclean
 distclean:
 	rm -Rf out/
 	rm -f build/lib/scripts/gn
-
-.PHONY: all clean dist distclean
