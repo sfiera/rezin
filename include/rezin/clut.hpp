@@ -7,8 +7,8 @@
 #define REZIN_CLUT_HPP_
 
 #include <stdint.h>
-#include <vector>
 #include <sfz/sfz.hpp>
+#include <vector>
 
 namespace rezin {
 
@@ -18,12 +18,12 @@ struct ColorTable {
     ColorTable();
     ColorTable(sfz::BytesSlice in);
 
-    uint32_t seed;
-    uint16_t flags;
-    uint16_t size;
+    uint32_t                  seed;
+    uint16_t                  flags;
+    uint16_t                  size;
     std::map<uint16_t, Color> table;
 };
-void read_from(sfz::ReadSource in, ColorTable& out);
+void      read_from(sfz::ReadSource in, ColorTable& out);
 sfz::Json json(const ColorTable& color_table);
 
 struct Color {
@@ -31,9 +31,9 @@ struct Color {
     uint16_t green;
     uint16_t blue;
 };
-void read_from(sfz::ReadSource in, Color& out);
+void      read_from(sfz::ReadSource in, Color& out);
 sfz::Json json(const Color& spec);
 
 }  // namespace rezin
 
-#endif // REZIN_CLUT_HPP_
+#endif  // REZIN_CLUT_HPP_

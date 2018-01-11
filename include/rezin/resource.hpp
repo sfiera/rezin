@@ -41,23 +41,31 @@ class ResourceFork {
     // STL-like iterator type.
     class const_iterator {
       public:
-        typedef ResourceFork container_type;
+        typedef ResourceFork        container_type;
         typedef const ResourceType* pointer;
         typedef const ResourceType* const_pointer;
         typedef const ResourceType& reference;
         typedef const ResourceType& const_reference;
 
         const_reference operator*() const { return *_it->second; }
-        const_pointer operator->() const { return _it->second.get(); }
-        const_iterator& operator++() { ++_it; return *this; }
-        const_iterator operator++(int) { const_iterator old = *this; ++_it; return old; }
+        const_pointer   operator->() const { return _it->second.get(); }
+        const_iterator& operator++() {
+            ++_it;
+            return *this;
+        }
+        const_iterator operator++(int) {
+            const_iterator old = *this;
+            ++_it;
+            return old;
+        }
         bool operator==(const_iterator it) { return _it == it._it; }
         bool operator!=(const_iterator it) { return _it != it._it; }
 
       private:
         friend class ResourceFork;
-        const_iterator(sfz::StringMap<std::shared_ptr<ResourceType> >::const_iterator it) : _it(it) { }
-        sfz::StringMap<std::shared_ptr<ResourceType> >::const_iterator _it;
+        const_iterator(sfz::StringMap<std::shared_ptr<ResourceType>>::const_iterator it)
+                : _it(it) {}
+        sfz::StringMap<std::shared_ptr<ResourceType>>::const_iterator _it;
     };
     typedef const_iterator iterator;
 
@@ -67,7 +75,7 @@ class ResourceFork {
 
   private:
     // The map represented by this object.
-    sfz::StringMap<std::shared_ptr<ResourceType> > _types;
+    sfz::StringMap<std::shared_ptr<ResourceType>> _types;
 
     DISALLOW_COPY_AND_ASSIGN(ResourceFork);
 };
@@ -95,7 +103,7 @@ class ResourceType {
     // STL-like iterator type.
     class const_iterator {
       public:
-        typedef ResourceType container_type;
+        typedef ResourceType         container_type;
         typedef const ResourceEntry* pointer;
         typedef const ResourceEntry* const_pointer;
         typedef const ResourceEntry& reference;
@@ -103,15 +111,19 @@ class ResourceType {
 
         const ResourceEntry& operator*() const { return *_it->second; }
         const ResourceEntry* operator->() const { return _it->second.get(); }
-        const_iterator& operator++() { ++_it; return *this; }
+        const_iterator&      operator++() {
+            ++_it;
+            return *this;
+        }
         const_iterator operator++(int) { return iterator(_it++); }
-        bool operator==(const_iterator it) { return _it == it._it; }
-        bool operator!=(const_iterator it) { return _it != it._it; }
+        bool           operator==(const_iterator it) { return _it == it._it; }
+        bool           operator!=(const_iterator it) { return _it != it._it; }
 
       private:
         friend class ResourceType;
-        const_iterator(std::map<int16_t, std::shared_ptr<ResourceEntry> >::const_iterator it) : _it(it) { }
-        std::map<int16_t, std::shared_ptr<ResourceEntry> >::const_iterator _it;
+        const_iterator(std::map<int16_t, std::shared_ptr<ResourceEntry>>::const_iterator it)
+                : _it(it) {}
+        std::map<int16_t, std::shared_ptr<ResourceEntry>>::const_iterator _it;
     };
     typedef const_iterator iterator;
 
@@ -137,7 +149,7 @@ class ResourceType {
     sfz::String _code;
 
     // The map represented by this object.
-    std::map<int16_t, std::shared_ptr<ResourceEntry> > _entries;
+    std::map<int16_t, std::shared_ptr<ResourceEntry>> _entries;
 
     DISALLOW_COPY_AND_ASSIGN(ResourceType);
 };

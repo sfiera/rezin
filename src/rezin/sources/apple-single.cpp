@@ -15,9 +15,9 @@ using sfz::PrintTarget;
 
 namespace rezin {
 
-AppleSingleSource::AppleSingleSource() { }
+AppleSingleSource::AppleSingleSource() {}
 
-AppleSingleSource::~AppleSingleSource() { }
+AppleSingleSource::~AppleSingleSource() {}
 
 void AppleSingleSource::load(sfz::StringSlice path) {
     _file.reset(new MappedFile(path));

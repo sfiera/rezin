@@ -16,7 +16,7 @@ class ZipSource {
     ZipSource();
     ~ZipSource();
 
-    void load(sfz::StringSlice zip_file, sfz::StringSlice file_path);
+    void            load(sfz::StringSlice zip_file, sfz::StringSlice file_path);
     sfz::BytesSlice data() const;
 
   private:

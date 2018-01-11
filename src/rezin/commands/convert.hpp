@@ -6,9 +6,9 @@
 #ifndef REZIN_COMMANDS_CONVERT_HPP_
 #define REZIN_COMMANDS_CONVERT_HPP_
 
-#include <vector>
 #include <rezin/command.hpp>
 #include <sfz/sfz.hpp>
+#include <vector>
 
 namespace rezin {
 
@@ -22,7 +22,7 @@ class ConvertCommand : public Command {
 
   private:
     sfz::String _type;
-    int16_t _id;
+    int16_t     _id;
 
     DISALLOW_COPY_AND_ASSIGN(ConvertCommand);
 };

@@ -23,9 +23,11 @@ struct ColorIcon {
 
 PngColorIcon png(const ColorIcon& cicn);
 
-struct PngColorIcon { const ColorIcon& cicn; };
+struct PngColorIcon {
+    const ColorIcon& cicn;
+};
 void write_to(sfz::WriteTarget out, PngColorIcon png);
 
 }  // namespace rezin
 
-#endif // REZIN_CICN_HPP_
+#endif  // REZIN_CICN_HPP_

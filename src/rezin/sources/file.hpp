@@ -14,7 +14,7 @@ class FlatFileSource {
   public:
     FlatFileSource();
 
-    void load(sfz::StringSlice path);
+    void            load(sfz::StringSlice path);
     sfz::BytesSlice data() const;
 
   private:

@@ -23,15 +23,14 @@ namespace io = sfz::io;
 namespace rezin {
 
 LsCommand::LsCommand(args::Parser& parser, Command*& command) {
-    args::Parser& ls = parser.add_subparser(
-            "ls", "list resources", store_const(command, this));
+    args::Parser& ls = parser.add_subparser("ls", "list resources", store_const(command, this));
     ls.add_argument("type", store(_type));
     ls.add_argument("id", store(_id));
 }
 
 void LsCommand::run(const ResourceFork& rsrc, const Options& options) const {
     if (!_type.has()) {
-        for (const ResourceType& type: rsrc) {
+        for (const ResourceType& type : rsrc) {
             print(io::out, format("{0}\n", type.code()));
         }
         return;
@@ -39,7 +38,7 @@ void LsCommand::run(const ResourceFork& rsrc, const Options& options) const {
 
     const ResourceType& type = rsrc.at(*_type);
     if (!_id.has()) {
-        for (const ResourceEntry& entry: type) {
+        for (const ResourceEntry& entry : type) {
             print(io::out, format("{0}\t{1}\n", entry.id(), entry.name()));
         }
         return;
@@ -49,4 +48,4 @@ void LsCommand::run(const ResourceFork& rsrc, const Options& options) const {
     print(io::out, format("{0}\t{1}\n", entry.id(), entry.name()));
 }
 
-}  // namespace
+}  // namespace rezin

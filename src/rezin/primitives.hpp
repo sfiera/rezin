@@ -34,26 +34,26 @@ void read_from(sfz::ReadSource in, Rect& out);
 struct fixed32_t {
     int32_t int_value;
 
-    double to_double() const;
+    double    to_double() const;
     sfz::Json to_json() const;
 };
 void read_from(sfz::ReadSource in, fixed32_t& out);
 
 struct PixMap {
-    int16_t row_bytes;
-    Rect bounds;
-    int16_t pm_version;
-    int16_t pack_type;
-    int32_t pack_size;
+    int16_t   row_bytes;
+    Rect      bounds;
+    int16_t   pm_version;
+    int16_t   pack_type;
+    int32_t   pack_size;
     fixed32_t h_res;
     fixed32_t v_res;
-    int16_t pixel_type;
-    int16_t pixel_size;
-    int16_t cmp_count;
-    int16_t cmp_size;
-    int32_t plane_bytes;
-    uint32_t pm_table;
-    int32_t pm_reserved;
+    int16_t   pixel_type;
+    int16_t   pixel_size;
+    int16_t   cmp_count;
+    int16_t   cmp_size;
+    int32_t   plane_bytes;
+    uint32_t  pm_table;
+    int32_t   pm_reserved;
 
     void read_image(
             sfz::ReadSource in, const ColorTable& clut, std::unique_ptr<RasterImage>& image) const;
@@ -71,15 +71,15 @@ void read_from(sfz::ReadSource in, AddressedPixMap& out);
 struct BitMap {
     uint32_t base_addr;
     uint16_t row_bytes;
-    Rect bounds;
+    Rect     bounds;
 
     sfz::Json to_json() const;
-    void read_image(
-            sfz::ReadSource in, AlphaColor on, AlphaColor off,
-            std::unique_ptr<RasterImage>& image) const;
+    void      read_image(
+                 sfz::ReadSource in, AlphaColor on, AlphaColor off,
+                 std::unique_ptr<RasterImage>& image) const;
 };
 void read_from(sfz::ReadSource in, BitMap& out);
 
 }  // namespace rezin
 
-#endif // REZIN_PRIMITIVES_HPP_
+#endif  // REZIN_PRIMITIVES_HPP_

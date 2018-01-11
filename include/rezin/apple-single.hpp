@@ -30,20 +30,20 @@ class AppleSingle {
     // AppleSingle files.  Otherwise, the file may contain chunks corresponding to any integer;
     // these are simply a few well-known ones.
     enum PredefinedChunk {
-        DATA_FORK = 1,
-        RESOURCE_FORK = 2,
-        REAL_NAME = 3,
-        COMMENT = 4,
-        ICON_BW = 5,
-        ICON_COLOR = 6,
-        FILE_DATES_INFO = 8,
-        FINDER_INFO = 9,
+        DATA_FORK           = 1,
+        RESOURCE_FORK       = 2,
+        REAL_NAME           = 3,
+        COMMENT             = 4,
+        ICON_BW             = 5,
+        ICON_COLOR          = 6,
+        FILE_DATES_INFO     = 8,
+        FINDER_INFO         = 9,
         MACINTOSH_FILE_INFO = 10,
-        PRO_DOS_FILE_INFO = 11,
-        MS_DOS_FILE_INFO = 12,
-        SHORT_NAME = 13,
-        AFP_FILE_INFO = 14,
-        DIRECTORY_ID = 15,
+        PRO_DOS_FILE_INFO   = 11,
+        MS_DOS_FILE_INFO    = 12,
+        SHORT_NAME          = 13,
+        AFP_FILE_INFO       = 14,
+        DIRECTORY_ID        = 15,
     };
 
     // Initializes this object with the contents of `data`.
@@ -77,4 +77,4 @@ typedef AppleSingle AppleDouble;
 
 }  // namespace rezin
 
-#endif // REZIN_APPLE_SINGLE_HPP_
+#endif  // REZIN_APPLE_SINGLE_HPP_

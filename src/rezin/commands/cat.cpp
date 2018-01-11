@@ -23,17 +23,15 @@ namespace args = sfz::args;
 namespace rezin {
 
 CatCommand::CatCommand(args::Parser& parser, Command*& command) {
-    args::Parser& cat = parser.add_subparser(
-            "cat", "print binary resource data", store_const(command, this));
-    cat.add_argument("type", store(_type))
-        .required();
-    cat.add_argument("id", store(_id))
-        .required();
+    args::Parser& cat =
+            parser.add_subparser("cat", "print binary resource data", store_const(command, this));
+    cat.add_argument("type", store(_type)).required();
+    cat.add_argument("id", store(_id)).required();
 }
 
 void CatCommand::run(const ResourceFork& rsrc, const Options& options) const {
     const ResourceEntry& entry = rsrc.at(_type).at(_id);
-    BytesSlice data = entry.data();
+    BytesSlice           data  = entry.data();
     if (write(1, data.data(), data.size()) < 0) {
         // TODO(sfiera): handle result properly.
     }

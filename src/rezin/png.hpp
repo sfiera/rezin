@@ -22,16 +22,16 @@ class PngWriter {
 
   private:
     sfz::WriteTarget& _out;
-    const int32_t _width;
-    const int32_t _height;
+    const int32_t     _width;
+    const int32_t     _height;
 
     png_struct* _png;
-    png_info* _info;
+    png_info*   _info;
 
     sfz::Bytes _row_data;
-    int32_t _pixel_index;
+    int32_t    _pixel_index;
 };
 
 }  // namespace rezin
 
-#endif // REZIN_PNG_HPP_
+#endif  // REZIN_PNG_HPP_

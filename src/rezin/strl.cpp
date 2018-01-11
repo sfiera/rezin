@@ -5,9 +5,9 @@
 
 #include <rezin/strl.hpp>
 
-#include <vector>
 #include <rezin/options.hpp>
 #include <sfz/sfz.hpp>
+#include <vector>
 
 using sfz::Bytes;
 using sfz::BytesSlice;
@@ -26,13 +26,13 @@ StringList::StringList(BytesSlice in, const Options& options) {
     uint16_t array_size;
     read(in, array_size);
 
-    for (uint16_t i: range(array_size)) {
+    for (uint16_t i : range(array_size)) {
         static_cast<void>(i);
         uint8_t data[255];
         uint8_t size;
         read(in, size);
         read(in, data, size);
-        Bytes utf8;
+        Bytes                    utf8;
         shared_ptr<const String> string(new String(options.decode(BytesSlice(data, size))));
         strings.push_back(string);
     }
@@ -44,7 +44,7 @@ StringList::StringList(BytesSlice in, const Options& options) {
 
 Json json(const StringList& strings) {
     vector<Json> array;
-    for (const shared_ptr<const String>& string: strings.strings) {
+    for (const shared_ptr<const String>& string : strings.strings) {
         array.push_back(Json::string(*string));
     }
     return Json::array(array);

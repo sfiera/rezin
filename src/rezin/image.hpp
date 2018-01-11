@@ -6,9 +6,9 @@
 #ifndef REZIN_IMAGE_HPP_
 #define REZIN_IMAGE_HPP_
 
-#include <vector>
-#include <sfz/sfz.hpp>
 #include <rezin/primitives.hpp>
+#include <sfz/sfz.hpp>
+#include <vector>
 
 namespace rezin {
 
@@ -20,17 +20,10 @@ struct AlphaColor {
     uint8_t green;
     uint8_t blue;
 
-    AlphaColor():
-            alpha(0),
-            red(0),
-            green(0),
-            blue(0) { }
+    AlphaColor() : alpha(0), red(0), green(0), blue(0) {}
 
-    AlphaColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255):
-            alpha(alpha),
-            red(red),
-            green(green),
-            blue(blue) { }
+    AlphaColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255)
+            : alpha(alpha), red(red), green(green), blue(blue) {}
 };
 
 class Image {
@@ -38,8 +31,8 @@ class Image {
     Image(Rect bounds);
     virtual ~Image();
 
-    const Rect& bounds() const;
-    bool contains(int16_t x, int16_t y) const;
+    const Rect&        bounds() const;
+    bool               contains(int16_t x, int16_t y) const;
     virtual AlphaColor get(int16_t x, int16_t y) const = 0;
 
   private:
@@ -93,4 +86,4 @@ void write_to(sfz::WriteTarget out, const PngRasterImage& png);
 
 }  // namespace rezin
 
-#endif // REZIN_IMAGE_HPP_
+#endif  // REZIN_IMAGE_HPP_

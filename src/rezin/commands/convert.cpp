@@ -22,24 +22,22 @@ using sfz::string_to_int;
 using std::vector;
 
 namespace args = sfz::args;
-namespace io = sfz::io;
+namespace io   = sfz::io;
 namespace utf8 = sfz::utf8;
 
 namespace rezin {
 
 ConvertCommand::ConvertCommand(args::Parser& parser, Command*& command) {
-    args::Parser& convert = parser.add_subparser(
-            "convert", "convert resource", store_const(command, this));
-    convert.add_argument("type", store(_type))
-        .required();
-    convert.add_argument("id", store(_id))
-        .required();
+    args::Parser& convert =
+            parser.add_subparser("convert", "convert resource", store_const(command, this));
+    convert.add_argument("type", store(_type)).required();
+    convert.add_argument("id", store(_id)).required();
 }
 
 void ConvertCommand::run(const ResourceFork& rsrc, const Options& options) const {
     const ResourceEntry& entry = rsrc.at(_type).at(_id);
-    BytesSlice data = entry.data();
-    Bytes converted;
+    BytesSlice           data  = entry.data();
+    Bytes                converted;
 
     if (_type == "snd ") {
         Sound snd(data);
@@ -49,23 +47,23 @@ void ConvertCommand::run(const ResourceFork& rsrc, const Options& options) const
         converted.assign(utf8::encode(string));
     } else if (_type == "STR#") {
         StringList string_list(data, options);
-        Json list = json(string_list);
-        String decoded_string(pretty_print(list));
+        Json       list = json(string_list);
+        String     decoded_string(pretty_print(list));
         converted.assign(utf8::encode(decoded_string));
     } else if (_type == "cicn") {
         ColorIcon cicn(data);
         write(converted, png(cicn));
     } else if (_type == "clut") {
         ColorTable clut(data);
-        Json list = json(clut);
-        String decoded_string(pretty_print(list));
+        Json       list = json(clut);
+        String     decoded_string(pretty_print(list));
         converted.assign(utf8::encode(decoded_string));
     } else if (_type == "PICT") {
         Picture pict(data);
         write(converted, png(pict));
     } else {
-        print(io::err, format("warning: printing unknown resource type {0} as raw data.\n",
-                    quote(_type)));
+        print(io::err,
+              format("warning: printing unknown resource type {0} as raw data.\n", quote(_type)));
         converted.assign(data.data(), data.size());
     }
     if (write(1, converted.data(), converted.size()) < 0) {

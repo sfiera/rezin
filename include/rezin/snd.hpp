@@ -25,10 +25,10 @@ struct AiffSound;
 struct Sound {
     Sound(sfz::BytesSlice in);
 
-    uint16_t fmt;
-    uint32_t channels;
-    uint32_t sample_bits;
-    double sample_rate;
+    uint16_t             fmt;
+    uint32_t             channels;
+    uint32_t             sample_bits;
+    double               sample_rate;
     std::vector<uint8_t> samples;
 };
 
@@ -39,9 +39,11 @@ struct Sound {
 // same restrictions on input as read_snd() does on output.
 AiffSound aiff(const Sound& sound);
 
-struct AiffSound { const Sound& sound; };
+struct AiffSound {
+    const Sound& sound;
+};
 void write_to(sfz::WriteTarget out, AiffSound aiff);
 
 }  // namespace rezin
 
-#endif // REZIN_SND_HPP_
+#endif  // REZIN_SND_HPP_

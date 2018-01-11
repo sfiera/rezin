@@ -15,4 +15,4 @@
 #include <rezin/snd.hpp>
 #include <rezin/strl.hpp>
 
-#endif // REZIN_REZIN_HPP_
+#endif  // REZIN_REZIN_HPP_

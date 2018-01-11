@@ -16,17 +16,15 @@ namespace rezin {
 namespace {
 
 uint8_t bits(uint8_t byte, int begin, int end) {
-    const int size = end - begin;
-    const uint8_t mask = (1 << size) - 1;
-    const int shift = 8 - end;
+    const int     size  = end - begin;
+    const uint8_t mask  = (1 << size) - 1;
+    const int     shift = 8 - end;
     return (byte >> shift) & mask;
 }
 
 }  // namespace
 
-BitsSlice::BitsSlice(const BytesSlice& bytes)
-        : _bytes(bytes),
-          _bit_index(0) { }
+BitsSlice::BitsSlice(const BytesSlice& bytes) : _bytes(bytes), _bit_index(0) {}
 
 void BitsSlice::shift(int size) {
     _bit_index += size;
@@ -42,7 +40,7 @@ void BitsSlice::shift(uint8_t* data, size_t size) {
     }
 
     uint8_t byte = _bytes.at(0);
-    *data = bits(byte, _bit_index, _bit_index + size);
+    *data        = bits(byte, _bit_index, _bit_index + size);
 
     _bit_index += size;
     if (_bit_index == 8) {

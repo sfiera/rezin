@@ -5,11 +5,11 @@
 
 #include <rezin/primitives.hpp>
 
-#include <vector>
 #include <rezin/bits-slice.hpp>
 #include <rezin/clut.hpp>
 #include <rezin/image.hpp>
 #include <sfz/sfz.hpp>
+#include <vector>
 
 using sfz::Bytes;
 using sfz::BytesSlice;
@@ -24,31 +24,25 @@ using std::vector;
 
 namespace rezin {
 
-int16_t Rect::width() const {
-    return right - left;
-}
+int16_t Rect::width() const { return right - left; }
 
-int16_t Rect::height() const {
-    return bottom - top;
-}
+int16_t Rect::height() const { return bottom - top; }
 
 Json Rect::to_json() const {
     StringMap<Json> result;
-    result["top"]       = Json::number(top);
-    result["left"]      = Json::number(left);
-    result["bottom"]    = Json::number(bottom);
-    result["right"]     = Json::number(right);
+    result["top"]    = Json::number(top);
+    result["left"]   = Json::number(left);
+    result["bottom"] = Json::number(bottom);
+    result["right"]  = Json::number(right);
     return Json::object(result);
 }
 
 bool operator==(const Rect& x, const Rect& y) {
-    return (x.left == y.left) && (x.top == y.top)
-        && (x.right == y.right) && (x.bottom == y.bottom);
+    return (x.left == y.left) && (x.top == y.top) && (x.right == y.right) &&
+           (x.bottom == y.bottom);
 }
 
-bool operator!=(const Rect& x, const Rect& y) {
-    return !(x == y);
-}
+bool operator!=(const Rect& x, const Rect& y) { return !(x == y); }
 
 void read_from(ReadSource in, Rect& out) {
     read(in, out.top);
@@ -57,30 +51,24 @@ void read_from(ReadSource in, Rect& out) {
     read(in, out.right);
 }
 
-double fixed32_t::to_double() const {
-    return int_value / 65536.0;
-}
+double fixed32_t::to_double() const { return int_value / 65536.0; }
 
-Json fixed32_t::to_json() const {
-    return Json::number(to_double());
-}
+Json fixed32_t::to_json() const { return Json::number(to_double()); }
 
-void read_from(ReadSource in, fixed32_t& out) {
-    read(in, out.int_value);
-}
+void read_from(ReadSource in, fixed32_t& out) { read(in, out.int_value); }
 
 namespace {
 
 enum {
-    INDEXED = 0,
+    INDEXED    = 0,
     RGB_DIRECT = 16,
 };
 
 enum {
-    DEFAULT_PACKING = 0,
-    NO_PACKING = 1,
-    REMOVE_PAD_BYTE = 2,
-    CHUNK_RUN_LENGTH = 3,
+    DEFAULT_PACKING      = 0,
+    NO_PACKING           = 1,
+    REMOVE_PAD_BYTE      = 2,
+    CHUNK_RUN_LENGTH     = 3,
     COMPONENT_RUN_LENGTH = 4,
 };
 
@@ -104,7 +92,7 @@ void PixMap::read_image(
         return;
     }
     size_t bytes_read = 0;
-    Bytes bytes(row_bytes, '\0');
+    Bytes  bytes(row_bytes, '\0');
     for (int y = 0; y < bounds.height(); ++y) {
         in.shift(bytes.data(), bytes.size());
         bytes_read += bytes.size();
@@ -145,7 +133,7 @@ void PixMap::read_direct_image(ReadSource in, unique_ptr<RasterImage>& image) co
         bytes_read += bytes.size();
 
         BytesSlice remainder(bytes);
-        Bytes components;
+        Bytes      components;
         while (!remainder.empty()) {
             uint8_t header = read<uint8_t>(remainder);
             if (header >= 0x80) {
@@ -157,10 +145,10 @@ void PixMap::read_direct_image(ReadSource in, unique_ptr<RasterImage>& image) co
                 remainder.shift(data, size);
             }
         }
-        const int16_t w = bounds.width();
-        const BytesSlice red = components.slice((cmp_count - 3) * w, w);
+        const int16_t    w     = bounds.width();
+        const BytesSlice red   = components.slice((cmp_count - 3) * w, w);
         const BytesSlice green = components.slice((cmp_count - 2) * w, w);
-        const BytesSlice blue = components.slice((cmp_count - 1) * w);
+        const BytesSlice blue  = components.slice((cmp_count - 1) * w);
         for (int x = 0; x < w; ++x) {
             image->set(x, y, AlphaColor(red.at(x), green.at(x), blue.at(x)));
         }
@@ -192,13 +180,13 @@ void PixMap::read_packed_image(
         in.shift(bytes.data(), bytes.size());
         bytes_read += bytes.size();
 
-        int32_t x = 0;
+        int32_t    x         = 0;
         BytesSlice remainder = bytes;
         while (!remainder.empty()) {
             uint8_t header = read<uint8_t>(remainder);
             if (header >= 0x80) {
                 uint8_t value = read<uint8_t>(remainder);
-                uint8_t size = 0x101 - header;
+                uint8_t size  = 0x101 - header;
                 for (int j = 0; j < size; ++j) {
                     if (x < bounds.width()) {
                         image->set(x + bounds.left, y + bounds.top, lookup(clut, value));
@@ -249,14 +237,14 @@ void read_from(ReadSource in, PixMap& out) {
     switch (out.pixel_type) {
         case INDEXED: {
             switch (out.pixel_size) {
-              case 1:
-              case 2:
-              case 4:
-              case 8:
-                break;
+                case 1:
+                case 2:
+                case 4:
+                case 8: break;
 
-              default:
-                throw Exception(format("indexed pixels may not have size {0}", out.pixel_size));
+                default:
+                    throw Exception(
+                            format("indexed pixels may not have size {0}", out.pixel_size));
             }
             if ((out.pack_type != 0) || (out.pack_size != 0)) {
                 throw Exception("indexed pixels may not be packed");
@@ -291,9 +279,7 @@ void read_from(ReadSource in, PixMap& out) {
             break;
         }
 
-        default: {
-            throw Exception(format("illegal PixMap pixel_type {0}", out.pixel_type));
-        }
+        default: { throw Exception(format("illegal PixMap pixel_type {0}", out.pixel_type)); }
     }
 }
 

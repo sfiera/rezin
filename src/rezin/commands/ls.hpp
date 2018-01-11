@@ -6,9 +6,9 @@
 #ifndef REZIN_COMMANDS_LS_HPP_
 #define REZIN_COMMANDS_LS_HPP_
 
-#include <vector>
 #include <rezin/command.hpp>
 #include <sfz/sfz.hpp>
+#include <vector>
 
 namespace rezin {
 
@@ -22,11 +22,11 @@ class LsCommand : public Command {
 
   private:
     sfz::Optional<sfz::String> _type;
-    sfz::Optional<int16_t> _id;
+    sfz::Optional<int16_t>     _id;
 
     DISALLOW_COPY_AND_ASSIGN(LsCommand);
 };
 
-}  // namespace
+}  // namespace rezin
 
 #endif  // REZIN_COMMANDS_LS_HPP_

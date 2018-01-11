@@ -6,10 +6,10 @@
 #include <rezin/pict.hpp>
 
 #include <stdint.h>
-#include <vector>
 #include <rezin/clut.hpp>
 #include <rezin/image.hpp>
 #include <rezin/primitives.hpp>
+#include <vector>
 
 using sfz::BytesSlice;
 using sfz::Exception;
@@ -25,9 +25,9 @@ using std::vector;
 namespace rezin {
 
 struct Picture::Rep {
-    Rect bounds;
-    bool is_raster;
-    uint8_t version;
+    Rect                    bounds;
+    bool                    is_raster;
+    uint8_t                 version;
     unique_ptr<RasterImage> image;
 };
 
@@ -42,15 +42,15 @@ T round_up_even(T t) {
 }
 
 struct PackBitsRectOp {
-    PixMap pix_map;
-    ColorTable clut;
-    Rect src_rect;
-    Rect dst_rect;
-    int16_t mode;
+    PixMap                  pix_map;
+    ColorTable              clut;
+    Rect                    src_rect;
+    Rect                    dst_rect;
+    int16_t                 mode;
     unique_ptr<RasterImage> image;
 
     void draw(Picture::Rep& rep) {
-        RectImage mask(dst_rect, AlphaColor(0, 0, 0));
+        RectImage       mask(dst_rect, AlphaColor(0, 0, 0));
         TranslatedImage src(*image, dst_rect.left - src_rect.left, dst_rect.top - src_rect.top);
         rep.image->src(src, mask);
     }
@@ -69,14 +69,14 @@ void read_from(ReadSource in, PackBitsRectOp& op) {
 }
 
 struct DirectBitsRectOp {
-    AddressedPixMap pix_map;
-    Rect src_rect;
-    Rect dst_rect;
-    int16_t mode;
+    AddressedPixMap         pix_map;
+    Rect                    src_rect;
+    Rect                    dst_rect;
+    int16_t                 mode;
     unique_ptr<RasterImage> image;
 
     void draw(Picture::Rep& rep) {
-        RectImage mask(dst_rect, AlphaColor(0, 0, 0));
+        RectImage       mask(dst_rect, AlphaColor(0, 0, 0));
         TranslatedImage src(*image, dst_rect.left - src_rect.left, dst_rect.top - src_rect.top);
         rep.image->src(src, mask);
     }
@@ -100,7 +100,7 @@ struct Header {
 };
 
 enum {
-    HEADER_VERSION_2 = 0xffff,
+    HEADER_VERSION_2          = 0xffff,
     HEADER_VERSION_2_EXTENDED = 0xfffe,
 };
 
@@ -108,9 +108,9 @@ void read_from(ReadSource in, Header& header) {
     uint16_t version = read<uint16_t>(in);
     if (version == HEADER_VERSION_2) {
         in.shift(2);  // reserved
-        header.bounds.left = read<uint32_t>(in) / 65536;
-        header.bounds.top = read<uint32_t>(in) / 65536;
-        header.bounds.right = read<uint32_t>(in) / 65536;
+        header.bounds.left   = read<uint32_t>(in) / 65536;
+        header.bounds.top    = read<uint32_t>(in) / 65536;
+        header.bounds.right  = read<uint32_t>(in) / 65536;
         header.bounds.bottom = read<uint32_t>(in) / 65536;
         in.shift(4);  // reserved
     } else if (version == HEADER_VERSION_2_EXTENDED) {
@@ -129,34 +129,34 @@ void read_from(ReadSource in, Header& header) {
 }
 
 enum {
-    NOOP_V2 = 0x0000,
-    CLIP_V2 = 0x0001,
-    PEN_SIZE_V2 = 0x0007,
+    NOOP_V2             = 0x0000,
+    CLIP_V2             = 0x0001,
+    PEN_SIZE_V2         = 0x0007,
     FOREGROUND_COLOR_V2 = 0x001a,
     BACKGROUND_COLOR_V2 = 0x001b,
-    DEFAULT_HILITE_V2 = 0x001e,
-    OP_COLOR_V2 = 0x001f,
-    SHORT_LINE_V2 = 0x0022,
-    FRAME_RECT_V2 = 0x0030,
-    PAINT_RECT_V2 = 0x0031,
-    FRAME_SAME_RECT_V2 = 0x0038,
-    PAINT_SAME_RECT_V2 = 0x0039,
-    FRAME_OVAL_V2 = 0x0050,
-    PAINT_OVAL_V2 = 0x0051,
-    FRAME_SAME_OVAL_V2 = 0x0058,
-    PAINT_SAME_OVAL_V2 = 0x0059,
-    FRAME_ARC_V2 = 0x0060,
-    PAINT_ARC_V2 = 0x0061,
-    FRAME_SAME_ARC_V2 = 0x0068,
-    PAINT_SAME_ARC_V2 = 0x0069,
-    FRAME_POLY_V2 = 0x0070,
-    PAINT_POLY_V2 = 0x0071,
-    PACK_BITS_RECT_V2 = 0x0098,
+    DEFAULT_HILITE_V2   = 0x001e,
+    OP_COLOR_V2         = 0x001f,
+    SHORT_LINE_V2       = 0x0022,
+    FRAME_RECT_V2       = 0x0030,
+    PAINT_RECT_V2       = 0x0031,
+    FRAME_SAME_RECT_V2  = 0x0038,
+    PAINT_SAME_RECT_V2  = 0x0039,
+    FRAME_OVAL_V2       = 0x0050,
+    PAINT_OVAL_V2       = 0x0051,
+    FRAME_SAME_OVAL_V2  = 0x0058,
+    PAINT_SAME_OVAL_V2  = 0x0059,
+    FRAME_ARC_V2        = 0x0060,
+    PAINT_ARC_V2        = 0x0061,
+    FRAME_SAME_ARC_V2   = 0x0068,
+    PAINT_SAME_ARC_V2   = 0x0069,
+    FRAME_POLY_V2       = 0x0070,
+    PAINT_POLY_V2       = 0x0071,
+    PACK_BITS_RECT_V2   = 0x0098,
     DIRECT_BITS_RECT_V2 = 0x009a,
-    SHORT_COMMENT_V2 = 0x00a0,
-    LONG_COMMENT_V2 = 0x00a1,
-    HEADER_OP_V2 = 0x0c00,
-    END_V2 = 0x00ff,
+    SHORT_COMMENT_V2    = 0x00a0,
+    LONG_COMMENT_V2     = 0x00a1,
+    HEADER_OP_V2        = 0x0c00,
+    END_V2              = 0x00ff,
 };
 
 void read_version_2_pict(ReadSource in, Picture& pict) {
@@ -277,12 +277,11 @@ void read_version_2_pict(ReadSource in, Picture& pict) {
             }
         }
     }
-end_pict_v2:
-    ;
+end_pict_v2:;
 }
 
 enum {
-    NOOP_V1 = 0x00,
+    NOOP_V1        = 0x00,
     PIC_VERSION_V1 = 0x11,
 };
 
@@ -320,9 +319,8 @@ void read_version_1_pict(ReadSource in, Picture& pict) {
 
 }  // namespace
 
-Picture::Picture(BytesSlice in):
-        rep(new Rep) {
-    rep->version = 0;
+Picture::Picture(BytesSlice in) : rep(new Rep) {
+    rep->version   = 0;
     rep->is_raster = true;
     in.shift(2);  // Ignore size of 'PICT' resource.
     read(in, rep->bounds);
@@ -331,15 +329,11 @@ Picture::Picture(BytesSlice in):
     read_version_1_pict(in, *this);
 }
 
-bool Picture::is_raster() const {
-    return rep->is_raster;
-}
+bool Picture::is_raster() const { return rep->is_raster; }
 
-uint8_t Picture::version() const {
-    return rep->version;
-}
+uint8_t Picture::version() const { return rep->version; }
 
-Picture::~Picture() { }
+Picture::~Picture() {}
 
 PngPicture png(const Picture& pict) {
     if (pict.version() != 2) {

@@ -26,19 +26,12 @@ void png_write_data(png_struct* png, png_byte* data, png_size_t length) {
     write(*out, data, length);
 }
 
-void png_flush_data(png_struct* png) {
-    static_cast<void>(png);
-}
+void png_flush_data(png_struct* png) { static_cast<void>(png); }
 
 }  // namespace
 
-PngWriter::PngWriter(WriteTarget& out, int32_t width, int32_t height):
-        _out(out),
-        _width(width),
-        _height(height),
-        _png(NULL),
-        _info(NULL),
-        _pixel_index(0) {
+PngWriter::PngWriter(WriteTarget& out, int32_t width, int32_t height)
+        : _out(out), _width(width), _height(height), _png(NULL), _info(NULL), _pixel_index(0) {
     _png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, png_error, png_error);
     if (!_png) {
         throw Exception("couldn't create png_struct");
@@ -57,9 +50,7 @@ PngWriter::PngWriter(WriteTarget& out, int32_t width, int32_t height):
     png_write_info(_png, _info);
 }
 
-PngWriter::~PngWriter() {
-    png_destroy_write_struct(&_png, &_info);
-}
+PngWriter::~PngWriter() { png_destroy_write_struct(&_png, &_info); }
 
 void PngWriter::append_pixel(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {
     // I'm not sure why we specify "RGBA"-formatted pixels, but write

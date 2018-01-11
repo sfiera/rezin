@@ -14,19 +14,13 @@ using sfz::StringSlice;
 
 namespace rezin {
 
-FlatFileSource::FlatFileSource() { }
+FlatFileSource::FlatFileSource() {}
 
-void FlatFileSource::load(StringSlice path) {
-    _file.reset(new MappedFile(path));
-}
+void FlatFileSource::load(StringSlice path) { _file.reset(new MappedFile(path)); }
 
-BytesSlice FlatFileSource::data() const {
-    return _file->data();
-}
+BytesSlice FlatFileSource::data() const { return _file->data(); }
 
-void swap(FlatFileSource& x, FlatFileSource& y) {
-    swap(x._file, y._file);
-}
+void swap(FlatFileSource& x, FlatFileSource& y) { swap(x._file, y._file); }
 
 bool store_argument(FlatFileSource& to, sfz::StringSlice value, PrintTarget error) {
     to.load(value);

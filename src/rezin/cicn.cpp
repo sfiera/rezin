@@ -7,12 +7,12 @@
 
 #include <algorithm>
 #include <map>
-#include <vector>
 #include <rezin/bits-slice.hpp>
 #include <rezin/clut.hpp>
 #include <rezin/image.hpp>
 #include <rezin/primitives.hpp>
 #include <sfz/sfz.hpp>
+#include <vector>
 
 using sfz::Bytes;
 using sfz::BytesSlice;
@@ -35,13 +35,13 @@ using std::vector;
 namespace rezin {
 
 struct ColorIcon::Rep {
-    AddressedPixMap icon_pixmap;
-    BitMap mask_bitmap;
-    BitMap icon_bitmap;
-    uint32_t icon_data;
+    AddressedPixMap         icon_pixmap;
+    BitMap                  mask_bitmap;
+    BitMap                  icon_bitmap;
+    uint32_t                icon_data;
     unique_ptr<RasterImage> mask_bitmap_image;
     unique_ptr<RasterImage> icon_bitmap_image;
-    ColorTable color_table;
+    ColorTable              color_table;
     unique_ptr<RasterImage> icon_pixmap_image;
 };
 
@@ -60,15 +60,14 @@ void read_from(ReadSource in, ColorIcon::Rep& rep) {
     rep.icon_pixmap.read_image(in, rep.color_table, rep.icon_pixmap_image);
 }
 
-ColorIcon::ColorIcon(BytesSlice in):
-        rep(new Rep) {
+ColorIcon::ColorIcon(BytesSlice in) : rep(new Rep) {
     read(in, *rep);
     if (!in.empty()) {
         throw Exception("extra bytes at end of 'cicn' resource.");
     }
 }
 
-ColorIcon::~ColorIcon() { }
+ColorIcon::~ColorIcon() {}
 PngColorIcon png(const ColorIcon& cicn) {
     PngColorIcon png = {cicn};
     return png;
@@ -76,7 +75,7 @@ PngColorIcon png(const ColorIcon& cicn) {
 
 void write_to(WriteTarget out, PngColorIcon png_cicn) {
     const ColorIcon::Rep& rep = *png_cicn.cicn.rep;
-    RasterImage composite(rep.mask_bitmap.bounds);
+    RasterImage           composite(rep.mask_bitmap.bounds);
     composite.src(*rep.icon_pixmap_image, *rep.mask_bitmap_image);
     write(out, png(composite));
 }

@@ -22,7 +22,7 @@ struct Options {
 
 struct Options::EncodedString {
     const sfz::BytesSlice& bytes;
-    LineEnding line_ending;
+    LineEnding             line_ending;
 };
 void print_to(sfz::PrintTarget out, const Options::EncodedString& encoded);
 

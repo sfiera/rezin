@@ -13,7 +13,7 @@ class ResourceFork;
 
 class Command {
   public:
-    virtual ~Command() { }
+    virtual ~Command() {}
     virtual void run(const ResourceFork& rsrc, const Options& options) const = 0;
 };
 

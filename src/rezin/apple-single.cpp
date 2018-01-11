@@ -43,22 +43,18 @@ enum AppleSingleVersion {
 }  // namespace
 
 AppleSingle::AppleSingle(const BytesSlice& data) {
-    bool little_endian = false;
+    bool       little_endian = false;
     BytesSlice remainder(data);
-    uint32_t magic;
+    uint32_t   magic;
     read(remainder, magic);
     switch (magic) {
-      case APPLE_SINGLE_MAGIC:
-      case APPLE_DOUBLE_MAGIC:
-        break;
+        case APPLE_SINGLE_MAGIC:
+        case APPLE_DOUBLE_MAGIC: break;
 
-      case APPLE_SINGLE_CIGAM:
-      case APPLE_DOUBLE_CIGAM:
-        little_endian = true;
-        break;
+        case APPLE_SINGLE_CIGAM:
+        case APPLE_DOUBLE_CIGAM: little_endian = true; break;
 
-      default:
-        throw Exception(format("invalid magic number 0x{0}.", hex(magic, 8)));
+        default: throw Exception(format("invalid magic number 0x{0}.", hex(magic, 8)));
     }
 
     uint32_t version;
@@ -68,8 +64,7 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
     }
 
     switch (version) {
-      case APPLE_SINGLE_VERSION_2:
-        {
+        case APPLE_SINGLE_VERSION_2: {
             remainder.shift(16);
 
             uint16_t entry_count;
@@ -78,7 +73,7 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
                 entry_count = htons(entry_count);
             }
 
-            for (uint16_t i: range(entry_count)) {
+            for (uint16_t i : range(entry_count)) {
                 static_cast<void>(i);
                 uint32_t id;
                 uint32_t offset;
@@ -88,18 +83,16 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
                 read(remainder, length);
 
                 if (little_endian) {
-                    id = htonl(id);
+                    id     = htonl(id);
                     offset = htonl(offset);
                     length = htonl(length);
                 }
 
                 _entries.insert(std::make_pair(id, data.slice(offset, length)));
             }
-        }
-        break;
+        } break;
 
-      default:
-        throw Exception(format("unknown version {0}.", version / 65536.0));
+        default: throw Exception(format("unknown version {0}.", version / 65536.0));
     }
 }
 

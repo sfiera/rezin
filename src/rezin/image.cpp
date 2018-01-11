@@ -14,23 +14,18 @@ using std::min;
 
 namespace rezin {
 
-Image::Image(Rect bounds):
-        _bounds(bounds) { }
+Image::Image(Rect bounds) : _bounds(bounds) {}
 
-Image::~Image() { }
+Image::~Image() {}
 
-const Rect& Image::bounds() const {
-    return _bounds;
-}
+const Rect& Image::bounds() const { return _bounds; }
 
 bool Image::contains(int16_t x, int16_t y) const {
-    return (x >= _bounds.left) && (x < _bounds.right)
-        && (y >= _bounds.top) && (y < _bounds.bottom);
+    return (x >= _bounds.left) && (x < _bounds.right) && (y >= _bounds.top) &&
+           (y < _bounds.bottom);
 }
 
-RectImage::RectImage(Rect bounds, AlphaColor color):
-        Image(bounds),
-        _color(color) { }
+RectImage::RectImage(Rect bounds, AlphaColor color) : Image(bounds), _color(color) {}
 
 AlphaColor RectImage::get(int16_t x, int16_t y) const {
     if (contains(x, y)) {
@@ -39,9 +34,8 @@ AlphaColor RectImage::get(int16_t x, int16_t y) const {
     return AlphaColor();
 }
 
-RasterImage::RasterImage(Rect bounds):
-        Image(bounds),
-        _pixels(bounds.width() * bounds.height(), AlphaColor()) { }
+RasterImage::RasterImage(Rect bounds)
+        : Image(bounds), _pixels(bounds.width() * bounds.height(), AlphaColor()) {}
 
 void RasterImage::set(int16_t x, int16_t y, const AlphaColor& color) {
     if (contains(x, y)) {
@@ -59,10 +53,10 @@ AlphaColor RasterImage::get(int16_t x, int16_t y) const {
 
 void RasterImage::src(const Image& src, const Image& mask) {
     Rect area = {
-        max(max(src.bounds().top, mask.bounds().top), bounds().top),
-        max(max(src.bounds().left, mask.bounds().left), bounds().left),
-        min(min(src.bounds().bottom, mask.bounds().bottom), bounds().bottom),
-        min(min(src.bounds().right, mask.bounds().right), bounds().right),
+            max(max(src.bounds().top, mask.bounds().top), bounds().top),
+            max(max(src.bounds().left, mask.bounds().left), bounds().left),
+            min(min(src.bounds().bottom, mask.bounds().bottom), bounds().bottom),
+            min(min(src.bounds().right, mask.bounds().right), bounds().right),
     };
     for (int16_t y = area.top; y < area.bottom; ++y) {
         for (int16_t x = area.left; x < area.right; ++x) {
@@ -98,24 +92,20 @@ namespace {
 
 Rect translate_rect(Rect r, int16_t dx, int16_t dy) {
     Rect result = {
-        int16_t(r.top + dy),
-        int16_t(r.left + dx),
-        int16_t(r.bottom + dy),
-        int16_t(r.right + dx),
+            int16_t(r.top + dy), int16_t(r.left + dx), int16_t(r.bottom + dy),
+            int16_t(r.right + dx),
     };
     return result;
 }
 
 }  // namespace
 
-TranslatedImage::TranslatedImage(const Image& image, int16_t dx, int16_t dy):
-        Image(translate_rect(image.bounds(), dx, dy)),
-        _image(image) { }
+TranslatedImage::TranslatedImage(const Image& image, int16_t dx, int16_t dy)
+        : Image(translate_rect(image.bounds(), dx, dy)), _image(image) {}
 
 AlphaColor TranslatedImage::get(int16_t x, int16_t y) const {
     return _image.get(
-            x + _image.bounds().left - bounds().left,
-            y + _image.bounds().top - bounds().top);
+            x + _image.bounds().left - bounds().left, y + _image.bounds().top - bounds().top);
 }
 
 }  // namespace rezin

@@ -49,16 +49,15 @@ void read_snd_format_1_header(ReadSource in) {
     uint32_t options;
     read(in, options);
     if ((options & 0x00F0) != options) {
-        throw Exception(format("can only handle initMono and initStereo, not 0x{0}", hex(options)));
+        throw Exception(
+                format("can only handle initMono and initStereo, not 0x{0}", hex(options)));
     }
 }
 
 // Read the header of a format 2 'snd ' resource.
 //
 // @param [in] in       The ReadSource to read from.
-void read_snd_format_2_header(ReadSource in) {
-    in.shift(2);
-}
+void read_snd_format_2_header(ReadSource in) { in.shift(2); }
 
 // Read an individual command from a 'snd ' resource.
 //
@@ -85,8 +84,8 @@ void read_snd_data_table(ReadSource in, uint32_t& pointer, uint32_t& size, doubl
     uint32_t fixed_sample_rate;
     uint32_t loop_start;
     uint32_t loop_end;
-    uint8_t encoding;
-    uint8_t base_frequency;
+    uint8_t  encoding;
+    uint8_t  base_frequency;
 
     read(in, pointer);
     read(in, size);
@@ -104,7 +103,7 @@ void read_snd_data_table(ReadSource in, uint32_t& pointer, uint32_t& size, doubl
 // @param [in] sample_count The number of samples to read.
 // @param [out] samples The array to read the samples into.
 void read_snd_samples(ReadSource in, uint32_t sample_count, vector<uint8_t>* samples) {
-    for (uint32_t i: range(sample_count)) {
+    for (uint32_t i : range(sample_count)) {
         static_cast<void>(i);
         uint8_t sample;
         read(in, sample);
@@ -143,10 +142,10 @@ Sound::Sound(BytesSlice in) {
     }
 
     BytesSlice sound(in.slice(offset));
-    uint32_t pointer;
-    uint32_t sample_count;
+    uint32_t   pointer;
+    uint32_t   sample_count;
     read_snd_data_table(sound, pointer, sample_count, sample_rate);
-    channels = 1;
+    channels    = 1;
     sample_bits = 8;
 
     BytesSlice sample(in.slice(offset + 22 + pointer, sample_count));
@@ -171,7 +170,7 @@ void write_float80(WriteTarget out, double d) {
     //   * the sign, 1 bit.
     //   * the exponent, 11 bits with a bias of 1023.
     //   * the fraction, 52 bits, with an implicit '1' bit preceding.
-    uint64_t sign = sample_rate_bits >> 63;
+    uint64_t sign     = sample_rate_bits >> 63;
     uint64_t exponent = ((sample_rate_bits >> 52) & ((1 << 11) - 1)) - 1023;
     uint64_t fraction = (1ull << 52) | (sample_rate_bits & ((1ull << 52) - 1));
 
@@ -220,7 +219,7 @@ void write_ssnd(WriteTarget out, const Sound& sound) {
     Bytes ssnd;
     write<uint32_t>(ssnd, 0);
     write<uint32_t>(ssnd, 0);
-    for (uint8_t sample: sound.samples) {
+    for (uint8_t sample : sound.samples) {
         write<int8_t>(ssnd, sample - 0x80);
     }
 
@@ -252,8 +251,6 @@ AiffSound aiff(const Sound& sound) {
     return aiff;
 }
 
-void write_to(WriteTarget out, AiffSound aiff) {
-    write_form(out, aiff.sound);
-}
+void write_to(WriteTarget out, AiffSound aiff) { write_form(out, aiff.sound); }
 
 }  // namespace rezin

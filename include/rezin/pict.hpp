@@ -18,7 +18,7 @@ struct Picture {
     Picture(sfz::BytesSlice in);
     ~Picture();
 
-    bool is_raster() const;
+    bool    is_raster() const;
     uint8_t version() const;
 
     std::shared_ptr<Rep> rep;
@@ -26,9 +26,11 @@ struct Picture {
 
 PngPicture png(const Picture& pict);
 
-struct PngPicture { const Picture& pict; };
+struct PngPicture {
+    const Picture& pict;
+};
 void write_to(sfz::WriteTarget out, PngPicture png);
 
 }  // namespace rezin
 
-#endif // REZIN_PICT_HPP_
+#endif  // REZIN_PICT_HPP_

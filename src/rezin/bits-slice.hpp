@@ -19,9 +19,9 @@ class BitsSlice {
 
   private:
     sfz::BytesSlice _bytes;
-    int _bit_index;
+    int             _bit_index;
 };
 
 }  // namespace rezin
 
-#endif // REZIN_BITS_PIECE_HPP_
+#endif  // REZIN_BITS_PIECE_HPP_

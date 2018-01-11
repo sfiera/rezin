@@ -6,8 +6,8 @@
 #ifndef REZIN_STRL_HPP_
 #define REZIN_STRL_HPP_
 
-#include <vector>
 #include <sfz/sfz.hpp>
+#include <vector>
 
 namespace rezin {
 
@@ -16,11 +16,11 @@ struct Options;
 struct StringList {
     StringList(sfz::BytesSlice in, const Options& options);
 
-    std::vector<std::shared_ptr<const sfz::String> > strings;
+    std::vector<std::shared_ptr<const sfz::String>> strings;
 };
 
 sfz::Json json(const StringList& strings);
 
 }  // namespace rezin
 
-#endif // REZIN_STRL_HPP_
+#endif  // REZIN_STRL_HPP_

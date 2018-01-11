@@ -18,7 +18,7 @@ namespace {
 
 void convert_cr(String* string, const StringSlice& replacement) {
     String result;
-    for (Rune r: *string) {
+    for (Rune r : *string) {
         if (r == '\r') {
             result.append(replacement);
         } else {
@@ -30,28 +30,25 @@ void convert_cr(String* string, const StringSlice& replacement) {
 
 }  // namespace
 
-Options::Options()
-        : line_ending(NL) { }
+Options::Options() : line_ending(NL) {}
 
 Options::EncodedString Options::decode(const sfz::BytesSlice& bytes) const {
-    EncodedString result = { bytes, line_ending };
+    EncodedString result = {bytes, line_ending};
     return result;
 }
 
 void print_to(PrintTarget out, const Options::EncodedString& encoded) {
     String result;
     switch (encoded.line_ending) {
-      case Options::CR:
-        result.assign(macroman::decode(encoded.bytes));
-        break;
-      case Options::NL:
-        result.assign(macroman::decode(encoded.bytes));
-        convert_cr(&result, "\n");
-        break;
-      case Options::CRNL:
-        result.assign(macroman::decode(encoded.bytes));
-        convert_cr(&result, "\r\n");
-        break;
+        case Options::CR: result.assign(macroman::decode(encoded.bytes)); break;
+        case Options::NL:
+            result.assign(macroman::decode(encoded.bytes));
+            convert_cr(&result, "\n");
+            break;
+        case Options::CRNL:
+            result.assign(macroman::decode(encoded.bytes));
+            convert_cr(&result, "\r\n");
+            break;
     }
     out.push(result);
 }
@@ -64,8 +61,8 @@ bool store_argument(Options::LineEnding& to, StringSlice value, PrintTarget erro
     } else if (value == "crnl") {
         to = Options::CRNL;
     } else {
-        print(error, format(
-                    "invalid line ending {0}: must be one of cr, nl, or crnl", quote(value)));
+        print(error,
+              format("invalid line ending {0}: must be one of cr, nl, or crnl", quote(value)));
         return false;
     }
     return true;

@@ -17,14 +17,14 @@ class AppleSingleSource {
     AppleSingleSource();
     ~AppleSingleSource();
 
-    void load(sfz::StringSlice path);
+    void            load(sfz::StringSlice path);
     sfz::BytesSlice data() const;
 
   private:
     friend void swap(AppleSingleSource& x, AppleSingleSource& y);
 
     std::unique_ptr<sfz::MappedFile> _file;
-    std::unique_ptr<AppleSingle> _apple_single;
+    std::unique_ptr<AppleSingle>     _apple_single;
 
     DISALLOW_COPY_AND_ASSIGN(AppleSingleSource);
 };
