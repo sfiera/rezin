@@ -8,44 +8,41 @@
 #include <rezin/resource.hpp>
 #include <sfz/sfz.hpp>
 
-using sfz::Exception;
-using sfz::StringSlice;
-using sfz::args::store;
-using sfz::args::store_const;
-using sfz::format;
-using sfz::print;
-using std::vector;
-
 namespace args = sfz::args;
-
-namespace io = sfz::io;
 
 namespace rezin {
 
-LsCommand::LsCommand(args::Parser& parser, Command*& command) {
-    args::Parser& ls = parser.add_subparser("ls", "list resources", store_const(command, this));
-    ls.add_argument("type", store(_type));
-    ls.add_argument("id", store(_id));
+LsCommand::LsCommand() = default;
+
+bool LsCommand::argument(pn::string_view arg) {
+    if (!_type.has_value()) {
+        _type.emplace(arg.copy());
+    } else if (!_id.has_value()) {
+        args::integer_option(arg, &_id);
+    } else {
+        return false;
+    }
+    return true;
 }
 
 void LsCommand::run(const ResourceFork& rsrc, const Options& options) const {
-    if (!_type.has()) {
+    if (!_type.has_value()) {
         for (const ResourceType& type : rsrc) {
-            print(io::out, format("{0}\n", type.code()));
+            pn::format(stdout, "{0}\n", type.code());
         }
         return;
     }
 
     const ResourceType& type = rsrc.at(*_type);
-    if (!_id.has()) {
+    if (!_id.has_value()) {
         for (const ResourceEntry& entry : type) {
-            print(io::out, format("{0}\t{1}\n", entry.id(), entry.name()));
+            pn::format(stdout, "{0}\t{1}\n", entry.id(), entry.name());
         }
         return;
     }
 
     const ResourceEntry& entry = type.at(*_id);
-    print(io::out, format("{0}\t{1}\n", entry.id(), entry.name()));
+    pn::format(stdout, "{0}\t{1}\n", entry.id(), entry.name());
 }
 
 }  // namespace rezin

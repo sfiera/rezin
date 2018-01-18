@@ -16,23 +16,23 @@ struct Color;
 
 struct ColorTable {
     ColorTable();
-    ColorTable(sfz::BytesSlice in);
+    ColorTable(pn::data_view in);
 
     uint32_t                  seed;
     uint16_t                  flags;
     uint16_t                  size;
     std::map<uint16_t, Color> table;
 };
-void      read_from(sfz::ReadSource in, ColorTable& out);
-sfz::Json json(const ColorTable& color_table);
+void      read_from(pn::file_view in, ColorTable* out);
+pn::value value(const ColorTable& color_table);
 
 struct Color {
     uint16_t red;
     uint16_t green;
     uint16_t blue;
 };
-void      read_from(sfz::ReadSource in, Color& out);
-sfz::Json json(const Color& spec);
+void      read_from(pn::file_view in, Color* out);
+pn::value value(const Color& spec);
 
 }  // namespace rezin
 

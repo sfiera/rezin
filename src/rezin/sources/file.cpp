@@ -7,24 +7,12 @@
 
 #include <sfz/sfz.hpp>
 
-using sfz::BytesSlice;
-using sfz::MappedFile;
-using sfz::PrintTarget;
-using sfz::StringSlice;
-
 namespace rezin {
 
-FlatFileSource::FlatFileSource() {}
+FlatFileSource::FlatFileSource(pn::string_view path) : _path(path.copy()) {}
 
-void FlatFileSource::load(StringSlice path) { _file.reset(new MappedFile(path)); }
+void FlatFileSource::load() { _file.reset(new sfz::mapped_file(_path)); }
 
-BytesSlice FlatFileSource::data() const { return _file->data(); }
-
-void swap(FlatFileSource& x, FlatFileSource& y) { swap(x._file, y._file); }
-
-bool store_argument(FlatFileSource& to, sfz::StringSlice value, PrintTarget error) {
-    to.load(value);
-    return true;
-}
+pn::data_view FlatFileSource::data() const { return _file->data(); }
 
 }  // namespace rezin

@@ -14,18 +14,8 @@
 #include <sfz/sfz.hpp>
 #include <vector>
 
-using sfz::Bytes;
-using sfz::BytesSlice;
-using sfz::Exception;
-using sfz::Json;
-using sfz::JsonDefaultVisitor;
-using sfz::ReadSource;
 using sfz::StringMap;
-using sfz::StringSlice;
-using sfz::WriteTarget;
-using sfz::format;
 using sfz::range;
-using sfz::read;
 using std::make_pair;
 using std::map;
 using std::swap;
@@ -45,39 +35,35 @@ struct ColorIcon::Rep {
     unique_ptr<RasterImage> icon_pixmap_image;
 };
 
-void read_from(ReadSource in, ColorIcon::Rep& rep) {
-    read(in, rep.icon_pixmap);
-    read(in, rep.mask_bitmap);
-    read(in, rep.icon_bitmap);
-    read(in, rep.icon_data);
+void read_from(pn::file_view in, ColorIcon::Rep* rep) {
+    read_from(in, &rep->icon_pixmap);
+    read_from(in, &rep->mask_bitmap);
+    read_from(in, &rep->icon_bitmap);
+    in.read(&rep->icon_data).check();
 
     const AlphaColor black(0, 0, 0);
     const AlphaColor white(255, 255, 255);
     const AlphaColor clear(0, 0, 0, 0);
-    rep.mask_bitmap.read_image(in, black, clear, rep.mask_bitmap_image);
-    rep.icon_bitmap.read_image(in, black, white, rep.icon_bitmap_image);
-    read(in, rep.color_table);
-    rep.icon_pixmap.read_image(in, rep.color_table, rep.icon_pixmap_image);
+    rep->mask_bitmap_image = rep->mask_bitmap.read_image(in, black, clear);
+    rep->icon_bitmap_image = rep->icon_bitmap.read_image(in, black, white);
+    read_from(in, &rep->color_table);
+    rep->icon_pixmap_image = rep->icon_pixmap.read_image(in, rep->color_table);
 }
 
-ColorIcon::ColorIcon(BytesSlice in) : rep(new Rep) {
-    read(in, *rep);
-    if (!in.empty()) {
-        throw Exception("extra bytes at end of 'cicn' resource.");
+ColorIcon::ColorIcon(pn::data_view in) : rep(new Rep) {
+    pn::file f = in.open();
+    read_from(f, rep.get());
+    if (!f.read(pn::pad(1)).eof()) {
+        throw std::runtime_error("extra bytes at end of 'cicn' resource.");
     }
 }
 
 ColorIcon::~ColorIcon() {}
-PngColorIcon png(const ColorIcon& cicn) {
-    PngColorIcon png = {cicn};
-    return png;
-}
-
-void write_to(WriteTarget out, PngColorIcon png_cicn) {
-    const ColorIcon::Rep& rep = *png_cicn.cicn.rep;
+pn::data png(const ColorIcon& cicn) {
+    const ColorIcon::Rep& rep = *cicn.rep;
     RasterImage           composite(rep.mask_bitmap.bounds);
     composite.src(*rep.icon_pixmap_image, *rep.mask_bitmap_image);
-    write(out, png(composite));
+    return png(composite);
 }
 
 }  // namespace rezin

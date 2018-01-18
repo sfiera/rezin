@@ -6,27 +6,25 @@
 #ifndef REZIN_SOURCES_FILE_HPP_
 #define REZIN_SOURCES_FILE_HPP_
 
+#include <rezin/source.hpp>
 #include <sfz/sfz.hpp>
 
 namespace rezin {
 
-class FlatFileSource {
+class FlatFileSource : public Source {
   public:
-    FlatFileSource();
+    FlatFileSource(pn::string_view path);
 
-    void            load(sfz::StringSlice path);
-    sfz::BytesSlice data() const;
+    void          load() override;
+    pn::data_view data() const override;
 
   private:
-    friend void swap(FlatFileSource& x, FlatFileSource& y);
+    const pn::string                  _path;
+    std::unique_ptr<sfz::mapped_file> _file;
 
-    std::unique_ptr<sfz::MappedFile> _file;
-
-    DISALLOW_COPY_AND_ASSIGN(FlatFileSource);
+    FlatFileSource(const FlatFileSource&) = delete;
+    FlatFileSource& operator=(const FlatFileSource&) = delete;
 };
-
-void swap(FlatFileSource& x, FlatFileSource& y);
-bool store_argument(FlatFileSource& to, sfz::StringSlice value, sfz::PrintTarget error);
 
 }  // namespace rezin
 

@@ -16,15 +16,17 @@ class ResourceFork;
 
 class LsCommand : public Command {
   public:
-    LsCommand(sfz::args::Parser& parser, Command*& command);
+    LsCommand();
 
+    virtual bool argument(pn::string_view arg);
     virtual void run(const ResourceFork& rsrc, const Options& options) const;
 
   private:
-    sfz::Optional<sfz::String> _type;
-    sfz::Optional<int16_t>     _id;
+    sfz::optional<pn::string> _type;
+    sfz::optional<int16_t>    _id;
 
-    DISALLOW_COPY_AND_ASSIGN(LsCommand);
+    LsCommand(const LsCommand&) = delete;
+    LsCommand& operator=(const LsCommand&) = delete;
 };
 
 }  // namespace rezin

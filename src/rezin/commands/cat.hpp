@@ -16,15 +16,17 @@ class ResourceFork;
 
 class CatCommand : public Command {
   public:
-    CatCommand(sfz::args::Parser& parser, Command*& command);
+    CatCommand();
 
+    virtual bool argument(pn::string_view arg);
     virtual void run(const ResourceFork& rsrc, const Options& options) const;
 
   private:
-    sfz::String _type;
-    int16_t     _id;
+    sfz::optional<pn::string> _type;
+    sfz::optional<int16_t>    _id;
 
-    DISALLOW_COPY_AND_ASSIGN(CatCommand);
+    CatCommand(const CatCommand&) = delete;
+    CatCommand& operator=(const CatCommand&) = delete;
 };
 
 }  // namespace rezin

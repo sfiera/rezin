@@ -38,7 +38,8 @@ class Image {
   private:
     const Rect _bounds;
 
-    DISALLOW_COPY_AND_ASSIGN(Image);
+    Image(const Image&) = delete;
+    Image& operator=(const Image&) = delete;
 };
 
 class RectImage : public Image {
@@ -67,7 +68,7 @@ class RasterImage : public Image {
     std::vector<AlphaColor> _pixels;
 };
 
-PngRasterImage png(const RasterImage& image);
+pn::data png(const RasterImage& image);
 
 class TranslatedImage : public Image {
   public:
@@ -78,11 +79,6 @@ class TranslatedImage : public Image {
   private:
     const Image& _image;
 };
-
-struct PngRasterImage {
-    const RasterImage& image;
-};
-void write_to(sfz::WriteTarget out, const PngRasterImage& png);
 
 }  // namespace rezin
 

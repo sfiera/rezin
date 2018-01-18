@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <rezin/png.hpp>
 
-using sfz::WriteTarget;
 using std::max;
 using std::min;
 
@@ -73,19 +72,17 @@ size_t RasterImage::index(int16_t x, int16_t y) const {
     return x + (y * bounds().width());
 }
 
-PngRasterImage png(const RasterImage& image) {
-    PngRasterImage png = {image};
-    return png;
-}
-
-void write_to(WriteTarget out, const PngRasterImage& png) {
-    PngWriter writer(out, png.image.bounds().width(), png.image.bounds().height());
-    for (int16_t y = png.image.bounds().top; y < png.image.bounds().bottom; ++y) {
-        for (int16_t x = png.image.bounds().left; x < png.image.bounds().right; ++x) {
-            const AlphaColor& color = png.image.get(x, y);
+pn::data png(const RasterImage& image) {
+    pn::data  d;
+    pn::file  f = d.open("w");
+    PngWriter writer(f, image.bounds().width(), image.bounds().height());
+    for (int16_t y = image.bounds().top; y < image.bounds().bottom; ++y) {
+        for (int16_t x = image.bounds().left; x < image.bounds().right; ++x) {
+            const AlphaColor& color = image.get(x, y);
             writer.append_pixel(color.red, color.green, color.blue, color.alpha);
         }
     }
+    return d;
 }
 
 namespace {

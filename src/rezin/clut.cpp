@@ -7,61 +7,48 @@
 
 #include <sfz/sfz.hpp>
 
-using sfz::BytesSlice;
-using sfz::Exception;
-using sfz::Json;
-using sfz::ReadSource;
-using sfz::String;
-using sfz::StringMap;
-using sfz::format;
 using sfz::range;
-using sfz::read;
-using std::make_pair;
-using std::vector;
 
 namespace rezin {
 
 ColorTable::ColorTable() {}
 
-ColorTable::ColorTable(BytesSlice in) {
-    read(in, *this);
-    if (!in.empty()) {
-        throw Exception(format("{0} extra bytes at end of 'clut' resource.", in.size()));
+ColorTable::ColorTable(pn::data_view in) {
+    pn::file f = in.open();
+    read_from(f, this);
+    if (!f.read(pn::pad(1)).eof()) {
+        throw std::runtime_error("extra bytes at end of 'clut' resource.");
     }
 }
 
-void read_from(ReadSource in, ColorTable& out) {
-    read(in, out.seed);
-    read(in, out.flags);
-    read(in, out.size);
-    for (uint32_t i : range(uint32_t(out.size) + 1)) {
-        in.shift(2);
-        read(in, out.table[i]);
+void read_from(pn::file_view in, ColorTable* out) {
+    in.read(&out->seed, &out->flags, &out->size).check();
+    for (uint32_t i : range(uint32_t(out->size) + 1)) {
+        in.read(pn::pad(2)).check();
+        read_from(in, &out->table[i]);
     }
 }
 
-Json json(const ColorTable& color_table) {
-    StringMap<Json>                    specs;
+pn::value value(const ColorTable& color_table) {
+    pn::map                            m;
     typedef std::pair<uint16_t, Color> pair;
     for (const pair& p : color_table.table) {
-        String key(p.first);
-        specs[key] = json(p.second);
+        pn::string key = pn::format("{0}", p.first);
+        m[key]         = value(p.second);
     }
-    return Json::object(specs);
+    return std::move(m);
 }
 
-void read_from(ReadSource in, Color& out) {
-    read(in, out.red);
-    read(in, out.green);
-    read(in, out.blue);
+void read_from(pn::file_view in, Color* out) {
+    in.read(&out->red, &out->green, &out->blue).check();
 }
 
-sfz::Json json(const Color& spec) {
-    StringMap<Json> attributes;
-    attributes.insert(make_pair("red", Json::number(spec.red)));
-    attributes.insert(make_pair("green", Json::number(spec.green)));
-    attributes.insert(make_pair("blue", Json::number(spec.blue)));
-    return Json::object(attributes);
+pn::value value(const Color& spec) {
+    return pn::map{
+            {"r", spec.red / 65535.0 * 255},
+            {"g", spec.green / 65535.0 * 255},
+            {"b", spec.blue / 65535.0 * 255},
+    };
 }
 
 }  // namespace rezin

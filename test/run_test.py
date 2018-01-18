@@ -74,35 +74,19 @@ def test_convert_text(source):
 def test_convert_str(source):
     convert = lambda *args: subprocess.check_output(source + ["convert"] + list(map(str, args))).decode("utf-8")
 
-    assert convert("STR#", 128) == ("[\n"
-                                    "  \"STR#\",\n"
-                                    "  \"String\",\n"
-                                    "  \"List\",\n"
-                                    "  \"resource\",\n"
-                                    "  \"type\"\n"
-                                    "]")
+    assert convert("STR#", 128) == ("*\t\"STR#\"\n"
+                                    "*\t\"String\"\n"
+                                    "*\t\"List\"\n"
+                                    "*\t\"resource\"\n"
+                                    "*\t\"type\"\n")
 
 
 def test_convert_clut(source):
     convert = lambda *args: subprocess.check_output(source + ["convert"] + list(map(str, args))).decode("utf-8")
 
-    assert convert("clut", 128) == ("{\n"
-                                    "  \"0\": {\n"
-                                    "    \"blue\": 0,\n"
-                                    "    \"green\": 0,\n"
-                                    "    \"red\": 65535\n"
-                                    "  },\n"
-                                    "  \"1\": {\n"
-                                    "    \"blue\": 0,\n"
-                                    "    \"green\": 65535,\n"
-                                    "    \"red\": 0\n"
-                                    "  },\n"
-                                    "  \"2\": {\n"
-                                    "    \"blue\": 65535,\n"
-                                    "    \"green\": 0,\n"
-                                    "    \"red\": 0\n"
-                                    "  }\n"
-                                    "}")
+    assert convert("clut", 128) == ("0:  {r: 255.0, g: 0.0, b: 0.0}\n"
+                                    "1:  {r: 0.0, g: 255.0, b: 0.0}\n"
+                                    "2:  {r: 0.0, g: 0.0, b: 255.0}\n")
 
 
 def test_convert_snd(source):

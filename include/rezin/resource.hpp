@@ -28,15 +28,18 @@ class ResourceFork {
     //
     // @param [in] data     A block of memory containing the resource fork of a file.
     // @param [in] options  Miscellaneous options.
-    ResourceFork(const sfz::BytesSlice& data, const Options& options);
+    ResourceFork(const pn::data_view& data, const Options& options);
+
+    ResourceFork(ResourceFork&&) = default;
+    ResourceFork& operator=(ResourceFork&&) = default;
 
     ~ResourceFork();
 
     // Gets an individual resource type, e.g. "PICT" or "STR#".
     //
     // @param [in] code     The 4-character code of the resource type to get.
-    // @throws Exception    If the resource fork does not contain the given type.
-    const ResourceType& at(const sfz::StringSlice& code) const;
+    // @throws std::runtime_error    If the resource fork does not contain the given type.
+    const ResourceType& at(const pn::string_view& code) const;
 
     // STL-like iterator type.
     class const_iterator {
@@ -63,9 +66,9 @@ class ResourceFork {
 
       private:
         friend class ResourceFork;
-        const_iterator(sfz::StringMap<std::shared_ptr<ResourceType>>::const_iterator it)
+        const_iterator(sfz::StringMap<std::unique_ptr<ResourceType>>::const_iterator it)
                 : _it(it) {}
-        sfz::StringMap<std::shared_ptr<ResourceType>>::const_iterator _it;
+        sfz::StringMap<std::unique_ptr<ResourceType>>::const_iterator _it;
     };
     typedef const_iterator iterator;
 
@@ -75,9 +78,10 @@ class ResourceFork {
 
   private:
     // The map represented by this object.
-    sfz::StringMap<std::shared_ptr<ResourceType>> _types;
+    sfz::StringMap<std::unique_ptr<ResourceType>> _types;
 
-    DISALLOW_COPY_AND_ASSIGN(ResourceFork);
+    ResourceFork(const ResourceFork&) = delete;
+    ResourceFork& operator=(const ResourceFork&) = delete;
 };
 
 // Represents a collection of resources with the same type within the resource fork.
@@ -91,13 +95,13 @@ class ResourceType {
 
     // @returns             The four-character code of this resource type.  Is UTF-8 encoded; see
     //                      documentation for 'ResourceFork::at()' for ramifications.
-    const sfz::String& code() const;
+    const pn::string& code() const;
 
     // Gets an individual resource entry, e.g. "PICT 128" or "STR# 500".
     //
     // @param [in] id       The id of the resource entry to get.
     // @returns             A ResourceEntry object corresponding to `code`.
-    // @throws Exception    If the resource type does not contain the given ID.
+    // @throws std::runtime_error    If the resource type does not contain the given ID.
     const ResourceEntry& at(int16_t id) const;
 
     // STL-like iterator type.
@@ -121,9 +125,9 @@ class ResourceType {
 
       private:
         friend class ResourceType;
-        const_iterator(std::map<int16_t, std::shared_ptr<ResourceEntry>>::const_iterator it)
+        const_iterator(std::map<int16_t, std::unique_ptr<ResourceEntry>>::const_iterator it)
                 : _it(it) {}
-        std::map<int16_t, std::shared_ptr<ResourceEntry>>::const_iterator _it;
+        std::map<int16_t, std::unique_ptr<ResourceEntry>>::const_iterator _it;
     };
     typedef const_iterator iterator;
 
@@ -142,16 +146,17 @@ class ResourceType {
     // @param [in] data_data The block of data containing all resource data.
     // @param [in] options  Miscellaneous options.
     ResourceType(
-            const sfz::BytesSlice& type_data, int index, const sfz::BytesSlice& name_data,
-            const sfz::BytesSlice& data_data, const Options& options);
+            const pn::data_view& type_data, int index, const pn::data_view& name_data,
+            const pn::data_view& data_data, const Options& options);
 
     // The 4-character code of this resource type.
-    sfz::String _code;
+    pn::string _code;
 
     // The map represented by this object.
-    std::map<int16_t, std::shared_ptr<ResourceEntry>> _entries;
+    std::map<int16_t, std::unique_ptr<ResourceEntry>> _entries;
 
-    DISALLOW_COPY_AND_ASSIGN(ResourceType);
+    ResourceType(const ResourceType&) = delete;
+    ResourceType& operator=(const ResourceType&) = delete;
 };
 
 // Represents an individual entry within the resource fork.
@@ -166,10 +171,10 @@ class ResourceEntry {
 
     // @returns             The name of this entry (if any).  If the resource does not have a name,
     //                      returns the empty string.
-    const sfz::String& name() const;
+    const pn::string& name() const;
 
     // @returns             The block of data corresponding to this entry.
-    const sfz::BytesSlice& data() const;
+    const pn::data_view& data() const;
 
   private:
     friend class ResourceType;
@@ -182,19 +187,20 @@ class ResourceEntry {
     // @param [in] data_data The block of data containing all resource data.
     // @param [in] options  Miscellaneous options.
     ResourceEntry(
-            const sfz::BytesSlice& entry_data, int index, const sfz::BytesSlice& name_data,
-            const sfz::BytesSlice& data_data, const Options& options);
+            const pn::data_view& entry_data, int index, const pn::data_view& name_data,
+            const pn::data_view& data_data, const Options& options);
 
     // The ID of this resource entry.
     int16_t _id;
 
     // The name of this entry (if any).
-    sfz::String _name;
+    pn::string _name;
 
     // The block of data corresponding to this entry.
-    sfz::BytesSlice _data;
+    pn::data_view _data;
 
-    DISALLOW_COPY_AND_ASSIGN(ResourceEntry);
+    ResourceEntry(const ResourceEntry&) = delete;
+    ResourceEntry& operator=(const ResourceEntry&) = delete;
 };
 
 }  // namespace rezin
