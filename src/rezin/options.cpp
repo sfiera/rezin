@@ -5,55 +5,40 @@
 
 #include <rezin/options.hpp>
 
-using sfz::BytesSlice;
-using sfz::PrintTarget;
-using sfz::Rune;
-using sfz::String;
-using sfz::StringSlice;
 namespace macroman = sfz::macroman;
 
 namespace rezin {
 
 namespace {
 
-void convert_cr(String* string, const StringSlice& replacement) {
-    String result;
-    for (Rune r : *string) {
-        if (r == '\r') {
-            result.append(replacement);
+void convert_cr(pn::string* string, const pn::string_view& replacement) {
+    pn::string result;
+    for (pn::rune r : *string) {
+        if (r == pn::rune{'\r'}) {
+            result += replacement;
         } else {
-            result.append(1, r);
+            result += pn::rune{r};
         }
     }
-    swap(result, *string);
+    result.swap(*string);
 }
 
 }  // namespace
 
 Options::Options() : line_ending(NL) {}
 
-Options::EncodedString Options::decode(const sfz::BytesSlice& bytes) const {
-    EncodedString result = {bytes, line_ending};
+pn::string Options::decode(const pn::data_view& d) const {
+    pn::string result = macroman::decode(d);
+    switch (line_ending) {
+        case Options::CR: break;
+        case Options::NL: convert_cr(&result, "\n"); break;
+        case Options::CRNL: convert_cr(&result, "\r\n"); break;
+    }
     return result;
 }
 
-void print_to(PrintTarget out, const Options::EncodedString& encoded) {
-    String result;
-    switch (encoded.line_ending) {
-        case Options::CR: result.assign(macroman::decode(encoded.bytes)); break;
-        case Options::NL:
-            result.assign(macroman::decode(encoded.bytes));
-            convert_cr(&result, "\n");
-            break;
-        case Options::CRNL:
-            result.assign(macroman::decode(encoded.bytes));
-            convert_cr(&result, "\r\n");
-            break;
-    }
-    out.push(result);
-}
-
-bool store_argument(Options::LineEnding& to, StringSlice value, PrintTarget error) {
+/*
+bool store_argument(Options::LineEnding& to, pn::string_view value, PrintTarget error) {
     if (value == "cr") {
         to = Options::CR;
     } else if (value == "nl") {
@@ -67,5 +52,6 @@ bool store_argument(Options::LineEnding& to, StringSlice value, PrintTarget erro
     }
     return true;
 }
+*/
 
 }  // namespace rezin

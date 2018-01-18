@@ -26,6 +26,7 @@ static_library("librezin") {
     "//ext/libpng",
     "//ext/libsfz",
     "//ext/libzipxx",
+    "//ext/procyon:procyon-cpp",
   ]
   configs += [ ":librezin_private" ]
   public_configs = [ ":librezin_public" ]
@@ -43,6 +44,7 @@ executable("rezin") {
   ]
   deps = [
     ":librezin",
+    "//ext/procyon:procyon-cpp",
   ]
   configs += [ ":librezin_private" ]
 }

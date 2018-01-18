@@ -16,15 +16,17 @@ class ResourceFork;
 
 class ConvertCommand : public Command {
   public:
-    ConvertCommand(sfz::args::Parser& parser, Command*& command);
+    ConvertCommand();
 
+    virtual bool argument(pn::string_view arg);
     virtual void run(const ResourceFork& rsrc, const Options& options) const;
 
   private:
-    sfz::String _type;
-    int16_t     _id;
+    sfz::optional<pn::string> _type;
+    sfz::optional<int16_t>    _id;
 
-    DISALLOW_COPY_AND_ASSIGN(ConvertCommand);
+    ConvertCommand(const ConvertCommand&) = delete;
+    ConvertCommand& operator=(const ConvertCommand&) = delete;
 };
 
 }  // namespace rezin

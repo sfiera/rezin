@@ -6,6 +6,8 @@
 #ifndef REZIN_COMMAND_HPP_
 #define REZIN_COMMAND_HPP_
 
+#include <pn/fwd>
+
 namespace rezin {
 
 struct Options;
@@ -14,6 +16,7 @@ class ResourceFork;
 class Command {
   public:
     virtual ~Command() {}
+    virtual bool argument(pn::string_view arg)                               = 0;
     virtual void run(const ResourceFork& rsrc, const Options& options) const = 0;
 };
 

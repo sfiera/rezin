@@ -9,45 +9,38 @@
 #include <sfz/sfz.hpp>
 #include <vector>
 
-using sfz::Bytes;
-using sfz::BytesSlice;
-using sfz::Exception;
-using sfz::Json;
-using sfz::String;
-using sfz::format;
 using sfz::range;
-using sfz::read;
-using std::shared_ptr;
 using std::vector;
 
 namespace rezin {
 
-StringList::StringList(BytesSlice in, const Options& options) {
+StringList::StringList(pn::data_view in, const Options& options) {
+    pn::file f = in.open();
     uint16_t array_size;
-    read(in, array_size);
+    f.read(&array_size).check();
 
     for (uint16_t i : range(array_size)) {
-        static_cast<void>(i);
-        uint8_t data[255];
         uint8_t size;
-        read(in, size);
-        read(in, data, size);
-        Bytes                    utf8;
-        shared_ptr<const String> string(new String(options.decode(BytesSlice(data, size))));
-        strings.push_back(string);
+        f.read(&size).check();
+
+        pn::data data;
+        data.resize(size);
+        f.read(&data).check();
+
+        strings.push_back(options.decode(data));
     }
 
-    if (!in.empty()) {
-        throw Exception(format("{0} extra bytes at end of 'STR#' resource.", in.size()));
+    if (!f.read(pn::pad(1)).eof()) {
+        throw std::runtime_error(pn::format("extra bytes at end of 'STR#' resource.").c_str());
     }
 }
 
-Json json(const StringList& strings) {
-    vector<Json> array;
-    for (const shared_ptr<const String>& string : strings.strings) {
-        array.push_back(Json::string(*string));
+pn::value value(const StringList& strings) {
+    pn::array a;
+    for (const pn::string& string : strings.strings) {
+        a.push_back(string.copy());
     }
-    return Json::array(array);
+    return std::move(a);
 }
 
 }  // namespace rezin

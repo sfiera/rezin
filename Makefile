@@ -1,4 +1,4 @@
-NINJA=ninja -C out/cur
+NINJA=build/lib/bin/ninja -C out/cur
 
 .PHONY: all
 all:
@@ -15,4 +15,3 @@ clean:
 .PHONY: distclean
 distclean:
 	rm -Rf out/
-	rm -f build/lib/scripts/gn

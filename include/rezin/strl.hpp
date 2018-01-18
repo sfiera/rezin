@@ -14,12 +14,12 @@ namespace rezin {
 struct Options;
 
 struct StringList {
-    StringList(sfz::BytesSlice in, const Options& options);
+    StringList(pn::data_view in, const Options& options);
 
-    std::vector<std::shared_ptr<const sfz::String>> strings;
+    std::vector<pn::string> strings;
 };
 
-sfz::Json json(const StringList& strings);
+pn::value value(const StringList& strings);
 
 }  // namespace rezin
 

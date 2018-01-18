@@ -35,11 +35,6 @@ def main():
     args = parser.parse_args()
 
     check_submodules()
-    if not check_gn():
-        print("\nYou don't seem to have gn(1). Run:")
-        print("  $ build/lib/scripts/download-gn.py")
-        sys.exit(1)
-
     check_host()
     check_target(args)
 
@@ -58,6 +53,7 @@ def check_submodules():
         "ext/libpng",
         "ext/libsfz",
         "ext/libzipxx",
+        "ext/procyon",
     ]
     missing = False
     for module in REQUIRED_SUBMODULES:
@@ -67,8 +63,7 @@ def check_submodules():
 
     if missing:
         print("Some submodules are missing. Run:")
-        print("  $ git submodule init")
-        print("  $ git submodule update")
+        print("  $ git submodule update --init")
         sys.exit(1)
 
 
@@ -78,7 +73,7 @@ def check_host():
             msg(cfg.host_os(), color="green")
         else:
             msg(cfg.host_os(), color="red")
-            print("\nSorry! libsfz requires Mac OS X or Linux")
+            print("\nSorry! rezin requires Mac OS X or Linux")
             sys.exit(1)
 
 
@@ -114,10 +109,6 @@ def check_mac(args):
                 "* Xcode can be installed via the App Store:\n"
                 "    https://itunes.apple.com/en/app/xcode/id497799835\n"
                 "  After installing, open it and accept the license agreement\n")
-    if not check_ninja():
-        missing["ninja"] = (
-                "* ninja can be installed with Homebrew:\n"
-                "    $ brew install ninja\n")
 
     if missing:
         print("\nmissing dependencies: %s\n" % " ".join(missing.keys()))
@@ -140,8 +131,10 @@ def check_linux_native(args):
     missing = collections.OrderedDict()
     if not check_clang("clang++"):
         missing["clang"] = "clang"
-    if not check_ninja():
-        missing["ninja"] = "ninja-build"
+    if not check_libcxx("clang++"):
+        missing["libc++"] = "libc++-dev"
+    if not check_libcxxabi("clang++"):
+        missing["libc++abi"] = "libc++abi-dev"
 
     if missing:
         print("\nmissing dependencies: %s" % " ".join(missing.keys()))
@@ -155,10 +148,6 @@ def check_linux_native(args):
 
 def check_mac_on_linux(args):
     missing = collections.OrderedDict()
-    if not check_ninja():
-        missing["ninja"] = (
-                "* On Ubuntu, ninja can be installed with:\n"
-                "    $ sudo apt-get install ninja-build")
     if not (check_clang("x86_64-apple-darwin15-clang++") and
             check_libcxx("x86_64-apple-darwin15-clang++")):
         missing["osxcross"] = (
@@ -191,19 +180,17 @@ def check_libcxx(executable=""):
             input="#include <chrono>\n\nint main() { return std::chrono::seconds(1).count(); }")
 
 
-def check_gn():
-    """Run gn --version."""
-    return cfg.check_bin("build/lib/scripts/gn --version".split(), what="gn")
+def check_libcxxabi(executable=""):
+    """Compile a basic C++11, libc++ binary, including cxxabi.h.
 
-
-def check_ninja():
-    """Run ninja --version.
-
-    GNU Ninja doesn't have a --version flag, so this check should fail
-    if the user accidentally installed ninja instead of ninja-build.
+    Pass -I/usr/include/libcxxabi explicitly to work around a broken
+    environment on Ubuntu.
     """
-    return (cfg.check_bin("ninja --version".split()) or
-            cfg.check_bin("ninja-build --version".split()))
+    executable = executable or "clang++"
+    return cfg.check_bin(
+            ("%s -x c++ -std=c++11 -stdlib=libc++ -I/usr/include/libcxxabi - -o /dev/null" % executable).split(),
+            what="libc++abi",
+            input="#include <cxxabi.h>\n\nint main() { return 0; }")
 
 
 if __name__ == "__main__":

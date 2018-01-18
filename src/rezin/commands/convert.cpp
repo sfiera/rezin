@@ -9,66 +9,57 @@
 #include <unistd.h>
 #include <rezin/rezin.hpp>
 
-using sfz::Bytes;
-using sfz::BytesSlice;
-using sfz::Exception;
-using sfz::Json;
-using sfz::String;
-using sfz::StringSlice;
-using sfz::args::store;
-using sfz::args::store_const;
-using sfz::format;
-using sfz::string_to_int;
-using std::vector;
-
 namespace args = sfz::args;
-namespace io   = sfz::io;
-namespace utf8 = sfz::utf8;
 
 namespace rezin {
 
-ConvertCommand::ConvertCommand(args::Parser& parser, Command*& command) {
-    args::Parser& convert =
-            parser.add_subparser("convert", "convert resource", store_const(command, this));
-    convert.add_argument("type", store(_type)).required();
-    convert.add_argument("id", store(_id)).required();
+ConvertCommand::ConvertCommand() = default;
+
+bool ConvertCommand::argument(pn::string_view arg) {
+    if (!_type.has_value()) {
+        _type.emplace(arg.copy());
+    } else if (!_id.has_value()) {
+        args::integer_option(arg, &_id);
+    } else {
+        return false;
+    }
+    return true;
 }
 
 void ConvertCommand::run(const ResourceFork& rsrc, const Options& options) const {
-    const ResourceEntry& entry = rsrc.at(_type).at(_id);
-    BytesSlice           data  = entry.data();
-    Bytes                converted;
+    const ResourceEntry& entry = rsrc.at(*_type).at(*_id);
+    pn::data_view        data  = entry.data();
+    pn::data             converted;
 
-    if (_type == "snd ") {
+    if (*_type == "snd ") {
         Sound snd(data);
-        write(converted, aiff(snd));
-    } else if (_type == "TEXT") {
-        String string(options.decode(data));
-        converted.assign(utf8::encode(string));
-    } else if (_type == "STR#") {
+        converted = aiff(snd);
+    } else if (*_type == "TEXT") {
+        pn::string string(options.decode(data));
+        converted = string.as_data().copy();
+    } else if (*_type == "STR#") {
         StringList string_list(data, options);
-        Json       list = json(string_list);
-        String     decoded_string(pretty_print(list));
-        converted.assign(utf8::encode(decoded_string));
-    } else if (_type == "cicn") {
+        pn::value  list           = value(string_list);
+        pn::string decoded_string = pn::dump(list);
+        converted                 = decoded_string.as_data().copy();
+    } else if (*_type == "cicn") {
         ColorIcon cicn(data);
-        write(converted, png(cicn));
-    } else if (_type == "clut") {
+        converted = png(cicn);
+    } else if (*_type == "clut") {
         ColorTable clut(data);
-        Json       list = json(clut);
-        String     decoded_string(pretty_print(list));
-        converted.assign(utf8::encode(decoded_string));
-    } else if (_type == "PICT") {
+        pn::value  list           = value(clut);
+        pn::string decoded_string = pn::dump(list);
+        converted                 = decoded_string.as_data().copy();
+    } else if (*_type == "PICT") {
         Picture pict(data);
-        write(converted, png(pict));
+        converted = png(pict);
     } else {
-        print(io::err,
-              format("warning: printing unknown resource type {0} as raw data.\n", quote(_type)));
-        converted.assign(data.data(), data.size());
+        pn::format(
+                stderr, "warning: printing unknown resource type {0} as raw data.\n",
+                pn::dump(*_type, pn::dump_short));
+        converted = data.copy();
     }
-    if (write(1, converted.data(), converted.size()) < 0) {
-        // TODO(sfiera): handle result properly.
-    }
+    pn::file_view{stdout}.write(converted).check();
 }
 
 }  // namespace rezin

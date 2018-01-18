@@ -15,7 +15,7 @@ struct PngPicture;
 struct Picture {
     struct Rep;
 
-    Picture(sfz::BytesSlice in);
+    Picture(pn::data_view in);
     ~Picture();
 
     bool    is_raster() const;
@@ -24,12 +24,7 @@ struct Picture {
     std::shared_ptr<Rep> rep;
 };
 
-PngPicture png(const Picture& pict);
-
-struct PngPicture {
-    const Picture& pict;
-};
-void write_to(sfz::WriteTarget out, PngPicture png);
+pn::data png(const Picture& pict);
 
 }  // namespace rezin
 

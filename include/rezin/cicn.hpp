@@ -6,7 +6,8 @@
 #ifndef REZIN_CICN_HPP_
 #define REZIN_CICN_HPP_
 
-#include <sfz/sfz.hpp>
+#include <memory>
+#include <pn/fwd>
 
 namespace rezin {
 
@@ -15,18 +16,13 @@ struct PngColorIcon;
 struct ColorIcon {
     struct Rep;
 
-    ColorIcon(sfz::BytesSlice in);
+    ColorIcon(pn::data_view in);
     ~ColorIcon();
 
-    std::shared_ptr<Rep> rep;
+    std::unique_ptr<Rep> rep;
 };
 
-PngColorIcon png(const ColorIcon& cicn);
-
-struct PngColorIcon {
-    const ColorIcon& cicn;
-};
-void write_to(sfz::WriteTarget out, PngColorIcon png);
+pn::data png(const ColorIcon& cicn);
 
 }  // namespace rezin
 

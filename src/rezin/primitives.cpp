@@ -11,30 +11,16 @@
 #include <sfz/sfz.hpp>
 #include <vector>
 
-using sfz::Bytes;
-using sfz::BytesSlice;
-using sfz::Exception;
-using sfz::Json;
-using sfz::ReadSource;
-using sfz::StringMap;
-using sfz::format;
-using sfz::read;
-using std::unique_ptr;
-using std::vector;
-
 namespace rezin {
 
 int16_t Rect::width() const { return right - left; }
 
 int16_t Rect::height() const { return bottom - top; }
 
-Json Rect::to_json() const {
-    StringMap<Json> result;
-    result["top"]    = Json::number(top);
-    result["left"]   = Json::number(left);
-    result["bottom"] = Json::number(bottom);
-    result["right"]  = Json::number(right);
-    return Json::object(result);
+pn::value Rect::to_value() const {
+    return pn::map{
+            {"top", top}, {"left", left}, {"bottom", bottom}, {"right", right},
+    };
 }
 
 bool operator==(const Rect& x, const Rect& y) {
@@ -44,18 +30,15 @@ bool operator==(const Rect& x, const Rect& y) {
 
 bool operator!=(const Rect& x, const Rect& y) { return !(x == y); }
 
-void read_from(ReadSource in, Rect& out) {
-    read(in, out.top);
-    read(in, out.left);
-    read(in, out.bottom);
-    read(in, out.right);
+void read_from(pn::file_view in, Rect* out) {
+    in.read(&out->top, &out->left, &out->bottom, &out->right).check();
 }
 
 double fixed32_t::to_double() const { return int_value / 65536.0; }
 
-Json fixed32_t::to_json() const { return Json::number(to_double()); }
+pn::value fixed32_t::to_value() const { return to_double(); }
 
-void read_from(ReadSource in, fixed32_t& out) { read(in, out.int_value); }
+void read_from(pn::file_view in, fixed32_t* out) { in.read(&out->int_value).check(); }
 
 namespace {
 
@@ -74,7 +57,7 @@ enum {
 
 AlphaColor lookup(const ColorTable& clut, uint16_t index) {
     if (clut.table.find(index) == clut.table.end()) {
-        throw Exception("invalid color index");
+        return AlphaColor(0, 0, 0, 0);
     }
     const Color& color = clut.table.find(index)->second;
     return AlphaColor(color.red >> 8, color.green >> 8, color.blue >> 8);
@@ -82,21 +65,21 @@ AlphaColor lookup(const ColorTable& clut, uint16_t index) {
 
 }  // namespace
 
-void PixMap::read_image(
-        sfz::ReadSource in, const ColorTable& clut, unique_ptr<RasterImage>& image) const {
+std::unique_ptr<RasterImage> PixMap::read_image(pn::file_view in, const ColorTable& clut) const {
     if (pixel_type == RGB_DIRECT) {
-        return read_direct_image(in, image);
+        return read_direct_image(in);
     }
-    image.reset(new RasterImage(bounds));
+    std::unique_ptr<RasterImage> image(new RasterImage(bounds));
     if (row_bytes == 0) {
-        return;
+        return image;
     }
-    size_t bytes_read = 0;
-    Bytes  bytes(row_bytes, '\0');
+    size_t   bytes_read = 0;
+    pn::data d;
+    d.resize(row_bytes);
     for (int y = 0; y < bounds.height(); ++y) {
-        in.shift(bytes.data(), bytes.size());
-        bytes_read += bytes.size();
-        BitsSlice bits(bytes);
+        in.read(&d).check();
+        bytes_read += d.size();
+        BitsSlice bits(d);
         for (int x = 0; x < bounds.width(); ++x) {
             uint8_t value;
             bits.shift(&value, pixel_size);
@@ -104,89 +87,112 @@ void PixMap::read_image(
         }
     }
     if ((bytes_read % 2) != 0) {
-        in.shift(1);
+        in.read(pn::pad(1)).check();
     }
+    return image;
 }
 
-void PixMap::read_direct_image(ReadSource in, unique_ptr<RasterImage>& image) const {
+std::unique_ptr<RasterImage> PixMap::read_direct_image(pn::file_view in) const {
     if (pixel_type != RGB_DIRECT) {
-        throw Exception("image is not direct");
+        throw std::runtime_error("image is not direct");
     }
     if (pack_type != 4) {
-        throw Exception(format("unsupported pack_type {0}", pack_type));
+        throw std::runtime_error(pn::format("unsupported pack_type {0}", pack_type).c_str());
     }
-    image.reset(new RasterImage(bounds));
+    std::unique_ptr<RasterImage> image(new RasterImage(bounds));
     if (row_bytes == 0) {
-        return;
+        return image;
     }
     size_t bytes_read = 0;
     for (int y = 0; y < bounds.height(); ++y) {
-        Bytes bytes;
+        pn::data d;
         if (row_bytes <= 250) {
-            bytes.resize(read<uint8_t>(in));
+            uint8_t size;
+            in.read(&size).check();
+            d.resize(size);
             bytes_read += 1;
         } else {
-            bytes.resize(read<uint16_t>(in));
+            uint16_t size;
+            in.read(&size).check();
+            d.resize(size);
             bytes_read += 2;
         }
-        in.shift(bytes.data(), bytes.size());
-        bytes_read += bytes.size();
+        in.read(&d).check();
+        bytes_read += d.size();
 
-        BytesSlice remainder(bytes);
-        Bytes      components;
-        while (!remainder.empty()) {
-            uint8_t header = read<uint8_t>(remainder);
+        pn::data components;
+        pn::file remainder = d.open();
+        while (true) {
+            uint8_t header;
+            if (remainder.read(&header).eof()) {
+                break;
+            }
+            remainder.check();
             if (header >= 0x80) {
-                components.push(0x101 - header, read<uint8_t>(remainder));
+                uint8_t value;
+                remainder.read(&value).check();
+                for (int i = 0; i < (0x101 - header); ++i) {
+                    components.append(&value, 1);
+                }
             } else {
-                size_t size = header + 1;
-                components.push(size, '\0');
-                uint8_t* data = components.data() + components.size() - size;
-                remainder.shift(data, size);
+                pn::data d;
+                d.resize(header + 1);
+                remainder.read(&d).check();
+                components += d;
             }
         }
-        const int16_t    w     = bounds.width();
-        const BytesSlice red   = components.slice((cmp_count - 3) * w, w);
-        const BytesSlice green = components.slice((cmp_count - 2) * w, w);
-        const BytesSlice blue  = components.slice((cmp_count - 1) * w);
+        const int16_t       w     = bounds.width();
+        const pn::data_view red   = components.slice((cmp_count - 3) * w, w);
+        const pn::data_view green = components.slice((cmp_count - 2) * w, w);
+        const pn::data_view blue  = components.slice((cmp_count - 1) * w);
         for (int x = 0; x < w; ++x) {
-            image->set(x, y, AlphaColor(red.at(x), green.at(x), blue.at(x)));
+            image->set(x, y, AlphaColor(red[x], green[x], blue[x]));
         }
     }
     if ((bytes_read % 2) != 0) {
-        in.shift(1);
+        in.read(pn::pad(1)).check();
     }
+    return image;
 }
 
-void PixMap::read_packed_image(
-        sfz::ReadSource in, const ColorTable& clut, unique_ptr<RasterImage>& image) const {
+std::unique_ptr<RasterImage> PixMap::read_packed_image(
+        pn::file_view in, const ColorTable& clut) const {
     if (pixel_type != INDEXED) {
-        throw Exception("image is not indexed");
+        throw std::runtime_error("image is not indexed");
     }
-    image.reset(new RasterImage(bounds));
+    std::unique_ptr<RasterImage> image(new RasterImage(bounds));
     if (row_bytes == 0) {
-        return;
+        return image;
     }
     size_t bytes_read = 0;
     for (int y = 0; y < bounds.height(); ++y) {
-        Bytes bytes;
+        pn::data d;
         if (row_bytes <= 250) {
-            bytes.resize(read<uint8_t>(in));
+            uint8_t size;
+            in.read(&size).check();
+            d.resize(size);
             bytes_read += 1;
         } else {
-            bytes.resize(read<uint16_t>(in));
+            uint16_t size;
+            in.read(&size).check();
+            d.resize(size);
             bytes_read += 2;
         }
-        in.shift(bytes.data(), bytes.size());
-        bytes_read += bytes.size();
+        in.read(&d).check();
+        bytes_read += d.size();
 
-        int32_t    x         = 0;
-        BytesSlice remainder = bytes;
-        while (!remainder.empty()) {
-            uint8_t header = read<uint8_t>(remainder);
+        int32_t  x         = 0;
+        pn::file remainder = d.open();
+        while (true) {
+            uint8_t header;
+            if (remainder.read(&header).eof()) {
+                break;
+            }
+            remainder.check();
             if (header >= 0x80) {
-                uint8_t value = read<uint8_t>(remainder);
-                uint8_t size  = 0x101 - header;
+                uint8_t value;
+                remainder.read(&value).check();
+                uint8_t size = 0x101 - header;
                 for (int j = 0; j < size; ++j) {
                     if (x < bounds.width()) {
                         image->set(x + bounds.left, y + bounds.top, lookup(clut, value));
@@ -197,7 +203,8 @@ void PixMap::read_packed_image(
                 uint8_t size = header + 1;
                 for (int j = 0; j < size; ++j) {
                     if (x < bounds.width()) {
-                        uint8_t value = read<uint8_t>(remainder);
+                        uint8_t value;
+                        remainder.read(&value);
                         image->set(x + bounds.left, y + bounds.top, lookup(clut, value));
                     }
                     ++x;
@@ -206,117 +213,116 @@ void PixMap::read_packed_image(
         }
     }
     if ((bytes_read % 2 == 1)) {
-        in.shift(1);
+        in.read(pn::pad(1)).check();
     }
+    return image;
 }
 
-void read_from(ReadSource in, PixMap& out) {
-    read(in, out.row_bytes);
-    out.row_bytes &= 0x3fff;
-    read(in, out.bounds);
-    read(in, out.pm_version);
-    read(in, out.pack_type);
-    read(in, out.pack_size);
-    read(in, out.h_res);
-    read(in, out.v_res);
-    read(in, out.pixel_type);
-    read(in, out.pixel_size);
-    read(in, out.cmp_count);
-    read(in, out.cmp_size);
-    read(in, out.plane_bytes);
-    read(in, out.pm_table);
-    read(in, out.pm_reserved);
+void read_from(pn::file_view in, PixMap* out) {
+    in.read(&out->row_bytes).check();
+    out->row_bytes &= 0x3fff;
+    read_from(in, &out->bounds);
+    in.read(&out->pm_version, &out->pack_type, &out->pack_size).check();
+    read_from(in, &out->h_res);
+    read_from(in, &out->v_res);
+    in.read(&out->pixel_type, &out->pixel_size, &out->cmp_count, &out->cmp_size, &out->plane_bytes,
+            &out->pm_table, &out->pm_reserved)
+            .check();
 
-    if (out.pm_reserved != 0) {
-        throw Exception("PixMap::pm_reserved must be 0");
+    if (out->pm_reserved != 0) {
+        throw std::runtime_error("PixMap::pm_reserved must be 0");
     }
 
-    switch (out.pixel_type) {
+    switch (out->pixel_type) {
         case INDEXED: {
-            switch (out.pixel_size) {
+            switch (out->pixel_size) {
                 case 1:
                 case 2:
                 case 4:
                 case 8: break;
 
                 default:
-                    throw Exception(
-                            format("indexed pixels may not have size {0}", out.pixel_size));
+                    throw std::runtime_error(
+                            pn::format("indexed pixels may not have size {0}", out->pixel_size)
+                                    .c_str());
             }
-            if ((out.pack_type != 0) || (out.pack_size != 0)) {
-                throw Exception("indexed pixels may not be packed");
+            if ((out->pack_type != 0) || (out->pack_size != 0)) {
+                throw std::runtime_error("indexed pixels may not be packed");
             }
-            if ((out.cmp_count != 1) || (out.cmp_size != out.pixel_size)) {
-                throw Exception("indexed pixels must have one component");
+            if ((out->cmp_count != 1) || (out->cmp_size != out->pixel_size)) {
+                throw std::runtime_error("indexed pixels must have one component");
             }
             break;
         }
 
         case RGB_DIRECT: {
-            switch (out.pixel_size) {
+            switch (out->pixel_size) {
                 case 16: {
-                    throw Exception(format("unsupported pixel_size {0}", out.pixel_size));
+                    throw std::runtime_error(
+                            pn::format("unsupported pixel_size {0}", out->pixel_size).c_str());
                     break;
                 }
 
                 case 32: {
-                    if (out.cmp_size != 8) {
-                        throw Exception("32-bit direct pixels must have cmp_size 8");
+                    if (out->cmp_size != 8) {
+                        throw std::runtime_error("32-bit direct pixels must have cmp_size 8");
                     }
                     break;
                 }
 
                 default: {
-                    throw Exception(format("direct pixels may not have size {0}", out.pixel_size));
+                    throw std::runtime_error(
+                            pn::format("direct pixels may not have size {0}", out->pixel_size)
+                                    .c_str());
                 }
             }
-            if ((out.cmp_count != 3) && (out.cmp_count != 4)) {
-                throw Exception("direct pixels must have three or four components");
+            if ((out->cmp_count != 3) && (out->cmp_count != 4)) {
+                throw std::runtime_error("direct pixels must have three or four components");
             }
             break;
         }
 
-        default: { throw Exception(format("illegal PixMap pixel_type {0}", out.pixel_type)); }
+        default: {
+            throw std::runtime_error(
+                    pn::format("illegal PixMap pixel_type {0}", out->pixel_type).c_str());
+        }
     }
 }
 
-void read_from(ReadSource in, AddressedPixMap& out) {
-    read(in, out.base_addr);
-    PixMap& parent = out;
-    read(in, parent);
+void read_from(pn::file_view in, AddressedPixMap* out) {
+    in.read(&out->base_addr).check();
+    PixMap* parent = out;
+    read_from(in, parent);
 }
 
-Json BitMap::to_json() const {
-    StringMap<Json> result;
-    result["bounds"] = bounds.to_json();
-    return Json::object(result);
-}
+pn::value BitMap::to_value() const { return pn::map{{"bounds", bounds.to_value()}}; }
 
-void BitMap::read_image(
-        ReadSource in, AlphaColor on, AlphaColor off, unique_ptr<RasterImage>& image) const {
-    image.reset(new RasterImage(bounds));
+std::unique_ptr<RasterImage> BitMap::read_image(
+        pn::file_view in, AlphaColor on, AlphaColor off) const {
+    std::unique_ptr<RasterImage> image(new RasterImage(bounds));
     if (row_bytes == 0) {
-        return;
+        return image;
     }
-    Bytes bytes(row_bytes, '\0');
+    pn::data d;
+    d.resize(row_bytes);
     for (int y = 0; y < bounds.height(); ++y) {
-        in.shift(bytes.data(), bytes.size());
-        BitsSlice bits(bytes);
+        in.read(&d).check();
+        BitsSlice bits(d);
         for (int x = 0; x < bounds.width(); ++x) {
             uint8_t value;
             bits.shift(&value, 1);
             image->set(x + bounds.left, y + bounds.top, value ? on : off);
         }
     }
+    return image;
 }
 
-void read_from(ReadSource in, BitMap& out) {
-    read(in, out.base_addr);
-    read(in, out.row_bytes);
-    read(in, out.bounds);
+void read_from(pn::file_view in, BitMap* out) {
+    in.read(&out->base_addr, &out->row_bytes).check();
+    read_from(in, &out->bounds);
 
-    if (out.base_addr != 0) {
-        throw Exception("PixMap::base_addr must be 0");
+    if (out->base_addr != 0) {
+        throw std::runtime_error("PixMap::base_addr must be 0");
     }
 }
 

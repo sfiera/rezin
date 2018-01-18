@@ -6,30 +6,29 @@
 #ifndef REZIN_SOURCES_ZIP_HPP_
 #define REZIN_SOURCES_ZIP_HPP_
 
+#include <rezin/source.hpp>
 #include <sfz/sfz.hpp>
 #include <zipxx/zipxx.hpp>
 
 namespace rezin {
 
-class ZipSource {
+class ZipSource : public Source {
   public:
-    ZipSource();
+    ZipSource(pn::string_view arg);
     ~ZipSource();
 
-    void            load(sfz::StringSlice zip_file, sfz::StringSlice file_path);
-    sfz::BytesSlice data() const;
+    void          load() override;
+    pn::data_view data() const override;
 
   private:
-    friend void swap(ZipSource& x, ZipSource& y);
-
+    pn::string _zip_path;
+    pn::string _file_path;
     struct Contents;
     std::unique_ptr<Contents> _contents;
 
-    DISALLOW_COPY_AND_ASSIGN(ZipSource);
+    ZipSource(const ZipSource&) = delete;
+    ZipSource& operator=(const ZipSource&) = delete;
 };
-
-void swap(ZipSource& x, ZipSource& y);
-bool store_argument(ZipSource& to, sfz::StringSlice value, sfz::PrintTarget error);
 
 }  // namespace rezin
 

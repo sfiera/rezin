@@ -8,12 +8,8 @@
 #include <arpa/inet.h>
 #include <sfz/sfz.hpp>
 
-using sfz::BytesSlice;
-using sfz::Exception;
-using sfz::format;
 using sfz::hex;
 using sfz::range;
-using sfz::read;
 
 namespace rezin {
 
@@ -42,11 +38,11 @@ enum AppleSingleVersion {
 
 }  // namespace
 
-AppleSingle::AppleSingle(const BytesSlice& data) {
-    bool       little_endian = false;
-    BytesSlice remainder(data);
-    uint32_t   magic;
-    read(remainder, magic);
+AppleSingle::AppleSingle(const pn::data_view& data) {
+    bool     little_endian = false;
+    pn::file remainder     = data.open();
+    uint32_t magic;
+    remainder.read(&magic).check();
     switch (magic) {
         case APPLE_SINGLE_MAGIC:
         case APPLE_DOUBLE_MAGIC: break;
@@ -54,21 +50,21 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
         case APPLE_SINGLE_CIGAM:
         case APPLE_DOUBLE_CIGAM: little_endian = true; break;
 
-        default: throw Exception(format("invalid magic number 0x{0}.", hex(magic, 8)));
+        default:
+            throw std::runtime_error(
+                    pn::format("invalid magic number 0x{0}.", hex(magic, 8)).c_str());
     }
 
     uint32_t version;
-    read(remainder, version);
+    remainder.read(&version).check();
     if (little_endian) {
         version = htonl(version);
     }
 
     switch (version) {
         case APPLE_SINGLE_VERSION_2: {
-            remainder.shift(16);
-
             uint16_t entry_count;
-            read(remainder, entry_count);
+            remainder.read(pn::pad(16), &entry_count).check();
             if (little_endian) {
                 entry_count = htons(entry_count);
             }
@@ -78,9 +74,7 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
                 uint32_t id;
                 uint32_t offset;
                 uint32_t length;
-                read(remainder, id);
-                read(remainder, offset);
-                read(remainder, length);
+                remainder.read(&id, &offset, &length).check();
 
                 if (little_endian) {
                     id     = htonl(id);
@@ -92,14 +86,16 @@ AppleSingle::AppleSingle(const BytesSlice& data) {
             }
         } break;
 
-        default: throw Exception(format("unknown version {0}.", version / 65536.0));
+        default:
+            throw std::runtime_error(
+                    pn::format("unknown version {0}.", version / 65536.0).c_str());
     }
 }
 
-const BytesSlice& AppleSingle::at(uint32_t id) {
-    std::map<uint32_t, BytesSlice>::const_iterator it = _entries.find(id);
+const pn::data_view& AppleSingle::at(uint32_t id) {
+    std::map<uint32_t, pn::data_view>::const_iterator it = _entries.find(id);
     if (it == _entries.end()) {
-        throw Exception(format("no such id '{0}'", id));
+        throw std::runtime_error(pn::format("no such id '{0}'", id).c_str());
     }
     return it->second;
 }

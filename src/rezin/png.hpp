@@ -13,7 +13,7 @@ namespace rezin {
 
 class PngWriter {
   public:
-    PngWriter(sfz::WriteTarget& out, int32_t width, int32_t height);
+    PngWriter(pn::file_view out, int32_t width, int32_t height);
     ~PngWriter();
 
     // Appends a single pixel to out, with the given color components.
@@ -21,15 +21,15 @@ class PngWriter {
     void append_pixel(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha);
 
   private:
-    sfz::WriteTarget& _out;
-    const int32_t     _width;
-    const int32_t     _height;
+    pn::file_view _out;
+    const int32_t _width;
+    const int32_t _height;
 
     png_struct* _png;
     png_info*   _info;
 
-    sfz::Bytes _row_data;
-    int32_t    _pixel_index;
+    pn::data _row_data;
+    int32_t  _pixel_index;
 };
 
 }  // namespace rezin

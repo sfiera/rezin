@@ -16,17 +16,8 @@ struct Options {
     enum LineEnding { CR, NL, CRNL };
     LineEnding line_ending;
 
-    struct EncodedString;
-    EncodedString decode(const sfz::BytesSlice& bytes) const;
+    pn::string decode(const pn::data_view& bytes) const;
 };
-
-struct Options::EncodedString {
-    const sfz::BytesSlice& bytes;
-    LineEnding             line_ending;
-};
-void print_to(sfz::PrintTarget out, const Options::EncodedString& encoded);
-
-bool store_argument(Options::LineEnding& to, sfz::StringSlice value, sfz::PrintTarget error);
 
 }  // namespace rezin
 

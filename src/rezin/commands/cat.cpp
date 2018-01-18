@@ -9,32 +9,27 @@
 #include <unistd.h>
 #include <rezin/resource.hpp>
 
-using sfz::BytesSlice;
-using sfz::Exception;
-using sfz::StringSlice;
-using sfz::format;
-using sfz::args::store;
-using sfz::args::store_const;
-using sfz::string_to_int;
-using std::vector;
-
 namespace args = sfz::args;
 
 namespace rezin {
 
-CatCommand::CatCommand(args::Parser& parser, Command*& command) {
-    args::Parser& cat =
-            parser.add_subparser("cat", "print binary resource data", store_const(command, this));
-    cat.add_argument("type", store(_type)).required();
-    cat.add_argument("id", store(_id)).required();
+CatCommand::CatCommand() = default;
+
+bool CatCommand::argument(pn::string_view arg) {
+    if (!_type.has_value()) {
+        _type.emplace(arg.copy());
+    } else if (!_id.has_value()) {
+        args::integer_option(arg, &_id);
+    } else {
+        return false;
+    }
+    return true;
 }
 
 void CatCommand::run(const ResourceFork& rsrc, const Options& options) const {
-    const ResourceEntry& entry = rsrc.at(_type).at(_id);
-    BytesSlice           data  = entry.data();
-    if (write(1, data.data(), data.size()) < 0) {
-        // TODO(sfiera): handle result properly.
-    }
+    const ResourceEntry& entry = rsrc.at(*_type).at(*_id);
+    pn::data_view        data  = entry.data();
+    pn::file_view{stdout}.write(data).check();
 }
 
 }  // namespace rezin

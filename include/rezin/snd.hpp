@@ -21,9 +21,9 @@ struct AiffSound;
 // [0, 255].
 //
 // @param [in] in       The content of a 'snd ' resource.
-// @throws Exception    If the 'snd ' data could not be read.
+// @throws std::runtime_error    If the 'snd ' data could not be read.
 struct Sound {
-    Sound(sfz::BytesSlice in);
+    Sound(pn::data_view in);
 
     uint16_t             fmt;
     uint32_t             channels;
@@ -37,12 +37,7 @@ struct Sound {
 // Sound data is required to be as returned by read_snd().  It would be possible for us to
 // interpret a wider range of sound data (e.g. "sample_bits" of 16) but currently we observe the
 // same restrictions on input as read_snd() does on output.
-AiffSound aiff(const Sound& sound);
-
-struct AiffSound {
-    const Sound& sound;
-};
-void write_to(sfz::WriteTarget out, AiffSound aiff);
+pn::data aiff(const Sound& sound);
 
 }  // namespace rezin
 
